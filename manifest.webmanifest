@@ -1,0 +1,18 @@
+{
+  "name": "Muevete CB — Ciudad Bolívar",
+  "short_name": "Muevete CB",
+  "description": "Prototipo accesible para comparar rutas y recibir reportes ciudadanos.",
+  "lang": "es-CO",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f5ed",
+  "theme_color": "#062f2b",
+  "icons": [
+    {
+      "src": "assets/muevete-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

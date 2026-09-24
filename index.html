@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#092f2b">
+  <meta name="description" content="Muevete CB: prototipo accesible para comparar rutas formales e informales y visualizar reportes ciudadanos en Ciudad Bolívar.">
+  <title>Muevete CB — Tu camino, sin adivinar</title>
+  <link rel="icon" href="assets/muevete-icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="vendor/leaflet/leaflet.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#contenido" aria-label="Muevete CB, inicio">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 44 44" role="img">
+            <path d="M11 29c0-8 5-11 11-11 5 0 8-3 8-7"/>
+            <circle cx="11" cy="31" r="4"/>
+            <circle cx="32" cy="10" r="4"/>
+            <path d="M19 31h9"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <strong>Muevete</strong>
+          <small>Ciudad Bolívar</small>
+        </span>
+      </a>
+
+      <div class="topbar-actions">
+        <span class="mode-pill"><span class="status-dot" aria-hidden="true"></span>Demo funcional</span>
+        <button class="button button-ghost button-small" id="open-report" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          Reportar novedad
+        </button>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <span class="eyebrow"><span class="eyebrow-icon" aria-hidden="true">✦</span>Movilidad conectada de barrio</span>
+          <h1 id="hero-title">Tu camino,<br><em>sin adivinar.</em></h1>
+          <p class="hero-lead">Un solo lugar para comparar veredales, TransMiCable y SITP — y tener en cuenta lo que la comunidad reporta en este momento.</p>
+
+          <div class="hero-proof" aria-label="Beneficios del prototipo">
+            <div class="proof-item">
+              <strong>3 capas</strong>
+              <span>en un mapa claro</span>
+            </div>
+            <div class="proof-item">
+              <strong>1 pregunta</strong>
+              <span>respuesta en lenguaje sencillo</span>
+            </div>
+            <div class="proof-item">
+              <strong>0 registros</strong>
+              <span>para probar la demo</span>
+            </div>
+          </div>
+
+          <p class="demo-disclaimer"><span aria-hidden="true">ⓘ</span> Prototipo con datos demostrativos. No usar como información operativa.</p>
+        </div>
+
+        <form class="planner-card" id="planner-form">
+          <div class="planner-heading">
+            <div>
+              <span class="section-kicker">Planifica tu salida</span>
+              <h2>¿A dónde vas?</h2>
+            </div>
+            <span class="step-badge">3 pasos</span>
+          </div>
+
+          <div class="form-fields">
+            <label class="field">
+              <span>Estoy en</span>
+              <span class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/></svg>
+                <input id="origin" name="origin" list="places" value="Mochuelo Alto" autocomplete="off" required>
+              </span>
+            </label>
+
+            <label class="field">
+              <span>Quiero llegar a</span>
+              <span class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                <input id="destination" name="destination" list="places" value="Portal Tunal" autocomplete="off" required>
+              </span>
+            </label>
+
+            <label class="field field-time">
+              <span>Llegar antes de</span>
+              <span class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>
+                <input id="deadline" name="deadline" type="time" value="07:00" required>
+              </span>
+            </label>
+          </div>
+
+          <datalist id="places">
+            <option value="Mochuelo Alto"></option>
+            <option value="Quiba"></option>
+            <option value="La Candelaria"></option>
+            <option value="Portal Tunal"></option>
+          </datalist>
+
+          <button class="button button-primary button-full" type="submit">
+            Ver mi mejor ruta
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <p class="form-hint">La respuesta combina rutas, esperas estimadas y reportes recientes.</p>
+        </form>
+      </section>
+
+      <section class="demo-strip" aria-label="Demostración rápida">
+        <div class="demo-strip-copy">
+          <span class="live-label"><span aria-hidden="true"></span>Caso de demostración</span>
+          <p><strong>Laura:</strong> “Estoy en Mochuelo Alto y necesito llegar al Portal Tunal antes de las 7”.</p>
+        </div>
+        <button class="text-button" id="run-demo" type="button">
+          Repetir caso
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66L20 8.68"/><path d="M20 4v4.68h-4.68"/></svg>
+        </button>
+      </section>
+
+      <section class="workspace" id="workspace" aria-label="Asistente y mapa en vivo">
+        <article class="chat-card" aria-labelledby="chat-title">
+          <header class="panel-header chat-header">
+            <div class="agent-identity">
+              <span class="agent-avatar" aria-hidden="true">
+                <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20"/><path d="M14 26c4-8 16-8 20 0M17 18h.01M31 18h.01"/><path d="M18 31c4 3 8 3 12 0"/></svg>
+              </span>
+              <div>
+                <div class="agent-title-row">
+                  <h2 id="chat-title">Ángel</h2>
+                  <span class="online-badge">Demo</span>
+                </div>
+                <p>Asistente de movilidad</p>
+              </div>
+            </div>
+            <button class="icon-button" id="reset-demo" type="button" aria-label="Reiniciar demostración" title="Reiniciar demostración">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66L20 8.68"/><path d="M20 4v4.68h-4.68"/></svg>
+            </button>
+          </header>
+
+          <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversación con Ángel">
+            <article class="message message-agent">
+              <span class="message-avatar" aria-hidden="true">A</span>
+              <div class="message-content">
+                <p>Hola, soy Ángel. Dime de dónde sales, a dónde vas y a qué hora necesitas llegar. También puedes reportar una novedad con el botón superior.</p>
+                <span class="message-time">Ahora · respuesta demostrativa</span>
+              </div>
+            </article>
+          </div>
+
+          <div class="quick-prompts" aria-label="Preguntas sugeridas">
+            <button type="button" data-prompt="Estoy en Mochuelo Alto y necesito llegar al Portal Tunal antes de las 7">Ver ruta al Tunal</button>
+            <button type="button" data-prompt="REPORTE bloqueo en la vía Alpes Quiba">Reportar un bloqueo</button>
+          </div>
+
+          <form class="chat-composer" id="chat-form">
+            <label class="sr-only" for="chat-input">Escribe una pregunta para Ángel</label>
+            <textarea id="chat-input" name="message" rows="1" maxlength="240" placeholder="Pregunta por una ruta…" required></textarea>
+            <button class="composer-button mic-button" id="mic-button" type="button" aria-label="Dictar mensaje" title="Dictar mensaje">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="3" width="8" height="12" rx="4"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
+            </button>
+            <button class="composer-button send-button" type="submit" aria-label="Enviar mensaje">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 17 8-17 8 3-8-3-8Z"/><path d="M7 12h14"/></svg>
+            </button>
+          </form>
+        </article>
+
+        <div class="map-column">
+          <article class="map-card" aria-labelledby="map-title">
+            <header class="panel-header map-header">
+              <div>
+                <span class="section-kicker">Lectura rápida</span>
+                <h2 id="map-title">Mapa de la comunidad</h2>
+              </div>
+              <div class="map-actions">
+                <span class="map-state"><span aria-hidden="true"></span><span id="map-connection">Cargando mapa</span></span>
+                <button class="icon-button" id="share-route" type="button" aria-label="Compartir ruta" title="Compartir ruta">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5"/></svg>
+                </button>
+              </div>
+            </header>
+
+            <div class="layer-toolbar" aria-label="Capas del mapa">
+              <button class="layer-button is-active" type="button" data-layer="route" aria-pressed="true"><span class="legend-line legend-route"></span>Ruta</button>
+              <button class="layer-button is-active" type="button" data-layer="cable" aria-pressed="true"><span class="legend-line legend-cable"></span>TransMiCable</button>
+              <button class="layer-button is-active" type="button" data-layer="sitp" aria-pressed="true"><span class="legend-line legend-sitp"></span>SITP</button>
+              <button class="layer-button is-active" type="button" data-layer="informal" aria-pressed="true"><span class="legend-line legend-informal"></span>Veredales</button>
+              <button class="layer-button is-active" type="button" data-layer="reports" aria-pressed="true"><span class="legend-alert" id="report-count">0</span>Reportes</button>
+            </div>
+
+            <div class="map-wrap" id="map-wrap">
+              <div class="fallback-map" id="fallback-map" aria-hidden="true">
+                <svg viewBox="0 0 900 560" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <pattern id="map-grid" width="44" height="44" patternUnits="userSpaceOnUse">
+                      <path d="M44 0H0V44" fill="none" stroke="currentColor" stroke-opacity=".08"/>
+                    </pattern>
+                    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity=".16"/>
+                    </filter>
+                  </defs>
+                  <rect width="900" height="560" fill="#e9eee8"/>
+                  <rect width="900" height="560" fill="url(#map-grid)"/>
+                  <g fill="none" stroke="#cbd8cf" stroke-width="16" stroke-linecap="round" opacity=".8">
+                    <path d="M-30 80C160 160 246 98 391 175s229 78 541 5"/>
+                    <path d="M-10 476c171-94 281-46 383-143s239-74 551-1"/>
+                    <path d="M250-20c8 132 71 210 45 329s33 188 10 280"/>
+                    <path d="M680-30c-18 132-83 213-63 338s58 180 26 282"/>
+                  </g>
+                  <g fill="none" stroke="#fff" stroke-width="4" opacity=".95">
+                    <path d="M-20 303C161 205 250 305 407 256s287-41 523-106"/>
+                    <path d="M84-20c54 159 176 214 192 359s-46 171-47 241"/>
+                  </g>
+                  <path id="fallback-cable" d="M208 443C316 374 406 325 492 267S662 185 792 113" fill="none" stroke="#d99b1b" stroke-width="9" stroke-linecap="round"/>
+                  <path d="M101 474c82-68 128-116 173-169s91-50 140-31" fill="none" stroke="#ef765f" stroke-width="6" stroke-linecap="round" stroke-dasharray="10 9"/>
+                  <path id="fallback-route" d="M82 505c50-39 84-75 130-122s61-65 95-99" fill="none" stroke="#087f68" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" filter="url(#soft-shadow)"/>
+                  <g font-family="Segoe UI, sans-serif" font-size="15" font-weight="700" fill="#173d35">
+                    <g transform="translate(75 485)"><circle r="15" fill="#173d35" stroke="#fff" stroke-width="5"/><text x="0" y="5" fill="#fff" text-anchor="middle" font-size="13">A</text><text x="24" y="5">Mochuelo Alto</text></g>
+                    <g transform="translate(765 105)"><circle r="15" fill="#087f68" stroke="#fff" stroke-width="5"/><text x="0" y="5" fill="#fff" text-anchor="middle" font-size="13">B</text><text x="-20" y="-23" text-anchor="end">Portal Tunal</text></g>
+                    <text x="340" y="304" fill="#8a5c00">TransMiCable</text>
+                    <text x="210" y="355" fill="#a93f31">Ruta veredal</text>
+                  </g>
+                </svg>
+                <span class="fallback-label">Vista esquemática sin conexión</span>
+              </div>
+              <div id="map" aria-label="Mapa interactivo de rutas formales, informales y reportes"></div>
+              <div class="map-bottom-card" id="map-bottom-card">
+                <span class="map-bottom-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                </span>
+                <div>
+                  <strong id="map-message-title">Ruta lista para dibujar</strong>
+                  <p id="map-message">Haz tu pregunta para comparar trayectos.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="map-note">
+              <span>Trazados de referencia de OpenStreetMap.</span>
+              <span>Rutas, horarios y reportes son demostrativos.</span>
+            </div>
+          </article>
+
+          <article class="route-summary" id="route-summary" aria-live="polite">
+            <header class="summary-header">
+              <div>
+                <span class="section-kicker">Recomendación</span>
+                <h2 id="summary-title">Mochuelo Alto → Portal Tunal</h2>
+              </div>
+              <span class="best-badge" id="route-badge">Mejor opción</span>
+            </header>
+
+            <div class="trip-stats" aria-label="Resumen del viaje">
+              <div><span>Salir</span><strong id="departure-time">5:35 a. m.</strong></div>
+              <div><span>Llegar</span><strong id="arrival-time">6:29 a. m.</strong></div>
+              <div><span>Duración</span><strong id="trip-duration">54 min</strong></div>
+              <div><span>Margen</span><strong id="trip-buffer">31 min</strong></div>
+            </div>
+
+            <ol class="route-steps" id="route-steps">
+              <li><span class="step-icon step-informal">1</span><div><strong>Colectivo de Quiba</strong><span>Quiba → Villa del Rosario · 25 min</span></div></li>
+              <li><span class="step-icon step-cable">2</span><div><strong>TransMiCable</strong><span>Villa del Rosario → Portal Tunal · 14 min</span></div></li>
+              <li><span class="step-icon step-walk">3</span><div><strong>Camina al acceso</strong><span>Portal Tunal · 10 min</span></div></li>
+            </ol>
+
+            <div class="route-insight">
+              <div class="confidence-ring" id="confidence-ring" style="--score: 86"><span id="confidence-score">86%</span></div>
+              <div>
+                <strong id="confidence-label">Confianza media-alta</strong>
+                <p id="route-reason">Cruza una veredal y toma TransMiCable directo, evitando el trancón de la Boyacá.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="value-section" aria-labelledby="value-title">
+        <div class="value-heading">
+          <span class="section-kicker">La idea que lo cambia</span>
+          <h2 id="value-title">La comunidad también es una fuente de movilidad.</h2>
+          <p>El prototipo cierra el círculo: pregunta → compara → muestra → recibe reportes → recalcula.</p>
+        </div>
+        <div class="value-grid">
+          <article><span>01</span><h3>Pregunta normal</h3><p>La persona dice dónde está y a dónde va, sin aprender códigos ni menús.</p></article>
+          <article><span>02</span><h3>Respuesta explicada</h3><p>Cada tramo incluye modo, espera aproximada, duración y qué hacer al llegar.</p></article>
+          <article><span>03</span><h3>Cambio visible</h3><p>Un reporte se convierte en un marcador y en una nueva recomendación, con menos demora.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="brand footer-brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 44 44"><path d="M11 29c0-8 5-11 11-11 5 0 8-3 8-7"/><circle cx="11" cy="31" r="4"/><circle cx="32" cy="10" r="4"/><path d="M19 31h9"/></svg>
+        </span>
+        <span class="brand-copy"><strong>Muevete CB</strong><small>Prototipo de demostración</small></span>
+      </div>
+      <p>Creado para moverte con menos dudas, más contexto y participación comunitaria.</p>
+      <p class="footer-legal">Datos de mapa © colaboradores de OpenStreetMap (ODbL).</p>
+    </footer>
+  </div>
+
+  <dialog class="report-dialog" id="report-dialog" aria-labelledby="report-title">
+    <form id="report-form">
+      <header class="dialog-header">
+        <div>
+          <span class="section-kicker">Reporte ciudadano</span>
+          <h2 id="report-title">¿Qué está pasando?</h2>
+          <p>Tu aviso ayuda a recalcular la ruta de otros vecinos.</p>
+        </div>
+        <button class="icon-button dialog-close" type="button" data-close-dialog aria-label="Cerrar formulario">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </header>
+
+      <fieldset class="report-types">
+        <legend>Tipo de novedad</legend>
+        <label><input type="radio" name="reportType" value="bloqueo" checked><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 9v5M12 17h.01"/></svg><strong>Bloqueo</strong><small>La vía está cerrada</small></span></label>
+        <label><input type="radio" name="reportType" value="demora"><span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg><strong>Demora</strong><small>Está avanzando lento</small></span></label>
+        <label><input type="radio" name="reportType" value="cambio"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h13M14 4l3 3-3 3M20 17H7M10 14l-3 3 3 3"/></svg><strong>Cambio</strong><small>Cambió el recorrido</small></span></label>
+      </fieldset>
+
+      <label class="field dialog-field">
+        <span>Lugar afectado</span>
+        <span class="input-wrap">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <select id="report-location" name="location">
+            <option value="alpes">Vía Alpes – Quiba</option>
+            <option value="rosario">Sector Villa del Rosario</option>
+            <option value="tunal">Portal Tunal</option>
+          </select>
+        </span>
+      </label>
+
+      <label class="field dialog-field">
+        <span>Comentario <small>(opcional)</small></span>
+        <textarea id="report-note" name="note" maxlength="140" rows="3" placeholder="Por ejemplo: hay varias personas esperando el colectivo…"></textarea>
+      </label>
+
+      <label class="privacy-check">
+        <input type="checkbox" name="anonymous" checked>
+        <span>Mostrar como “Vecino/a de Ciudad Bolívar”</span>
+      </label>
+
+      <div class="dialog-actions">
+        <button class="button button-ghost" type="button" data-close-dialog>Cancelar</button>
+        <button class="button button-primary" type="submit">Enviar y recalcular</button>
+      </div>
+      <p class="dialog-local-note">En esta demo, el reporte se guarda únicamente en este navegador.</p>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <noscript>
+    <div class="noscript-message">Esta demostración necesita JavaScript para comparar rutas y mostrar el mapa.</div>
+  </noscript>
+</body>
+</html>
