@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 :root {
@@ -2162,6 +2162,396 @@ svg {
   }
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   MÓDULO DE REGISTRO
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.register-main {
+  min-height: calc(100vh - 82px - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 0 72px;
+}
+
+.register-section {
+  width: min(960px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+.register-heading {
+  text-align: center;
+  margin-bottom: 44px;
+}
+
+.register-kicker-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-600);
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.register-heading h1 {
+  margin: 10px 0 12px;
+  color: var(--green-950);
+  font-size: clamp(2.2rem, 5vw, 3.25rem);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.register-heading p {
+  max-width: 520px;
+  margin: 0 auto;
+  color: var(--ink-soft);
+  font-size: clamp(1.02rem, 2vw, 1.15rem);
+  line-height: 1.55;
+}
+
+.register-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.register-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 36px 32px 30px;
+  border: 1px solid rgba(8, 127, 104, 0.16);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow-sm);
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+  cursor: pointer;
+}
+
+.register-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(8, 127, 104, 0.38);
+  box-shadow: 0 18px 48px rgba(6, 47, 43, 0.12);
+}
+
+.register-card:focus-visible {
+  outline: none;
+  border-color: var(--green-600);
+  box-shadow: var(--shadow-focus), 0 18px 48px rgba(6, 47, 43, 0.12);
+}
+
+.register-card:active {
+  transform: translateY(-1px);
+}
+
+.register-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.register-card-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  background: var(--green-100);
+  color: var(--green-800);
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.register-card:hover .register-card-icon {
+  background: var(--green-200);
+  transform: scale(1.05);
+}
+
+.register-card-svg {
+  width: 34px;
+  height: 34px;
+  stroke-width: 2.2;
+}
+
+.register-card-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(8, 127, 104, 0.08);
+  color: var(--green-800);
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+}
+
+.register-card-body {
+  flex: 1 1 auto;
+  margin-bottom: 28px;
+}
+
+.register-card-title {
+  margin: 0 0 10px;
+  color: var(--green-950);
+  font-size: 1.6rem;
+  font-weight: 850;
+  letter-spacing: -0.035em;
+}
+
+.register-card-description {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+  line-height: 1.58;
+}
+
+.register-card-footer {
+  margin-top: auto;
+}
+
+.register-card-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 20px;
+  font-size: 0.96rem;
+  font-weight: 800;
+  border-radius: 14px;
+}
+
+.register-button-arrow {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.4;
+  transition: transform 160ms ease;
+}
+
+.register-card:hover .register-button-arrow {
+  transform: translateX(4px);
+}
+
+.register-login-prompt {
+  text-align: center;
+  margin-top: 36px;
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+  font-weight: 550;
+}
+
+.register-login-link {
+  color: var(--green-800);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  margin-left: 5px;
+  transition: color 140ms ease;
+}
+
+.register-login-link:hover {
+  color: var(--green-950);
+}
+
+/* Placeholders y componentes auxiliares */
+.register-placeholder-card {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 40px 32px;
+  text-align: center;
+  border: 1px dashed rgba(8, 127, 104, 0.3);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-sm);
+}
+
+.register-placeholder-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--yellow-soft);
+  color: #8c6004;
+  font-size: 0.76rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.register-placeholder-card h3 {
+  margin: 0 0 10px;
+  color: var(--green-950);
+  font-size: 1.4rem;
+  font-weight: 850;
+}
+
+.register-placeholder-card p {
+  color: var(--ink-soft);
+  font-size: 0.96rem;
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto 24px;
+}
+
+.register-placeholder-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Step Indicator */
+.step-indicator {
+  margin: 0 0 24px;
+}
+
+.step-indicator-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 8px;
+}
+
+.step-indicator-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-faint);
+  flex: 1;
+}
+
+.step-indicator-bullet {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface-soft);
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.step-indicator-item.is-current .step-indicator-bullet {
+  background: var(--green-700);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--green-100);
+}
+
+.step-indicator-item.is-current {
+  color: var(--green-950);
+}
+
+.step-indicator-item.is-completed .step-indicator-bullet {
+  background: var(--green-600);
+  color: #fff;
+}
+
+.step-check-icon {
+  width: 14px;
+  height: 14px;
+  stroke: #fff;
+  stroke-width: 3;
+}
+
+/* Transport Selector */
+.transport-selector-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+.transport-selector-legend {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+
+.transport-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.transport-option-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.transport-option-pill:hover {
+  border-color: var(--green-600);
+  background: var(--surface-soft);
+}
+
+.transport-option-pill.is-selected {
+  border-color: var(--green-700);
+  background: var(--green-100);
+  color: var(--green-950);
+}
+
+.transport-option-icon {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 820px) {
+  .register-cards-grid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+    margin: 0 auto;
+    gap: 20px;
+  }
+
+  .register-section {
+    width: min(100% - 32px, 560px);
+  }
+
+  .register-card {
+    padding: 28px 24px 24px;
+  }
+}
+
+@media (max-width: 540px) {
+  .register-section {
+    width: calc(100% - 24px);
+  }
+
+  .register-heading h1 {
+    font-size: 2rem;
+  }
+
+  .register-card-title {
+    font-size: 1.35rem;
+  }
+
+  .register-card-icon {
+    width: 54px;
+    height: 54px;
+  }
+
+  .register-card-svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 @media (forced-colors: active) {
   .button,
   .icon-button,
@@ -2169,8 +2559,10 @@ svg {
   .chat-card,
   .map-card,
   .route-summary,
-  .planner-card {
+  .planner-card,
+  .register-card {
     border: 1px solid CanvasText;
   }
 }
+
 
