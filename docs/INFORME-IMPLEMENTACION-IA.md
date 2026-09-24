@@ -57,7 +57,7 @@ En `http://127.0.0.1:5173` se verificó:
 
 ## Riesgos para la demo
 
-- **Clave de Anthropic no configurada:** el build y la interfaz funcionan, pero la respuesta real del modelo todavía no fue probada contra el proveedor. Configurar `ANTHROPIC_API_KEY` en Vercel antes de ensayo.
+- **Clave de Anthropic:** la clave proporcionada en la sesión fue rechazada por el proveedor con HTTP 401 `API key is invalid`; la interfaz y el fallback funcionan, pero hace falta una clave válida para probar la respuesta real. No se registra ni se expone esa clave en Git.
 - **Geometría del GTFS:** el extracto prueba paradas y servicios; la geometría completa de rutas aún necesita los trazados del GTFS y el GeoJSON de David.
 - **Reportes compartidos:** el formulario guarda en `localStorage`; otro dispositivo no ve el reporte hasta que exista una base/API compartida.
 - **WhatsApp:** el modal prepara el mensaje; falta el webhook Twilio y el número Sandbox.
