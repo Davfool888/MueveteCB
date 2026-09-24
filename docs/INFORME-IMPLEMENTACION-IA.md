@@ -58,7 +58,7 @@ En `http://127.0.0.1:5173` se verificó:
 ## Riesgos para la demo
 
 - **Clave de Anthropic no configurada:** el build y la interfaz funcionan, pero la respuesta real del modelo todavía no fue probada contra el proveedor. Configurar `ANTHROPIC_API_KEY` en Vercel antes de ensayo.
-- **GTFSShapes:** el extracto prueba paradas y servicios; la geometría completa de rutas aún necesita los trazados del GTFS y el GeoJSON de David.
+- **Geometría del GTFS:** el extracto prueba paradas y servicios; la geometría completa de rutas aún necesita los trazados del GTFS y el GeoJSON de David.
 - **Reportes compartidos:** el formulario guarda en `localStorage`; otro dispositivo no ve el reporte hasta que exista una base/API compartida.
 - **WhatsApp:** el modal prepara el mensaje; falta el webhook Twilio y el número Sandbox.
 - **Rutas informales:** no se deben presentar como operación en tiempo real hasta que la comunidad valide el dataset.
