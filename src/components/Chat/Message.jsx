@@ -32,7 +32,7 @@ export default function Message({ msg, onScrollToMap }) {
         )}
 
         <span className="message-time">
-          {role === 'agent' ? 'Ángel · ahora' : 'Tú · ahora'}
+          {role === 'agent' ? 'Eco · ahora' : 'Tú · ahora'}
         </span>
       </div>
     </article>

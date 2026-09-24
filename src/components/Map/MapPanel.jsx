@@ -52,25 +52,20 @@ export default function MapPanel({
         onToggle={onToggleLayer}
       />
 
-      {/* Map container */}
       <div className={`map-wrap${mapConnected ? ' is-online' : ' is-schematic'}`} id="map-wrap">
-        {/* Schematic fallback — always rendered, hidden via CSS when online */}
         <FallbackMap activeRoute={activeRoute} isOnline={mapConnected} />
-
-        {/* Live Leaflet map */}
         <LeafletMap
           activeRouteId={activeRouteId}
           reports={reports}
           layers={layers}
           onConnectionChange={onMapConnectionChange}
         />
-
         <MapBottomCard activeRoute={activeRoute} isAlert={isAlert} />
       </div>
 
       <div className="map-note">
-        <span>Trazados de referencia de OpenStreetMap.</span>
-        <span>Rutas, horarios y reportes son demostrativos.</span>
+        <span>Base: OpenStreetMap + corte GTFS 18-08-2026.</span>
+        <span>Los trayectos veredales y sus tiempos siguen en validación.</span>
       </div>
     </article>
   );

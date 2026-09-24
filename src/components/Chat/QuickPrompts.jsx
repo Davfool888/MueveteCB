@@ -2,10 +2,10 @@ import React from 'react';
 
 const PROMPTS = [
   { label: '⚡ Mochuelo → Tunal', text: 'Estoy en Mochuelo Alto y necesito llegar al Portal Tunal antes de las 7' },
-  { label: '💰 Solo tengo $3.000', text: '¿Cuál es la ruta más barata? Solo tengo 3000 pesos.' },
-  { label: '♿ Voy con silla de ruedas', text: 'Voy con una persona en silla de ruedas, ¿cuál es la ruta 100% accesible?' },
+  { label: '💰 Opción económica', text: 'Estoy en Mochuelo Bajo y necesito llegar al Portal Tunal antes de las 7. Priorizo una ruta económica.' },
+  { label: '♿ Ruta formal PMR', text: 'Estoy en Mirador del Paraíso y necesito llegar al Portal Tunal antes de las 7. Priorizo accesibilidad y quiero verificar las condiciones PMR.' },
   { label: '🚨 Reportar bloqueo en Alpes', text: 'REPORTE bloqueo en la vía Alpes Quiba por derrumbe' },
-  { label: '🚡 Info TransMiCable', text: '¿Cuáles son los horarios y estaciones del TransMiCable?' },
+  { label: '🚡 Info TransMiCable', text: '¿Cuáles son las estaciones, la tarifa y la ventana de transbordo de TransMiCable?' },
 ];
 
 export default function QuickPrompts({ onPrompt }) {

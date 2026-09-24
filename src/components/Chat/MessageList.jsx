@@ -22,7 +22,7 @@ export default function MessageList({ messages, isTyping, onScrollToMap }) {
       role="log"
       aria-live="polite"
       aria-relevant="additions"
-      aria-label="Conversación con Ángel"
+      aria-label="Conversación con Eco"
     >
       {messages.map((msg) => (
         <Message key={msg.id} msg={msg} onScrollToMap={onScrollToMap} />

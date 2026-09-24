@@ -1,0 +1,5741 @@
+{
+  "metadata": {
+    "title": "Extracto GTFS del SITP para Ciudad Bolívar",
+    "source": "TransMilenio S.A. / Datos Abiertos Colombia",
+    "sourceUrl": "https://www.datos.gov.co/dataset/Especificaci-n-GTFS-General-Transport-Feed-Specifi/nysb-4689",
+    "snapshotDate": "2026-08-18",
+    "snapshotUrl": "https://storage.googleapis.com/gtfs-estaticos/GTFS_20260818.zip",
+    "generatedAt": "2026-09-24T21:33:45.502Z",
+    "bounds": {
+      "south": 4.4,
+      "west": -74.23,
+      "north": 4.62,
+      "east": -74.1
+    },
+    "note": "Extracto para validar servicios próximos; por sí solo no demuestra una itinerary completa ni cubre rutas informales."
+  },
+  "stops": [
+    {
+      "id": "54163",
+      "code": "542A12_TM",
+      "name": "Br. Cerros de Oriente",
+      "latitude": 4.55644823860151,
+      "longitude": -74.10694204170109,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "54164",
+      "code": "543A12_TM",
+      "name": "Br. Cerros de Oriente",
+      "latitude": 4.556349238595443,
+      "longitude": -74.10669404171186,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "54124",
+      "code": "500A12_TM",
+      "name": "Br. El Mochuelo",
+      "latitude": 4.523922381619454,
+      "longitude": -74.1228322191273,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51856",
+      "code": "027A11_TM",
+      "name": "Br. El Tunal",
+      "latitude": 4.574015473128236,
+      "longitude": -74.1375797454874,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52231",
+      "code": "187A11_TM",
+      "name": "Br. Juan Pablo II",
+      "latitude": 4.555353442961552,
+      "longitude": -74.15138329357515,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52398",
+      "code": "290A11_TM",
+      "name": "Br. Juan Pablo II",
+      "latitude": 4.555132123435067,
+      "longitude": -74.1498014120811,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52399",
+      "code": "291A11_TM",
+      "name": "Br. Juan Pablo II",
+      "latitude": 4.555628162849675,
+      "longitude": -74.14957982689252,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52400",
+      "code": "293A11_TM",
+      "name": "Br. Juan Pablo II",
+      "latitude": 4.554612239759924,
+      "longitude": -74.14707203994001,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52401",
+      "code": "294A11_TM",
+      "name": "Br. Juan Pablo II",
+      "latitude": 4.554503239756522,
+      "longitude": -74.1468740399525,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52608",
+      "code": "436A11_TM",
+      "name": "Br. Juan Pablo II",
+      "latitude": 4.553577572151162,
+      "longitude": -74.14647032763133,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52667",
+      "code": "462A11_TM",
+      "name": "Br. Juan Pablo II",
+      "latitude": 4.5545608973379474,
+      "longitude": -74.14817826857941,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52670",
+      "code": "466A11_TM",
+      "name": "Br. Juan Pablo II",
+      "latitude": 4.554533227517316,
+      "longitude": -74.14807583698419,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51806",
+      "code": "002C11_TM",
+      "name": "Br. Meissen",
+      "latitude": 4.559323763604813,
+      "longitude": -74.13886622080406,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52499",
+      "code": "337A11_TM",
+      "name": "Br. Meissen",
+      "latitude": 4.558641440828345,
+      "longitude": -74.13639445531302,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52500",
+      "code": "339A11_TM",
+      "name": "Br. Meissen",
+      "latitude": 4.558567811920218,
+      "longitude": -74.13667002729956,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52501",
+      "code": "341A11_TM",
+      "name": "Br. Meissen",
+      "latitude": 4.560224632021364,
+      "longitude": -74.13863155651545,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52502",
+      "code": "342A11_TM",
+      "name": "Br. Meissen",
+      "latitude": 4.559689692940089,
+      "longitude": -74.1380250807802,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52317",
+      "code": "247A11_TM",
+      "name": "Br. Quiba",
+      "latitude": 4.538625393594863,
+      "longitude": -74.14333297125542,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52327",
+      "code": "259A11_TM",
+      "name": "Br. Quiba",
+      "latitude": 4.54213194137202,
+      "longitude": -74.1433226851563,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52743",
+      "code": "546A11_TM",
+      "name": "Br. Quiba",
+      "latitude": 4.540677976890613,
+      "longitude": -74.14210200003303,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52744",
+      "code": "547A11_TM",
+      "name": "Br. Quiba",
+      "latitude": 4.540790976887382,
+      "longitude": -74.14204100003715,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "54994",
+      "code": "040A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.57843382563722,
+      "longitude": -74.16648999754582,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55042",
+      "code": "067A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.5835969284147176,
+      "longitude": -74.16414231033814,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55125",
+      "code": "103A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.5743269267040905,
+      "longitude": -74.1688746961735,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55126",
+      "code": "104A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.57708019425679,
+      "longitude": -74.1706029911621,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55131",
+      "code": "109A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.577092175544518,
+      "longitude": -74.16909067297594,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55135",
+      "code": "113A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.579304002447934,
+      "longitude": -74.16732464956802,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55136",
+      "code": "114A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.579349098793867,
+      "longitude": -74.1671911404207,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55166",
+      "code": "129A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.5807511687587645,
+      "longitude": -74.16865046930573,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55167",
+      "code": "130A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.580781581730932,
+      "longitude": -74.1687779772507,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55349",
+      "code": "300A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.57707227370741,
+      "longitude": -74.17067974613124,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55406",
+      "code": "331A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.578412253164797,
+      "longitude": -74.1677089550163,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "58431",
+      "code": "439A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.574891976739847,
+      "longitude": -74.16522700003546,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "58436",
+      "code": "440A10_TM",
+      "name": "Br. Sierra Morena",
+      "latitude": 4.577924976719562,
+      "longitude": -74.16553000003024,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55134",
+      "code": "112A10_TM",
+      "name": "Br. Sierra Morena  Tv  73J",
+      "latitude": 4.579202666984999,
+      "longitude": -74.16994523368453,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55039",
+      "code": "064A10_TM",
+      "name": "Br. Sierra Morena CL 69F Sur",
+      "latitude": 4.5804532972591705,
+      "longitude": -74.16574428513927,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55040",
+      "code": "065A10_TM",
+      "name": "Br. Sierra Morena DG 69A Sur",
+      "latitude": 4.580474939506431,
+      "longitude": -74.16557650494485,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55132",
+      "code": "110A10_TM",
+      "name": "Br. Sierra Morena III Sector",
+      "latitude": 4.577208125230562,
+      "longitude": -74.16900665737715,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55350",
+      "code": "301A10_TM",
+      "name": "Br. Sierra Morena III Sector",
+      "latitude": 4.578123954966769,
+      "longitude": -74.16773597834377,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55401",
+      "code": "326A10_TM",
+      "name": "Br. Sierra Morena III Sector",
+      "latitude": 4.5746860493075125,
+      "longitude": -74.16744344332186,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55402",
+      "code": "327A10_TM",
+      "name": "Br. Sierra Morena III Sector",
+      "latitude": 4.574587365624789,
+      "longitude": -74.16723146567863,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "58446",
+      "code": "442A10_TM",
+      "name": "Br. Sierra Morena III Sector",
+      "latitude": 4.574287976738377,
+      "longitude": -74.16578800003184,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "58447",
+      "code": "443A10_TM",
+      "name": "Br. Sierra Morena III Sector",
+      "latitude": 4.574371976744506,
+      "longitude": -74.16576000003357,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "58057",
+      "code": "428A10_TM",
+      "name": "Br. Sierra Morena TV 73G",
+      "latitude": 4.579144976721922,
+      "longitude": -74.16844500003027,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "58062",
+      "code": "430A10_TM",
+      "name": "Br. Sierra Morena TV 73G",
+      "latitude": 4.579034976723413,
+      "longitude": -74.1684950000349,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55348",
+      "code": "299A10_TM",
+      "name": "Br. Sierra Morena TV 73G Bis B",
+      "latitude": 4.577327659320841,
+      "longitude": -74.17002472604645,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55133",
+      "code": "111A10_TM",
+      "name": "Br. Sierra Morena Tv 73H",
+      "latitude": 4.579050012242702,
+      "longitude": -74.16992340615512,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55347",
+      "code": "298A10_TM",
+      "name": "Br. Sierra Morena TV 73H Bis",
+      "latitude": 4.57764746025604,
+      "longitude": -74.1704673205223,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51854",
+      "code": "025A11_TM",
+      "name": "Br. Tunal Oriental",
+      "latitude": 4.575396729259807,
+      "longitude": -74.13415454517234,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51990",
+      "code": "075A11_TM",
+      "name": "Br. Tunal Oriental",
+      "latitude": 4.577384135097843,
+      "longitude": -74.12898378637162,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51991",
+      "code": "075B11_TM",
+      "name": "Br. Tunal Oriental",
+      "latitude": 4.576674249428515,
+      "longitude": -74.12880855762837,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52035",
+      "code": "098A11_TM",
+      "name": "Br. Tunal Oriental",
+      "latitude": 4.576853986876992,
+      "longitude": -74.13988322837578,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52541",
+      "code": "366A11_TM",
+      "name": "Br. Tunal Oriental",
+      "latitude": 4.576515239174461,
+      "longitude": -74.13489503989337,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52544",
+      "code": "369A11_TM",
+      "name": "Br. Tunal Oriental",
+      "latitude": 4.573720458037954,
+      "longitude": -74.12610203422625,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52545",
+      "code": "370A11_TM",
+      "name": "Br. Tunal Oriental",
+      "latitude": 4.57548579275472,
+      "longitude": -74.12662129389221,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52779",
+      "code": "572A11_TM",
+      "name": "Br. Tunal Oriental",
+      "latitude": 4.574248705111364,
+      "longitude": -74.12816114302157,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52780",
+      "code": "572B11_TM",
+      "name": "Br. Tunal Oriental",
+      "latitude": 4.573898523647563,
+      "longitude": -74.12806586222287,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52547",
+      "code": "373B11_TM",
+      "name": "Br. Tunal Sector II",
+      "latitude": 4.577181965958342,
+      "longitude": -74.1330830786555,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52708",
+      "code": "505A11_TM",
+      "name": "Br. Tunal Sector II",
+      "latitude": 4.5758726151644735,
+      "longitude": -74.14005926079035,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52709",
+      "code": "505B11_TM",
+      "name": "Br. Tunal Sector II",
+      "latitude": 4.575446588010003,
+      "longitude": -74.13988762478463,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51242",
+      "code": "078A09_TM",
+      "name": "Br. Villa del Rosario",
+      "latitude": 4.594163389338472,
+      "longitude": -74.12201416708692,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52064",
+      "code": "563A09_TM",
+      "name": "Br. Villa del Rosario",
+      "latitude": 4.597217976602589,
+      "longitude": -74.12196899958919,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52066",
+      "code": "565A09_TM",
+      "name": "Br. Villa del Rosario",
+      "latitude": 4.595956976419157,
+      "longitude": -74.12100009976778,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52092",
+      "code": "122A11_TM",
+      "name": "C.C. Ciudad Tunal",
+      "latitude": 4.577066574772903,
+      "longitude": -74.13011126534832,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "cable_tunal",
+      "code": null,
+      "name": "Cable portal tunal",
+      "latitude": 4.56917,
+      "longitude": -74.13968,
+      "wheelchairBoarding": 1,
+      "zoneId": "0",
+      "locationType": 0
+    },
+    {
+      "id": "52086",
+      "code": "118A11_TM",
+      "name": "CADE Ciudad Bolívar",
+      "latitude": 4.570696586024093,
+      "longitude": -74.14876537823439,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52087",
+      "code": "118B11_TM",
+      "name": "CADE Ciudad Bolívar",
+      "latitude": 4.571084734226465,
+      "longitude": -74.14929406944759,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51982",
+      "code": "069A11_TM",
+      "name": "CAI Tunal",
+      "latitude": 4.5773646751182895,
+      "longitude": -74.1309780647181,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51983",
+      "code": "069B11_TM",
+      "name": "CAI Tunal",
+      "latitude": 4.577704101978041,
+      "longitude": -74.13111193152778,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52091",
+      "code": "121A11_TM",
+      "name": "CAI Tunal",
+      "latitude": 4.576892735045531,
+      "longitude": -74.13000597287673,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "54995",
+      "code": "041A10_TM",
+      "name": "CED. Ciudad Bolívar",
+      "latitude": 4.578202934592325,
+      "longitude": -74.16650410911905,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52836",
+      "code": "619A11_TM",
+      "name": "El Mochuelo Oriental",
+      "latitude": 4.5387592395144525,
+      "longitude": -74.13232304103124,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52837",
+      "code": "620A11_TM",
+      "name": "El Mochuelo Oriental",
+      "latitude": 4.538507239485612,
+      "longitude": -74.1311900410949,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52090",
+      "code": "120A11_TM",
+      "name": "Estación Eléctrica el Tunal",
+      "latitude": 4.57356031759579,
+      "longitude": -74.13990761988111,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51811",
+      "code": "005A11_TM",
+      "name": "Hsp. de Meissen",
+      "latitude": 4.558873976940921,
+      "longitude": -74.13872255700392,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51812",
+      "code": "005B11_TM",
+      "name": "Hsp. de Meissen",
+      "latitude": 4.558655773589244,
+      "longitude": -74.138647408435,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51938",
+      "code": "067A11_TM",
+      "name": "Hsp. El Tunal",
+      "latitude": 4.572096709967254,
+      "longitude": -74.12939618231238,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51939",
+      "code": "067B11_TM",
+      "name": "Hsp. El Tunal",
+      "latitude": 4.572684610732946,
+      "longitude": -74.12954579591246,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51988",
+      "code": "074A11_TM",
+      "name": "Hsp. El Tunal",
+      "latitude": 4.571770452365582,
+      "longitude": -74.12862431066907,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51989",
+      "code": "074B11_TM",
+      "name": "Hsp. El Tunal",
+      "latitude": 4.571701991631195,
+      "longitude": -74.12890249233182,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "55433",
+      "code": "333A10_TM",
+      "name": "IED Sierra Morena",
+      "latitude": 4.574205072880771,
+      "longitude": -74.16897052604568,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "50128",
+      "code": "284A10_TM",
+      "name": "IED Sierra Morena Sede B",
+      "latitude": 4.578849770899607,
+      "longitude": -74.17914219298062,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51855",
+      "code": "026A11_TM",
+      "name": "INEM Tunal",
+      "latitude": 4.575419213262029,
+      "longitude": -74.13351898497325,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "cable_jpablo",
+      "code": null,
+      "name": "Juan Pablo II",
+      "latitude": 4.55578994999999,
+      "longitude": -74.1473999,
+      "wheelchairBoarding": 1,
+      "zoneId": "0",
+      "locationType": 0
+    },
+    {
+      "id": "52696",
+      "code": "482A11_TM",
+      "name": "Ladrillera Los Mochuelos",
+      "latitude": 4.522476485095524,
+      "longitude": -74.14270978216994,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52701",
+      "code": "487A11_TM",
+      "name": "Ladrillera Los Mochuelos",
+      "latitude": 4.522449658785374,
+      "longitude": -74.14258728904814,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52170",
+      "code": "154A11_TM",
+      "name": "Las Manitas",
+      "latitude": 4.550314077640091,
+      "longitude": -74.15082564921333,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "cable_manitas",
+      "code": null,
+      "name": "Manitas",
+      "latitude": 4.55028009,
+      "longitude": -74.15049744,
+      "wheelchairBoarding": 1,
+      "zoneId": "0",
+      "locationType": 0
+    },
+    {
+      "id": "cable_paraiso",
+      "code": null,
+      "name": "Mirador del Paraiso",
+      "latitude": 4.55009985,
+      "longitude": -74.1588974,
+      "wheelchairBoarding": 1,
+      "zoneId": "0",
+      "locationType": 0
+    },
+    {
+      "id": "58629",
+      "code": "7-2CL40_TM",
+      "name": "n Calle 40 Sur 7-2 Tunal",
+      "latitude": 4.5759956924656855,
+      "longitude": -74.12019423246821,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52592",
+      "code": "418A11_TM",
+      "name": "Portal Tunal",
+      "latitude": 4.572020333077083,
+      "longitude": -74.13953506201759,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52593",
+      "code": "418B11_TM",
+      "name": "Portal Tunal",
+      "latitude": 4.57166843190678,
+      "longitude": -74.13942828902474,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "8000",
+      "code": null,
+      "name": "Portal Tunal",
+      "latitude": 4.570911724422979,
+      "longitude": -74.13957490426228,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 1
+    },
+    {
+      "id": "73710",
+      "code": "6-4_Portal Tunal",
+      "name": "Portal Tunal",
+      "latitude": 4.571666330457937,
+      "longitude": -74.13982421228572,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "73711",
+      "code": "H625_Portal Tunal",
+      "name": "Portal Tunal H625 Potosi",
+      "latitude": 4.571999985534869,
+      "longitude": -74.13989413960165,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "73459",
+      "code": "PA73459",
+      "name": "Portal Tunal T1",
+      "latitude": 4.567917168293446,
+      "longitude": -74.13946634715627,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "73460",
+      "code": "PA73460",
+      "name": "Portal Tunal T2",
+      "latitude": 4.568343961584406,
+      "longitude": -74.13932841456305,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "61807",
+      "code": "H036",
+      "name": "Portal Tunal T5",
+      "latitude": 4.570810055795081,
+      "longitude": -74.13948083533828,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "61808",
+      "code": "Tunal T3",
+      "name": "Portal Tunal T6",
+      "latitude": 4.571462314178586,
+      "longitude": -74.13963031867758,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "61809",
+      "code": "H038",
+      "name": "Portal Tunal T7",
+      "latitude": 4.572061216606671,
+      "longitude": -74.13976147128692,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51857",
+      "code": "028A11_TM",
+      "name": "Pq. El Tunal",
+      "latitude": 4.573853007428603,
+      "longitude": -74.13744882800275,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "51995",
+      "code": "078A11_TM",
+      "name": "Pq. El Tunal",
+      "latitude": 4.568748482615468,
+      "longitude": -74.1314621849333,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52088",
+      "code": "119A11_TM",
+      "name": "Pq. El Tunal",
+      "latitude": 4.571885531449494,
+      "longitude": -74.13899479233422,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52089",
+      "code": "119B11_TM",
+      "name": "Pq. El Tunal",
+      "latitude": 4.5716515630032415,
+      "longitude": -74.13891010856085,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52819",
+      "code": "592A11_TM",
+      "name": "Pq. Metropolitano El Tunal",
+      "latitude": 4.568700239272234,
+      "longitude": -74.13513604008882,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52607",
+      "code": "435A11_TM",
+      "name": "Quiba",
+      "latitude": 4.542747240546944,
+      "longitude": -74.17018403923186,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "58197",
+      "code": "438A10_TM",
+      "name": "Sierra Morena",
+      "latitude": 4.576692976727462,
+      "longitude": -74.16396100003868,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "58448",
+      "code": "444A10_TM",
+      "name": "Tanque Sierra Morena",
+      "latitude": 4.575627976738088,
+      "longitude": -74.16756200003873,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "58449",
+      "code": "445A10_TM",
+      "name": "Tanque Sierra Morena",
+      "latitude": 4.575466976732849,
+      "longitude": -74.16736700003412,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52542",
+      "code": "367A11_TM",
+      "name": "Tunal Sector I",
+      "latitude": 4.57606052664766,
+      "longitude": -74.12813149542524,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52543",
+      "code": "368A11_TM",
+      "name": "Tunal Sector I",
+      "latitude": 4.574077794890882,
+      "longitude": -74.12753105244056,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "59030",
+      "code": "452A10_TM",
+      "name": "UPA Sierra Morena",
+      "latitude": 4.57804821400785,
+      "longitude": -74.16575133811433,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    },
+    {
+      "id": "52169",
+      "code": "153A11_TM",
+      "name": "Villa Gloria Las Manitas",
+      "latitude": 4.550121399966626,
+      "longitude": -74.15080946189177,
+      "wheelchairBoarding": 1,
+      "zoneId": null,
+      "locationType": 0
+    }
+  ],
+  "routes": [
+    {
+      "id": "10510",
+      "shortName": "10-12",
+      "longName": "Mochuelo Bajo ||  Paraiso",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52607",
+          "code": "435A11_TM",
+          "name": "Quiba",
+          "latitude": 4.542747240546944,
+          "longitude": -74.17018403923186,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12115",
+      "shortName": "260",
+      "longName": "Unicentro ||  Arabia",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52708",
+          "code": "505A11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.5758726151644735,
+          "longitude": -74.14005926079035,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13222",
+      "shortName": "3-8",
+      "longName": "Virrey",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "54124",
+          "code": "500A12_TM",
+          "name": "Br. El Mochuelo",
+          "latitude": 4.523922381619454,
+          "longitude": -74.1228322191273,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13217",
+      "shortName": "3-8",
+      "longName": "Virrey ||  Portal Usme",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "54124",
+          "code": "500A12_TM",
+          "name": "Br. El Mochuelo",
+          "latitude": 4.523922381619454,
+          "longitude": -74.1228322191273,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "11102",
+      "shortName": "330",
+      "longName": "El Uval",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13146",
+      "shortName": "330",
+      "longName": "La estrella",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52708",
+          "code": "505A11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.5758726151644735,
+          "longitude": -74.14005926079035,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12797",
+      "shortName": "330",
+      "longName": "La Estrellita",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52708",
+          "code": "505A11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.5758726151644735,
+          "longitude": -74.14005926079035,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12786",
+      "shortName": "539",
+      "longName": "El Uval",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12785",
+      "shortName": "539",
+      "longName": "Engativá",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52709",
+          "code": "505B11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.575446588010003,
+          "longitude": -74.13988762478463,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12014",
+      "shortName": "6-12",
+      "longName": "Portal Tunal",
+      "agencyId": "2",
+      "routeType": 3,
+      "color": "#00ff00",
+      "matchedStops": [
+        {
+          "id": "52231",
+          "code": "187A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.555353442961552,
+          "longitude": -74.15138329357515,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12016",
+      "shortName": "6-12",
+      "longName": "Villa Gloria",
+      "agencyId": "2",
+      "routeType": 3,
+      "color": "#00ff00",
+      "matchedStops": [
+        {
+          "id": "52231",
+          "code": "187A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.555353442961552,
+          "longitude": -74.15138329357515,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12013",
+      "shortName": "6-12",
+      "longName": "Villa Gloria ||  Portal Tunal",
+      "agencyId": "2",
+      "routeType": 3,
+      "color": "#00ff00",
+      "matchedStops": [
+        {
+          "id": "52231",
+          "code": "187A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.555353442961552,
+          "longitude": -74.15138329357515,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "11192",
+      "shortName": "6-18",
+      "longName": "Mochuelo Bajo ||  San Carlos",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52502",
+          "code": "342A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.559689692940089,
+          "longitude": -74.1380250807802,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52499",
+          "code": "337A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.558641440828345,
+          "longitude": -74.13639445531302,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51938",
+          "code": "067A11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.572096709967254,
+          "longitude": -74.12939618231238,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52701",
+          "code": "487A11_TM",
+          "name": "Ladrillera Los Mochuelos",
+          "latitude": 4.522449658785374,
+          "longitude": -74.14258728904814,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52696",
+          "code": "482A11_TM",
+          "name": "Ladrillera Los Mochuelos",
+          "latitude": 4.522476485095524,
+          "longitude": -74.14270978216994,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "11193",
+      "shortName": "6-18",
+      "longName": "Santa Barbara ||  San Carlos",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52502",
+          "code": "342A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.559689692940089,
+          "longitude": -74.1380250807802,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52499",
+          "code": "337A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.558641440828345,
+          "longitude": -74.13639445531302,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51938",
+          "code": "067A11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.572096709967254,
+          "longitude": -74.12939618231238,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52701",
+          "code": "487A11_TM",
+          "name": "Ladrillera Los Mochuelos",
+          "latitude": 4.522449658785374,
+          "longitude": -74.14258728904814,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52696",
+          "code": "482A11_TM",
+          "name": "Ladrillera Los Mochuelos",
+          "latitude": 4.522476485095524,
+          "longitude": -74.14270978216994,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12018",
+      "shortName": "6-7",
+      "longName": "Portal Tunal",
+      "agencyId": "2",
+      "routeType": 3,
+      "color": "#00ff00",
+      "matchedStops": [
+        {
+          "id": "51806",
+          "code": "002C11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.559323763604813,
+          "longitude": -74.13886622080406,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12017",
+      "shortName": "6-7",
+      "longName": "San Joaquín  ||  Portal Tunal",
+      "agencyId": "2",
+      "routeType": 3,
+      "color": "#00ff00",
+      "matchedStops": [
+        {
+          "id": "51806",
+          "code": "002C11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.559323763604813,
+          "longitude": -74.13886622080406,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "11011",
+      "shortName": "6-7",
+      "longName": "San Joaquín ||  Portal Tunal",
+      "agencyId": "2",
+      "routeType": 3,
+      "color": "#00ff00",
+      "matchedStops": [
+        {
+          "id": "51806",
+          "code": "002C11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.559323763604813,
+          "longitude": -74.13886622080406,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12494",
+      "shortName": "624",
+      "longName": "20 de Julio ||  Verbenal Sur",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52231",
+          "code": "187A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.555353442961552,
+          "longitude": -74.15138329357515,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52779",
+          "code": "572A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.574248705111364,
+          "longitude": -74.12816114302157,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51990",
+          "code": "075A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.577384135097843,
+          "longitude": -74.12898378637162,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51982",
+          "code": "069A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.5773646751182895,
+          "longitude": -74.1309780647181,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51938",
+          "code": "067A11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.572096709967254,
+          "longitude": -74.12939618231238,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51988",
+          "code": "074A11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.571770452365582,
+          "longitude": -74.12862431066907,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52170",
+          "code": "154A11_TM",
+          "name": "Las Manitas",
+          "latitude": 4.550314077640091,
+          "longitude": -74.15082564921333,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52819",
+          "code": "592A11_TM",
+          "name": "Pq. Metropolitano El Tunal",
+          "latitude": 4.568700239272234,
+          "longitude": -74.13513604008882,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52607",
+          "code": "435A11_TM",
+          "name": "Quiba",
+          "latitude": 4.542747240546944,
+          "longitude": -74.17018403923186,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52169",
+          "code": "153A11_TM",
+          "name": "Villa Gloria Las Manitas",
+          "latitude": 4.550121399966626,
+          "longitude": -74.15080946189177,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12522",
+      "shortName": "624",
+      "longName": "20 de Julio ||  Verbenal Sur Ciclovía",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52231",
+          "code": "187A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.555353442961552,
+          "longitude": -74.15138329357515,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51982",
+          "code": "069A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.5773646751182895,
+          "longitude": -74.1309780647181,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51938",
+          "code": "067A11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.572096709967254,
+          "longitude": -74.12939618231238,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52170",
+          "code": "154A11_TM",
+          "name": "Las Manitas",
+          "latitude": 4.550314077640091,
+          "longitude": -74.15082564921333,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52819",
+          "code": "592A11_TM",
+          "name": "Pq. Metropolitano El Tunal",
+          "latitude": 4.568700239272234,
+          "longitude": -74.13513604008882,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52607",
+          "code": "435A11_TM",
+          "name": "Quiba",
+          "latitude": 4.542747240546944,
+          "longitude": -74.17018403923186,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52169",
+          "code": "153A11_TM",
+          "name": "Villa Gloria Las Manitas",
+          "latitude": 4.550121399966626,
+          "longitude": -74.15080946189177,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13237",
+      "shortName": "796A",
+      "longName": "Teusaquillo ||  Mochuelo Bajo",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52701",
+          "code": "487A11_TM",
+          "name": "Ladrillera Los Mochuelos",
+          "latitude": 4.522449658785374,
+          "longitude": -74.14258728904814,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52696",
+          "code": "482A11_TM",
+          "name": "Ladrillera Los Mochuelos",
+          "latitude": 4.522476485095524,
+          "longitude": -74.14270978216994,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52089",
+          "code": "119B11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.5716515630032415,
+          "longitude": -74.13891010856085,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12461",
+      "shortName": "A704",
+      "longName": "Germania",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52089",
+          "code": "119B11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.5716515630032415,
+          "longitude": -74.13891010856085,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13016",
+      "shortName": "C201",
+      "longName": "Paraíso ||  Patio Bonito",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52709",
+          "code": "505B11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.575446588010003,
+          "longitude": -74.13988762478463,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52089",
+          "code": "119B11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.5716515630032415,
+          "longitude": -74.13891010856085,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13019",
+      "shortName": "C201",
+      "longName": "Paraíso ||  Patio Bonito",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52709",
+          "code": "505B11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.575446588010003,
+          "longitude": -74.13988762478463,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52089",
+          "code": "119B11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.5716515630032415,
+          "longitude": -74.13891010856085,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13020",
+      "shortName": "C201",
+      "longName": "Paraíso ||  Patio Bonito",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52709",
+          "code": "505B11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.575446588010003,
+          "longitude": -74.13988762478463,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52089",
+          "code": "119B11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.5716515630032415,
+          "longitude": -74.13891010856085,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "C_1",
+      "shortName": "CABLE",
+      "longName": "Tunal || Mirador del Paraiso",
+      "agencyId": "7",
+      "routeType": 6,
+      "color": "#e30613",
+      "matchedStops": [
+        {
+          "id": "cable_tunal",
+          "code": null,
+          "name": "Cable portal tunal",
+          "latitude": 4.56917,
+          "longitude": -74.13968,
+          "wheelchairBoarding": 1,
+          "zoneId": "0",
+          "locationType": 0
+        },
+        {
+          "id": "cable_jpablo",
+          "code": null,
+          "name": "Juan Pablo II",
+          "latitude": 4.55578994999999,
+          "longitude": -74.1473999,
+          "wheelchairBoarding": 1,
+          "zoneId": "0",
+          "locationType": 0
+        },
+        {
+          "id": "cable_manitas",
+          "code": null,
+          "name": "Manitas",
+          "latitude": 4.55028009,
+          "longitude": -74.15049744,
+          "wheelchairBoarding": 1,
+          "zoneId": "0",
+          "locationType": 0
+        },
+        {
+          "id": "cable_paraiso",
+          "code": null,
+          "name": "Mirador del Paraiso",
+          "latitude": 4.55009985,
+          "longitude": -74.1588974,
+          "wheelchairBoarding": 1,
+          "zoneId": "0",
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13286",
+      "shortName": "F718",
+      "longName": "La Riviera",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52708",
+          "code": "505A11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.5758726151644735,
+          "longitude": -74.14005926079035,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13210",
+      "shortName": "F733",
+      "longName": "Tierra Buena",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "54164",
+          "code": "543A12_TM",
+          "name": "Br. Cerros de Oriente",
+          "latitude": 4.556349238595443,
+          "longitude": -74.10669404171186,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51991",
+          "code": "075B11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.576674249428515,
+          "longitude": -74.12880855762837,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52780",
+          "code": "572B11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.573898523647563,
+          "longitude": -74.12806586222287,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51989",
+          "code": "074B11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.571701991631195,
+          "longitude": -74.12890249233182,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51995",
+          "code": "078A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.568748482615468,
+          "longitude": -74.1314621849333,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12200",
+      "shortName": "GH521",
+      "longName": "H521 Usme-Chinguaza || G521 San Bernardino",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52086",
+          "code": "118A11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.570696586024093,
+          "longitude": -74.14876537823439,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "11204",
+      "shortName": "H308",
+      "longName": "El Tuno",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "11207",
+      "shortName": "H308",
+      "longName": "El Tuno",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12956",
+      "shortName": "H318",
+      "longName": "El Uval",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12925",
+      "shortName": "H322",
+      "longName": "Cerros de Oriente",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "54163",
+          "code": "542A12_TM",
+          "name": "Br. Cerros de Oriente",
+          "latitude": 4.55644823860151,
+          "longitude": -74.10694204170109,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "54164",
+          "code": "543A12_TM",
+          "name": "Br. Cerros de Oriente",
+          "latitude": 4.556349238595443,
+          "longitude": -74.10669404171186,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52035",
+          "code": "098A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.576853986876992,
+          "longitude": -74.13988322837578,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51983",
+          "code": "069B11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.577704101978041,
+          "longitude": -74.13111193152778,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51939",
+          "code": "067B11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.572684610732946,
+          "longitude": -74.12954579591246,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13147",
+      "shortName": "H322",
+      "longName": "Cerros de Oriente",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "54163",
+          "code": "542A12_TM",
+          "name": "Br. Cerros de Oriente",
+          "latitude": 4.55644823860151,
+          "longitude": -74.10694204170109,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "54164",
+          "code": "543A12_TM",
+          "name": "Br. Cerros de Oriente",
+          "latitude": 4.556349238595443,
+          "longitude": -74.10669404171186,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52035",
+          "code": "098A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.576853986876992,
+          "longitude": -74.13988322837578,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51983",
+          "code": "069B11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.577704101978041,
+          "longitude": -74.13111193152778,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51939",
+          "code": "067B11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.572684610732946,
+          "longitude": -74.12954579591246,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10254",
+      "shortName": "H613",
+      "longName": "Perdomo",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52502",
+          "code": "342A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.559689692940089,
+          "longitude": -74.1380250807802,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52499",
+          "code": "337A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.558641440828345,
+          "longitude": -74.13639445531302,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52086",
+          "code": "118A11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.570696586024093,
+          "longitude": -74.14876537823439,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10463",
+      "shortName": "H638",
+      "longName": "Juan Pablo II ||  Arabia",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52401",
+          "code": "294A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.554503239756522,
+          "longitude": -74.1468740399525,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52400",
+          "code": "293A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.554612239759924,
+          "longitude": -74.14707203994001,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52667",
+          "code": "462A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.5545608973379474,
+          "longitude": -74.14817826857941,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52608",
+          "code": "436A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.553577572151162,
+          "longitude": -74.14647032763133,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10227",
+      "shortName": "H704",
+      "longName": "El Uval",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12339",
+      "shortName": "H704",
+      "longName": "El Uval Ciclovía",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51982",
+          "code": "069A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.5773646751182895,
+          "longitude": -74.1309780647181,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51938",
+          "code": "067A11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.572096709967254,
+          "longitude": -74.12939618231238,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52819",
+          "code": "592A11_TM",
+          "name": "Pq. Metropolitano El Tunal",
+          "latitude": 4.568700239272234,
+          "longitude": -74.13513604008882,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10235",
+      "shortName": "H707",
+      "longName": "El Uval",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13110",
+      "shortName": "H718",
+      "longName": "Usme Centro",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10282",
+      "shortName": "H724",
+      "longName": "Ciudadela Usme",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51982",
+          "code": "069A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.5773646751182895,
+          "longitude": -74.1309780647181,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12406",
+      "shortName": "H724",
+      "longName": "Ciudadela Usme Ciclovía",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51982",
+          "code": "069A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.5773646751182895,
+          "longitude": -74.1309780647181,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51938",
+          "code": "067A11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.572096709967254,
+          "longitude": -74.12939618231238,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52819",
+          "code": "592A11_TM",
+          "name": "Pq. Metropolitano El Tunal",
+          "latitude": 4.568700239272234,
+          "longitude": -74.13513604008882,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13209",
+      "shortName": "H733",
+      "longName": "Cerros de Oriente",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "54163",
+          "code": "542A12_TM",
+          "name": "Br. Cerros de Oriente",
+          "latitude": 4.55644823860151,
+          "longitude": -74.10694204170109,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "54164",
+          "code": "543A12_TM",
+          "name": "Br. Cerros de Oriente",
+          "latitude": 4.556349238595443,
+          "longitude": -74.10669404171186,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51982",
+          "code": "069A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.5773646751182895,
+          "longitude": -74.1309780647181,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51938",
+          "code": "067A11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.572096709967254,
+          "longitude": -74.12939618231238,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12600",
+      "shortName": "HA610",
+      "longName": "A610 Chicó Norte || H610 Paraíso",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13193",
+      "shortName": "HA643",
+      "longName": "A643 Paloquemao || H643 San Joaquín",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51242",
+          "code": "078A09_TM",
+          "name": "Br. Villa del Rosario",
+          "latitude": 4.594163389338472,
+          "longitude": -74.12201416708692,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52089",
+          "code": "119B11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.5716515630032415,
+          "longitude": -74.13891010856085,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10505",
+      "shortName": "HB608",
+      "longName": "B608 Chicó Navarra || H608 Arabia",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10506",
+      "shortName": "HB608",
+      "longName": "B608 Chicó Navarra || H608 Arabia Ciclovía",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10535",
+      "shortName": "HB631",
+      "longName": "B631 Avenida Calle 134 Carrera 9 || H631 Paraíso",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13177",
+      "shortName": "HB647",
+      "longName": "B647 AC 134 AK 9 || H647 Alpes",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13178",
+      "shortName": "HB647",
+      "longName": "B647 AC 134 AK 9 || H647 Alpes Ciclovía",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12089",
+      "shortName": "HC612",
+      "longName": "C612 Villa María  || H612 San Joaquín",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52087",
+          "code": "118B11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.571084734226465,
+          "longitude": -74.14929406944759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12366",
+      "shortName": "HC705",
+      "longName": "C705 Est. Suba CL 100 || H705 El Uval",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51982",
+          "code": "069A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.5773646751182895,
+          "longitude": -74.1309780647181,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12367",
+      "shortName": "HC705",
+      "longName": "C705 Est. Suba CL 100 || H705 El Uval Ciclovía",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51982",
+          "code": "069A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.5773646751182895,
+          "longitude": -74.1309780647181,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51938",
+          "code": "067A11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.572096709967254,
+          "longitude": -74.12939618231238,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52819",
+          "code": "592A11_TM",
+          "name": "Pq. Metropolitano El Tunal",
+          "latitude": 4.568700239272234,
+          "longitude": -74.13513604008882,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13156",
+      "shortName": "HD717",
+      "longName": "D717 Bonanza || H717 Usme Centro",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52708",
+          "code": "505A11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.5758726151644735,
+          "longitude": -74.14005926079035,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13151",
+      "shortName": "HG712",
+      "longName": "G712 Bosa Estacion || H712 El Uval",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52086",
+          "code": "118A11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.570696586024093,
+          "longitude": -74.14876537823439,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52836",
+          "code": "619A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.5387592395144525,
+          "longitude": -74.13232304103124,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10299",
+      "shortName": "HH632",
+      "longName": "H632 Villa Gloria || H632 General Santander",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52231",
+          "code": "187A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.555353442961552,
+          "longitude": -74.15138329357515,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52087",
+          "code": "118B11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.571084734226465,
+          "longitude": -74.14929406944759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12508",
+      "shortName": "HH632",
+      "longName": "H632 Villa Gloria || H632 General Santander Ciclovía",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52231",
+          "code": "187A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.555353442961552,
+          "longitude": -74.15138329357515,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52087",
+          "code": "118B11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.571084734226465,
+          "longitude": -74.14929406944759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13288",
+      "shortName": "HH633",
+      "longName": "H633 General Santander || H633 Acapulco",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52709",
+          "code": "505B11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.575446588010003,
+          "longitude": -74.13988762478463,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52089",
+          "code": "119B11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.5716515630032415,
+          "longitude": -74.13891010856085,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13227",
+      "shortName": "HH729",
+      "longName": "H729 La Aurora || H729 Portal Usme",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "54124",
+          "code": "500A12_TM",
+          "name": "Br. El Mochuelo",
+          "latitude": 4.523922381619454,
+          "longitude": -74.1228322191273,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13317",
+      "shortName": "HK606",
+      "longName": "K606 Salitre || H606 San Joaquín",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51983",
+          "code": "069B11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.577704101978041,
+          "longitude": -74.13111193152778,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12604",
+      "shortName": "HK627",
+      "longName": "K627 Salitre || H627 Alpes",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52231",
+          "code": "187A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.555353442961552,
+          "longitude": -74.15138329357515,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52086",
+          "code": "118A11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.570696586024093,
+          "longitude": -74.14876537823439,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52170",
+          "code": "154A11_TM",
+          "name": "Las Manitas",
+          "latitude": 4.550314077640091,
+          "longitude": -74.15082564921333,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52169",
+          "code": "153A11_TM",
+          "name": "Villa Gloria Las Manitas",
+          "latitude": 4.550121399966626,
+          "longitude": -74.15080946189177,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13108",
+      "shortName": "HK646",
+      "longName": "K646 Puente Aéreo || H646 Paraíso",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52708",
+          "code": "505A11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.5758726151644735,
+          "longitude": -74.14005926079035,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52090",
+          "code": "120A11_TM",
+          "name": "Estación Eléctrica el Tunal",
+          "latitude": 4.57356031759579,
+          "longitude": -74.13990761988111,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52592",
+          "code": "418A11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.572020333077083,
+          "longitude": -74.13953506201759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "11205",
+      "shortName": "K308",
+      "longName": "Puente Grande",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52708",
+          "code": "505A11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.5758726151644735,
+          "longitude": -74.14005926079035,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12957",
+      "shortName": "K318",
+      "longName": "Fontibón Brisas",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52086",
+          "code": "118A11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.570696586024093,
+          "longitude": -74.14876537823439,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12926",
+      "shortName": "K322",
+      "longName": "Fontibon Brisas",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "54164",
+          "code": "543A12_TM",
+          "name": "Br. Cerros de Oriente",
+          "latitude": 4.556349238595443,
+          "longitude": -74.10669404171186,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51991",
+          "code": "075B11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.576674249428515,
+          "longitude": -74.12880855762837,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52780",
+          "code": "572B11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.573898523647563,
+          "longitude": -74.12806586222287,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52709",
+          "code": "505B11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.575446588010003,
+          "longitude": -74.13988762478463,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51989",
+          "code": "074B11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.571701991631195,
+          "longitude": -74.12890249233182,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51995",
+          "code": "078A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.568748482615468,
+          "longitude": -74.1314621849333,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13148",
+      "shortName": "K322",
+      "longName": "Fontibon Brisas",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "54164",
+          "code": "543A12_TM",
+          "name": "Br. Cerros de Oriente",
+          "latitude": 4.556349238595443,
+          "longitude": -74.10669404171186,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52780",
+          "code": "572B11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.573898523647563,
+          "longitude": -74.12806586222287,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51991",
+          "code": "075B11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.576674249428515,
+          "longitude": -74.12880855762837,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52709",
+          "code": "505B11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.575446588010003,
+          "longitude": -74.13988762478463,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51989",
+          "code": "074B11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.571701991631195,
+          "longitude": -74.12890249233182,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51995",
+          "code": "078A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.568748482615468,
+          "longitude": -74.1314621849333,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12927",
+      "shortName": "K322",
+      "longName": "Fontibon Brisas Ciclovía",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "54164",
+          "code": "543A12_TM",
+          "name": "Br. Cerros de Oriente",
+          "latitude": 4.556349238595443,
+          "longitude": -74.10669404171186,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52780",
+          "code": "572B11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.573898523647563,
+          "longitude": -74.12806586222287,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51991",
+          "code": "075B11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.576674249428515,
+          "longitude": -74.12880855762837,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51989",
+          "code": "074B11_TM",
+          "name": "Hsp. El Tunal",
+          "latitude": 4.571701991631195,
+          "longitude": -74.12890249233182,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51995",
+          "code": "078A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.568748482615468,
+          "longitude": -74.1314621849333,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10224",
+      "shortName": "K707",
+      "longName": "El Refugio",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52708",
+          "code": "505A11_TM",
+          "name": "Br. Tunal Sector II",
+          "latitude": 4.5758726151644735,
+          "longitude": -74.14005926079035,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52088",
+          "code": "119A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.571885531449494,
+          "longitude": -74.13899479233422,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10296",
+      "shortName": "K724",
+      "longName": "Montevideo",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52837",
+          "code": "620A11_TM",
+          "name": "El Mochuelo Oriental",
+          "latitude": 4.538507239485612,
+          "longitude": -74.1311900410949,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51811",
+          "code": "005A11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558873976940921,
+          "longitude": -74.13872255700392,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52089",
+          "code": "119B11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.5716515630032415,
+          "longitude": -74.13891010856085,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10255",
+      "shortName": "L613",
+      "longName": "Horacio Orjuela",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52501",
+          "code": "341A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.560224632021364,
+          "longitude": -74.13863155651545,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52500",
+          "code": "339A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.558567811920218,
+          "longitude": -74.13667002729956,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12896",
+      "shortName": "LG816",
+      "longName": "G816 Villa del Rio || L816 Doña Liliana",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52501",
+          "code": "341A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.560224632021364,
+          "longitude": -74.13863155651545,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52499",
+          "code": "337A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.558641440828345,
+          "longitude": -74.13639445531302,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52500",
+          "code": "339A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.558567811920218,
+          "longitude": -74.13667002729956,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52502",
+          "code": "342A11_TM",
+          "name": "Br. Meissen",
+          "latitude": 4.559689692940089,
+          "longitude": -74.1380250807802,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52087",
+          "code": "118B11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.571084734226465,
+          "longitude": -74.14929406944759,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "10594",
+      "shortName": "P39",
+      "longName": "Zona Franca ||  Arabia",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52401",
+          "code": "294A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.554503239756522,
+          "longitude": -74.1468740399525,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52400",
+          "code": "293A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.554612239759924,
+          "longitude": -74.14707203994001,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52667",
+          "code": "462A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.5545608973379474,
+          "longitude": -74.14817826857941,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52398",
+          "code": "290A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.555132123435067,
+          "longitude": -74.1498014120811,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52399",
+          "code": "291A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.555628162849675,
+          "longitude": -74.14957982689252,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52670",
+          "code": "466A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.554533227517316,
+          "longitude": -74.14807583698419,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52608",
+          "code": "436A11_TM",
+          "name": "Br. Juan Pablo II",
+          "latitude": 4.553577572151162,
+          "longitude": -74.14647032763133,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52086",
+          "code": "118A11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.570696586024093,
+          "longitude": -74.14876537823439,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12972",
+      "shortName": "P44",
+      "longName": "Bosa Santa Fe ||  Arabia",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52317",
+          "code": "247A11_TM",
+          "name": "Br. Quiba",
+          "latitude": 4.538625393594863,
+          "longitude": -74.14333297125542,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52743",
+          "code": "546A11_TM",
+          "name": "Br. Quiba",
+          "latitude": 4.540677976890613,
+          "longitude": -74.14210200003303,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52744",
+          "code": "547A11_TM",
+          "name": "Br. Quiba",
+          "latitude": 4.540790976887382,
+          "longitude": -74.14204100003715,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52327",
+          "code": "259A11_TM",
+          "name": "Br. Quiba",
+          "latitude": 4.54213194137202,
+          "longitude": -74.1433226851563,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52086",
+          "code": "118A11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.570696586024093,
+          "longitude": -74.14876537823439,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "13294",
+      "shortName": "P44",
+      "longName": "Bosa Santa Fe ||  Arabia",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "52317",
+          "code": "247A11_TM",
+          "name": "Br. Quiba",
+          "latitude": 4.538625393594863,
+          "longitude": -74.14333297125542,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52743",
+          "code": "546A11_TM",
+          "name": "Br. Quiba",
+          "latitude": 4.540677976890613,
+          "longitude": -74.14210200003303,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52327",
+          "code": "259A11_TM",
+          "name": "Br. Quiba",
+          "latitude": 4.54213194137202,
+          "longitude": -74.1433226851563,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52744",
+          "code": "547A11_TM",
+          "name": "Br. Quiba",
+          "latitude": 4.540790976887382,
+          "longitude": -74.14204100003715,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52086",
+          "code": "118A11_TM",
+          "name": "CADE Ciudad Bolívar",
+          "latitude": 4.570696586024093,
+          "longitude": -74.14876537823439,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12381",
+      "shortName": "T12",
+      "longName": "Chicó Calle 100 ||  San Joaquín",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52089",
+          "code": "119B11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.5716515630032415,
+          "longitude": -74.13891010856085,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    },
+    {
+      "id": "12384",
+      "shortName": "T12",
+      "longName": "Chicó Calle 100 ||  San Joaquín Ciclovía",
+      "agencyId": "3",
+      "routeType": 3,
+      "color": "#0000ff",
+      "matchedStops": [
+        {
+          "id": "51856",
+          "code": "027A11_TM",
+          "name": "Br. El Tunal",
+          "latitude": 4.574015473128236,
+          "longitude": -74.1375797454874,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51854",
+          "code": "025A11_TM",
+          "name": "Br. Tunal Oriental",
+          "latitude": 4.575396729259807,
+          "longitude": -74.13415454517234,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52092",
+          "code": "122A11_TM",
+          "name": "C.C. Ciudad Tunal",
+          "latitude": 4.577066574772903,
+          "longitude": -74.13011126534832,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52091",
+          "code": "121A11_TM",
+          "name": "CAI Tunal",
+          "latitude": 4.576892735045531,
+          "longitude": -74.13000597287673,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51812",
+          "code": "005B11_TM",
+          "name": "Hsp. de Meissen",
+          "latitude": 4.558655773589244,
+          "longitude": -74.138647408435,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51855",
+          "code": "026A11_TM",
+          "name": "INEM Tunal",
+          "latitude": 4.575419213262029,
+          "longitude": -74.13351898497325,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52593",
+          "code": "418B11_TM",
+          "name": "Portal Tunal",
+          "latitude": 4.57166843190678,
+          "longitude": -74.13942828902474,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "51857",
+          "code": "028A11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.573853007428603,
+          "longitude": -74.13744882800275,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        },
+        {
+          "id": "52089",
+          "code": "119B11_TM",
+          "name": "Pq. El Tunal",
+          "latitude": 4.5716515630032415,
+          "longitude": -74.13891010856085,
+          "wheelchairBoarding": 1,
+          "zoneId": null,
+          "locationType": 0
+        }
+      ]
+    }
+  ]
+}

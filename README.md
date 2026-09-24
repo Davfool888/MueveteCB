@@ -1,83 +1,142 @@
-# Muevete CB — MVP demostrable
+# ECO CB — Muévete Ciudad Bolívar
 
-Prototipo web construido a partir de `mi guia.docx`. Convierte la propuesta en un caso de uso que puede ejecutarse ante el jurado sin cuentas, instalaciones ni una clave de API.
+Prototipo web de movilidad que compara rutas formales e informales, explica una recomendación y considera reportes ciudadanos recientes. Construido con **React 18 + Vite 6 + Leaflet** y preparado para desplegarse en Vercel.
 
-> **Importante:** rutas, horarios y reportes incluidos son demostrativos. OpenStreetMap aporta la base geográfica; no usar esta demo para decisiones reales de movilidad.
+> Las rutas veredales, frecuencias, tarifas informales y tiempos combinados siguen marcados como demostración. No usar la aplicación para decisiones operativas.
 
-## Lo que ya funciona
+## Funcionalidades
 
-- Pregunta en lenguaje natural mediante formulario o chat.
-- Respuesta con pasos, tiempos, transbordo, llegada y nivel de confianza.
-- Mapa Leaflet con capas diferenciadas para TransMiCable, SITP, veredales, reportes y ruta.
-- Vista esquemática de respaldo si no cargan los mapas de OpenStreetMap.
-- Formulario ciudadano para bloqueo, demora o cambio de ruta.
-- El reporte aparece en el mapa y recalcula la recomendación.
-- Persistencia local de reportes en el navegador.
-- Enlace compartible, reinicio de demo y entrada por voz cuando el navegador la soporta.
-- Diseño móvil, controles táctiles grandes, foco visible y reducción de movimiento.
+- Agente **Eco** conectado a `POST /api/chat`.
+- Claude redacta la respuesta únicamente a partir de una ruta seleccionada por el motor determinista.
+- Fallback local si no hay clave, red o respuesta válida del proveedor.
+- Formulario y chat en español de Colombia.
+- Mapa con TransMiCable, SITP, veredales, reportes y ruta recomendada.
+- Extracto GTFS oficial del 18 de agosto de 2026 con paradas y servicios de Ciudad Bolívar.
+- Reporte ciudadano con expiración, estado visible y recálculo según el lugar afectado.
+- Enlace por ruta mediante `?ruta=alternate`.
+- Vista esquemática de respaldo y diseño móvil accesible.
 
-## Ejecutar
+## Arquitectura
 
-Requisitos: Node.js 18 o superior.
+```text
+Web / WhatsApp → /api/chat → parser de intención
+                              ↓
+                      reportes vigentes
+                              ↓
+                    motor determinista
+                              ↓
+                    objeto de ruta único
+                       ↙               ↘
+              Claude redacta      fallback local
+                       ↘               ↙
+                    respuesta + mapa
+```
 
-```powershell
-cd "C:\Users\oscar\OneDrive\Datos adjuntos\Documentos\MueveteCB"
+El modelo de lenguaje **no dibuja ni inventa rutas**. La función serverless conserva la clave y entrega al modelo únicamente contexto acotado.
+
+## Requisitos
+
+- Node.js 18 o superior.
+- npm 9 o superior.
+- Opcional: cuenta de Anthropic para respuestas reales con Claude.
+- Opcional: CLI de Vercel para probar funciones serverless localmente.
+
+## Ejecutar el frontend
+
+```bash
+npm install
 npm run dev
 ```
 
-Abrir: **http://localhost:4173**
+Abrir la URL que indique Vite, normalmente `http://localhost:5173`.
 
-Para verificar la sintaxis:
+En `localhost`, Vite usa deliberadamente el fallback local para no mostrar un 404 al abrir `/api/chat`. Para probar la función serverless en local, ejecuta `VITE_CHAT_API=true npx vercel dev` (PowerShell: `$env:VITE_CHAT_API='true'; npx vercel dev`). Sin `ANTHROPIC_API_KEY`, la función también responde con el mismo fallback estructurado.
 
-```powershell
+## Probar frontend + API
+
+```bash
+npx vercel dev
+```
+
+La reescritura de `vercel.json` excluye `/api/*`; por eso la función `api/chat.js` no se convierte en una respuesta HTML de la SPA.
+
+## Configurar Claude
+
+1. Crear una clave en Anthropic.
+2. Copiar `.env.example` a `.env.local`.
+3. Completar:
+
+```dotenv
+ANTHROPIC_API_KEY=tu_clave_privada
+ANTHROPIC_MODEL=claude-sonnet-5
+```
+
+En Vercel, configurar las mismas variables en **Project Settings → Environment Variables**. Nunca usar `VITE_` para una clave privada.
+
+## Verificación
+
+```bash
+npm test
+npm run build
 npm run check
 ```
 
-No hay dependencias que instalar: el servidor usa módulos nativos de Node y Leaflet está incluido localmente en `vendor/leaflet`.
+Las pruebas cubren:
 
-## Demo recomendada — 80 segundos
+- interpretación de intención y prioridad;
+- selección de rutas;
+- ubicación y expiración de reportes;
+- consulta de información oficial;
+- fallback sin clave o con proveedor caído;
+- rechazo de afirmaciones no soportadas;
+- contrato HTTP de `/api/chat`.
 
-1. Pulsar **Repetir caso**.
-2. Ángel responde al caso “Mochuelo Alto → Portal Tunal antes de las 7”.
-3. Señalar la ruta resaltada y las capas diferenciadas.
-4. Pulsar **Reportar novedad** → **Bloqueo** → **Vía Alpes – Quiba** → **Enviar y recalcular**.
-5. El aviso aparece en rojo, la ruta pasa a la alternativa por Las Torres y Ángel explica el cambio.
-6. Compartir el enlace generado en la barra de direcciones.
+## Datos
+
+El proyecto incluye un extracto pequeño generado desde el GTFS oficial:
+
+- `src/data/gtfs-ciudad-bolivar-snapshot.json`
+- `src/data/gtfsIndex.js`
+- `src/data/mobilitySources.js`
+- `scripts/build-gtfs-snapshot.mjs`
+
+Para regenerarlo:
+
+```bash
+npm run extract:gtfs -- "C:\ruta\GTFS_20260818" "src/data/gtfs-ciudad-bolivar-snapshot.json"
+```
+
+Detalles, fuentes y límites: `docs/FUENTES-Y-DATOS.md`.
 
 ## Estructura
 
 ```text
 MueveteCB/
-├─ index.html                    Interfaz y contenido accesible
-├─ styles.css                    Sistema visual adaptable a móvil
-├─ app.js                        Chat, rutas, mapa y reportes
-├─ server.mjs                    Servidor local sin dependencias
-├─ manifest.webmanifest          Metadatos de instalación
-├─ assets/                       Identidad visual
-├─ vendor/leaflet/               Leaflet 1.9.4 local
-├─ docs/
-│  ├─ ANALISIS-Y-DECISIONES.md   Diagnóstico de la guía
-│  ├─ GUION-DEMO-Y-PITCH.md      Guion cronometrado
-│  └─ CONTRATOS-INTEGRACION.md   Contratos con David y Ángel
-└─ mi guia.docx                  Documento original, sin modificar
+├─ api/chat.js                  Función serverless segura
+├─ src/App.jsx                  Orquestación de UI
+├─ src/components/              Componentes React
+├─ src/core/                    Parser, motor, fallback y agente
+├─ src/data/                    Catálogo, fuentes y extracto GTFS
+├─ src/hooks/                   Estado de reportes y avisos
+├─ src/services/chatApi.js      Cliente de /api/chat
+├─ scripts/                     ETL reproducible del GTFS
+├─ docs/                        Análisis, contratos, datos y pitch
+├─ vercel.json                  Vite + funciones /api
+└─ package.json
 ```
 
-## Decisión de producto
+## Demo recomendada
 
-La prioridad es demostrar el **ciclo completo** antes que construir una infraestructura perfecta:
+1. Pulsar **Repetir caso**.
+2. Eco responde el viaje Mochuelo Alto → Portal Tunal.
+3. Señalar la ruta y el cambio de capas del mapa.
+4. Reportar un bloqueo en Alpes–Quiba.
+5. Eco cambia a la alternativa por Las Torres y explica la compensación entre tiempo y tramo afectado.
+6. Mostrar que un reporte en Portal Tunal genera advertencia, no una salida inventada.
 
-```text
-Pregunta → compara trazados → explica la ruta → recibe reporte → recalcula
-```
+## Alcance actual
 
-WhatsApp debe integrarse después del flujo navegable. Para la conexión del pitch, usar esta web detrás de un QR o ngrok; si falla, mostrar el video de respaldo.
-
-## Próximo paso de integración
-
-1. Reemplazar el catálogo `ROUTES` de `app.js` por el endpoint de Ángel.
-2. Cargar el GeoJSON de David y usar `confidence`, `updatedAt` y `source` por tramo.
-3. Enviar reportes a un endpoint con `id`, `type`, `location`, `createdAt` y estado de verificación.
-4. Añadir moderación y una línea base de operación para que un reporte aislado no se presente como certeza.
-5. Integrar Twilio Sandbox después de cerrar el contrato de entrada/salida y probar reintentos.
-
-Los campos propuestos están en `docs/CONTRATOS-INTEGRACION.md`.
+- La API de IA está implementada y probada.
+- Los reportes siguen locales al navegador; falta una base compartida o moderación para producción.
+- El modal de WhatsApp prepara el mensaje, pero el webhook Twilio aún requiere credenciales y número del Sandbox.
+- Los trazados completos del GTFS y la capa comunitaria de David todavía deben sustituir el fixture.

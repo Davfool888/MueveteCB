@@ -30,7 +30,7 @@ Campos opcionales para la versión mínima:
 ```json
 {
   "requestId": "req_01J...",
-  "answerText": "Toma el colectivo de Quiba, transborda en Villa del Rosario y llega por TransMiCable. Salida 5:35 a. m.; llegada 6:29 a. m.",
+  "answerText": "Toma el colectivo de Quiba, transborda en Mirador del Paraíso y llega por TransMiCable. Salida 5:35 a. m.; llegada 6:29 a. m.",
   "intent": "route_planning",
   "needsClarification": false,
   "route": {
@@ -55,7 +55,7 @@ Campos opcionales para la versión mínima:
         "order": 1,
         "mode": "informal",
         "from": "Mochuelo Alto",
-        "to": "Villa del Rosario",
+        "to": "Mirador del Paraíso",
         "durationMinutes": 25,
         "instruction": "Toma el colectivo de Quiba",
         "source": "community_dataset",
@@ -137,7 +137,7 @@ Propiedades recomendadas para cada capa:
 ```json
 {
   "id": "stop_001",
-  "name": "Villa del Rosario",
+  "name": "Mirador del Paraíso",
   "kind": "station | stop | board | poi",
   "modes": ["TransMiCable"],
   "routeIds": ["CABLE-01"],

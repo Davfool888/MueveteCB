@@ -29,17 +29,17 @@ export default function Hero({
           <em>sin adivinar.</em>
         </h1>
         <p className="hero-lead">
-          Un solo asistente de IA para cruzar <strong>TransMiCable</strong>, <strong>SITP</strong> y <strong>camperos veredales</strong>, calculando tiempos, tarifas en pesos y sorteando novedades ciudadanas en tiempo real.
+          Un asistente de IA para comparar <strong>TransMiCable</strong>, <strong>SITP</strong> y <strong>camperos veredales</strong>, explicar tiempos y considerar reportes ciudadanos recientes.
         </p>
 
         <div className="hero-proof" aria-label="Beneficios del prototipo">
           <div className="proof-item">
-            <strong>$2.950 – $5.450</strong>
-            <span>Tarifas transparentes</span>
+            <strong>$3.550 – $6.050*</strong>
+            <span>Tarifas formales + informal demo</span>
           </div>
           <div className="proof-item">
-            <strong>100% CB</strong>
-            <span>Delimitado a la localidad</span>
+            <strong>Localidad 19</strong>
+            <span>Ámbito del prototipo</span>
           </div>
           <div className="proof-item">
             <strong>Agente IA</strong>
@@ -114,7 +114,7 @@ export default function Hero({
                 cursor: 'pointer',
               }}
             >
-              ♿ Accesible
+              ♿ Formal / PMR
             </button>
           </div>
         </div>
@@ -200,7 +200,7 @@ export default function Hero({
             <path d="m9 18 6-6-6-6" />
           </svg>
         </button>
-        <p className="form-hint">Cruza frecuencias de camperos, teleférico, SITP y alertas ciudadanas.</p>
+        <p className="form-hint">Compara alternativas del fixture y considera reportes ciudadanos vigentes.</p>
       </form>
     </section>
   );

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
+import { GTFS_ANCHOR_STOPS } from '../../data/gtfsIndex';
 import {
   CIUDAD_BOLIVAR_BOUNDS,
   CIUDAD_BOLIVAR_CENTER,
@@ -94,7 +95,7 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
         lineCap: 'round',
         lineJoin: 'round',
       })
-        .bindTooltip('🚡 TransMiCable (Portal Tunal ↔ Mirador del Paraíso) · $2.950 TuLlave', { sticky: true })
+        .bindTooltip('🚡 TransMiCable (Portal Tunal ↔ Mirador del Paraíso) · $3.550 (2026)', { sticky: true })
         .addTo(groups.cable);
 
       // 3. TransMiCable Stations
@@ -111,8 +112,8 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
             <h4 style="margin: 2px 0 6px; font-size: 1.05rem; color: #062f2b;">${st.name}</h4>
             <p style="margin: 0 0 6px; font-size: 0.85rem; color: #516564;">${st.detail}</p>
             <div style="display: flex; gap: 6px; font-size: 0.78rem;">
-              <span style="background: #eef4ef; padding: 2px 6px; border-radius: 6px; font-weight: 600; color: #075d50;">♿ Ascensor 100% PMR</span>
-              <span style="background: #fff3cf; padding: 2px 6px; border-radius: 6px; font-weight: 600; color: #9a6c0b;">$2.950 COP</span>
+              <span style="background: #eef4ef; padding: 2px 6px; border-radius: 6px; font-weight: 600; color: #075d50;">Fuente: TransMilenio</span>
+              <span style="background: #fff3cf; padding: 2px 6px; border-radius: 6px; font-weight: 600; color: #9a6c0b;">$3.550 COP</span>
             </div>
           </div>
         `;
@@ -126,8 +127,45 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
         opacity: 0.9,
         lineCap: 'round',
       })
-        .bindTooltip('🚌 Corredor SITP (Rutas H610 / 6-18) · $2.950 TuLlave (Transbordo $0)', { sticky: true })
+        .bindTooltip('🚌 Corredor SITP de demostración · $3.550 (2026)', { sticky: true })
         .addTo(groups.sitp);
+
+      // Official GTFS anchor stops. Geometry remains a separate fixture until David supplies route shapes.
+      GTFS_ANCHOR_STOPS.forEach((stop) => {
+        const marker = L.circleMarker(stop.coordinates, {
+          radius: 5,
+          color: '#174a7e',
+          weight: 2,
+          fillColor: '#ffffff',
+          fillOpacity: 1,
+          keyboard: true,
+          title: `${stop.name} — GTFS 2026-08-18`,
+        });
+        const popup = document.createElement('div');
+        popup.style.minWidth = '210px';
+        const title = document.createElement('strong');
+        title.textContent = stop.name;
+        const source = document.createElement('div');
+        source.textContent = 'Fuente: GTFS SITP · 18 de agosto de 2026';
+        source.style.cssText = 'font-size:0.72rem;color:#516564;margin:3px 0 7px;';
+        const routeTitle = document.createElement('div');
+        routeTitle.textContent = 'Servicios que pasan por este punto:';
+        routeTitle.style.cssText = 'font-size:0.78rem;font-weight:700;margin-bottom:4px;';
+        const routeList = document.createElement('ul');
+        routeList.style.cssText = 'margin:0;padding-left:18px;font-size:0.78rem;line-height:1.45;';
+        stop.routes.slice(0, 10).forEach((route) => {
+          const item = document.createElement('li');
+          item.textContent = `${route.shortName || route.id} — ${route.longName || 'SITP'}`;
+          routeList.append(item);
+        });
+        if (stop.routes.length > 10) {
+          const more = document.createElement('li');
+          more.textContent = `y ${stop.routes.length - 10} servicios más`;
+          routeList.append(more);
+        }
+        popup.append(title, source, routeTitle, routeList);
+        marker.bindPopup(popup).addTo(groups.sitp);
+      });
 
       // 5. Informal and Veredales paths
       INFORMAL_PATHS.forEach((path) => {
@@ -153,7 +191,11 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
           .addTo(groups.boundary);
       });
 
-      setTimeout(() => map.invalidateSize(), 120);
+      setTimeout(() => {
+        if (mapRef.current === map && mapContainerRef.current?.isConnected) {
+          map.invalidateSize();
+        }
+      }, 120);
       onConnectionChange(true);
     } catch (err) {
       console.error('No fue posible inicializar Leaflet', err);
@@ -236,6 +278,7 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
 
     // Fit bounds smoothly within Ciudad Bolívar
     setTimeout(() => {
+      if (mapRef.current !== map || !map._mapPane || !mapContainerRef.current?.isConnected) return;
       map.fitBounds(L.latLngBounds(route.mapPath), {
         paddingTopLeft: [35, 30],
         paddingBottomRight: [35, 80],
@@ -275,7 +318,7 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
 
       const meta = document.createElement('div');
       meta.style.cssText = 'font-size:0.8rem; color:#516564; margin-bottom:6px;';
-      meta.textContent = 'Reportado por vecino · Activo en tiempo real';
+      meta.textContent = `Estado: ${report.status || 'reportado'} · se oculta al expirar`;
 
       popupEl.append(tag, title, meta);
 
@@ -286,10 +329,14 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
         popupEl.append(note);
       }
 
-      const corroborate = document.createElement('span');
-      corroborate.style.cssText = 'display:inline-block; font-size:0.75rem; color:#087f68; font-weight:600;';
-      corroborate.textContent = '✓ 2 corroboraciones comunitarias';
-      popupEl.append(corroborate);
+      if (['corroborated', 'verified'].includes(report.status)) {
+        const corroborate = document.createElement('span');
+        corroborate.style.cssText = 'display:inline-block; font-size:0.75rem; color:#087f68; font-weight:600;';
+        corroborate.textContent = report.status === 'verified'
+          ? '✓ Reporte verificado'
+          : '✓ Reporte corroborado por la comunidad';
+        popupEl.append(corroborate);
+      }
 
       marker.bindPopup(popupEl).addTo(groups.reports);
     });

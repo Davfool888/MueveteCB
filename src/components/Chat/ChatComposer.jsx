@@ -82,7 +82,7 @@ export default function ChatComposer({ onSend, showToast }) {
 
   return (
     <form className="chat-composer" id="chat-form" onSubmit={handleSubmit}>
-      <label className="sr-only" htmlFor="chat-input">Escribe una pregunta para Ángel</label>
+      <label className="sr-only" htmlFor="chat-input">Escribe una pregunta para Eco</label>
       <textarea
         id="chat-input"
         ref={textareaRef}

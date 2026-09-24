@@ -14,9 +14,9 @@ En pantalla: página inicial, con el caso visible en la franja de demostración.
 
 **Santiago:** “La prueba es simple: ¿cómo se siente preguntar lo que realmente necesita?”
 
-Pulsar **Repetir caso**. El chat escribe la pregunta y Ángel responde.
+Pulsar **Repetir caso**. El chat escribe la pregunta y Eco responde.
 
-**Ángel:** “Colectivo de Quiba, transbordo en Villa del Rosario y TransMiCable directo. Cincuenta y cuatro minutos; llegada estimada 6:29.”
+**Eco:** “Colectivo de Quiba, transbordo en Mirador del Paraíso y TransMiCable directo. Cincuenta y cuatro minutos; llegada estimada 6:29.”
 
 Señalar la ruta resaltada y decir: “La misma recomendación existe como texto y como mapa.”
 
@@ -41,7 +41,7 @@ La ruta se torna amarilla y cambia hacia Las Torres.
 
 ### 1:02–1:15 — Decisión de IA
 
-**Ángel:** “Evito el tramo bloqueado. La alternativa llega 13 minutos más tarde, pero no depende de la vía cerrada.”
+**Eco:** “Evito el tramo bloqueado. La alternativa suma 10 minutos al recorrido, pero no depende de la vía cerrada.”
 
 **Santiago:** “La IA no reemplaza el dato local: incorpora la señal comunitaria y explica la consecuencia.”
 
