@@ -119,17 +119,17 @@ export default function ReportDialog({ isOpen, onClose, onSubmit }) {
             <input
               type="radio"
               name="reportType"
-              value="clima"
-              checked={reportType === 'clima'}
-              onChange={() => setReportType('clima')}
+              value="otro"
+              checked={reportType === 'otro'}
+              onChange={() => setReportType('otro')}
             />
             <span>
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/>
-                <path d="m8 19-2 3M12 19l-2 3M16 19l-2 3"/>
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 11v5M12 8h.01"/>
               </svg>
-              <strong>Clima / Lluvia</strong>
-              <small>Trocha resbalosa</small>
+              <strong>Otro</strong>
+              <small>Otra novedad local</small>
             </span>
           </label>
         </fieldset>
@@ -147,7 +147,7 @@ export default function ReportDialog({ isOpen, onClose, onSubmit }) {
               onChange={(e) => setLocation(e.target.value)}
             >
               <option value="alpes">Vía Alpes – Quiba</option>
-              <option value="rosario">Sector Villa del Rosario / Paraíso</option>
+              <option value="paraiso">Mirador del Paraíso / enlace veredal</option>
               <option value="meissen">Av. Boyacá con Meissen</option>
               <option value="torres">Cruce Sector Las Torres</option>
               <option value="tunal">Portal Tunal (Entrada peatonal)</option>

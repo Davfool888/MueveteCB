@@ -52,7 +52,7 @@ export default function RouteSummary({ activeRoute, margin, isAlert, onSelectRou
             transition: 'all 0.18s ease',
           }}
         >
-          💰 Más Económica ($2.950)
+          💰 Más económica ($3.550*)
         </button>
         <button
           type="button"
@@ -70,7 +70,7 @@ export default function RouteSummary({ activeRoute, margin, isAlert, onSelectRou
             transition: 'all 0.18s ease',
           }}
         >
-          ♿ 100% Accesible PMR
+          ♿ Ruta formal PMR*
         </button>
       </div>
 
@@ -108,7 +108,7 @@ export default function RouteSummary({ activeRoute, margin, isAlert, onSelectRou
         <div>
           <span>Costo Total</span>
           <strong id="trip-cost" style={{ color: 'var(--green-800)' }}>
-            {activeRoute.costFormatted || '$5.450'}
+            {activeRoute.costFormatted || '$6.050*'}
           </strong>
         </div>
         <div>
@@ -204,6 +204,9 @@ export default function RouteSummary({ activeRoute, margin, isAlert, onSelectRou
           </p>
         </div>
       </div>
+      <p className="map-note" style={{ marginTop: '12px' }}>
+        * La tarifa formal de $3.550 corresponde a 2026. Los tramos informales y las rutas combinadas siguen en validación.
+      </p>
     </article>
   );
 }

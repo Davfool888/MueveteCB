@@ -5,7 +5,7 @@ export default function WhatsAppModal({ isOpen, onClose, activeRoute, origin, de
 
   if (!isOpen) return null;
 
-  const sampleMessage = `Hola Ángel 🚡, salgo de ${origin || 'Mochuelo Alto'} hacia ${destination || 'Portal Tunal'} para llegar antes de las ${deadline || '07:00'}. ¿Cuál es mi mejor ruta, cuánto me vale y si hay bloqueos?`;
+  const sampleMessage = `Hola Eco, salgo de ${origin || 'Mochuelo Alto'} hacia ${destination || 'Portal Tunal'} para llegar antes de las ${deadline || '07:00'}. ¿Cuál es mi mejor ruta, cuánto me vale y si hay bloqueos?`;
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(sampleMessage)}`;
 
   function handleCopy() {
@@ -74,7 +74,7 @@ export default function WhatsAppModal({ isOpen, onClose, activeRoute, origin, de
             </div>
             <div>
               <h3 id="wa-modal-title" style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600 }}>
-                Ángel · Muévete CB
+                Eco · ECO CB
               </h3>
               <span style={{ fontSize: '0.78rem', color: '#bce7d9' }}>En línea · Asistente Comunitario</span>
             </div>
@@ -141,17 +141,17 @@ export default function WhatsAppModal({ isOpen, onClose, activeRoute, origin, de
             }}
           >
             <strong style={{ display: 'block', color: '#075e54', marginBottom: '4px' }}>
-              Ángel de Ciudad Bolívar:
+              Eco, asistente de movilidad:
             </strong>
             <p style={{ margin: '0 0 6px' }}>
               ¡Hola vecina/vecino! Para tu trayecto a <strong>{destination || 'Portal Tunal'}</strong>:
             </p>
             <ul style={{ margin: '0 0 8px', paddingLeft: '18px', fontSize: '0.84rem' }}>
-              <li>🚐 <strong>1. Campero:</strong> Salida a las {activeRoute?.departureClock || '5:35 AM'} ($2.500 COP efectivo).</li>
-              <li>🚡 <strong>2. TransMiCable:</strong> En Mirador del Paraíso ($2.950 COP TuLlave).</li>
+              <li>🚐 <strong>1. Tramo veredal:</strong> Salida estimada {activeRoute?.departureClock || '5:35 a. m.'} (tarifa por confirmar).</li>
+              <li>🚡 <strong>2. TransMiCable:</strong> En Mirador del Paraíso ($3.550 COP TuLlave, tarifa 2026).</li>
             </ul>
             <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, color: '#087f68' }}>
-              ⏱️ Duración: {activeRoute?.duration || '54 min'} | 💰 Costo: {activeRoute?.costFormatted || '$5.450 COP'}.
+              ⏱️ Duración: {activeRoute?.duration || '54 min'} | 💰 Costo estimado: {activeRoute?.costFormatted || '$6.050* COP'}.
             </p>
             <span style={{ display: 'block', textAlign: 'right', fontSize: '0.7rem', color: '#6b7280', marginTop: '4px' }}>
               Ahora
@@ -203,8 +203,11 @@ export default function WhatsAppModal({ isOpen, onClose, activeRoute, origin, de
               boxShadow: '0 2px 8px rgba(37,211,102,0.3)',
             }}
           >
-            <span>💬 Abrir conversación en WhatsApp Real</span>
+            <span>💬 Abrir WhatsApp con el mensaje</span>
           </a>
+          <p style={{ margin: '2px 0 0', color: '#647572', fontSize: '0.7rem', textAlign: 'center' }}>
+            Vista previa del canal. El webhook de Twilio se activa al configurar el número del Sandbox.
+          </p>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
               onClick={handleCopy}

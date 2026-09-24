@@ -4,7 +4,7 @@ export default function Header({ onOpenReport, onOpenWhatsApp }) {
   return (
     <header className="topbar">
       {/* Brand / Logo */}
-      <a className="brand" href="#contenido" aria-label="Muevete CB, inicio">
+      <a className="brand" href="#contenido">
         <span className="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 44 44" role="img" aria-hidden="true">
             <path d="M11 29c0-8 5-11 11-11 5 0 8-3 8-7"/>

@@ -17,8 +17,8 @@ export default function ChatPanel({ messages, isTyping, onSendMessage, onResetDe
           </span>
           <div>
             <div className="agent-title-row">
-              <h2 id="chat-title">Ángel</h2>
-              <span className="online-badge">Demo</span>
+              <h2 id="chat-title">Eco</h2>
+              <span className="online-badge">IA · Demo</span>
             </div>
             <p>Asistente de movilidad</p>
           </div>
