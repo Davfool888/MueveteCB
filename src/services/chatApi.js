@@ -1,4 +1,11 @@
 const DEFAULT_TIMEOUT_MS = 9000;
+const LOCAL_API_OPT_IN =
+  typeof import.meta !== 'undefined' && import.meta.env?.VITE_CHAT_API === 'true';
+
+function isPlainLocalDevServer() {
+  if (typeof window === 'undefined') return false;
+  return ['localhost', '127.0.0.1'].includes(window.location.hostname) && !LOCAL_API_OPT_IN;
+}
 
 export class ChatApiError extends Error {
   constructor(message, status = 0, code = 'network_error') {
@@ -13,6 +20,9 @@ export async function requestChat(input, options = {}) {
   const fetchImpl = options.fetchImpl || globalThis.fetch;
   if (typeof fetchImpl !== 'function') {
     throw new ChatApiError('Fetch no está disponible.', 0, 'fetch_unavailable');
+  }
+  if (!options.fetchImpl && isPlainLocalDevServer()) {
+    throw new ChatApiError('La API se probará en Vercel; se usará el fallback local.', 0, 'local_fallback');
   }
 
   const controller = new AbortController();

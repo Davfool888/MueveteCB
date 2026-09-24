@@ -191,7 +191,11 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
           .addTo(groups.boundary);
       });
 
-      setTimeout(() => map.invalidateSize(), 120);
+      setTimeout(() => {
+        if (mapRef.current === map && mapContainerRef.current?.isConnected) {
+          map.invalidateSize();
+        }
+      }, 120);
       onConnectionChange(true);
     } catch (err) {
       console.error('No fue posible inicializar Leaflet', err);
@@ -274,6 +278,7 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
 
     // Fit bounds smoothly within Ciudad Bolívar
     setTimeout(() => {
+      if (mapRef.current !== map || !map._mapPane || !mapContainerRef.current?.isConnected) return;
       map.fitBounds(L.latLngBounds(route.mapPath), {
         paddingTopLeft: [35, 30],
         paddingBottomRight: [35, 80],

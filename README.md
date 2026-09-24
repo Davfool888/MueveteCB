@@ -50,7 +50,7 @@ npm run dev
 
 Abrir la URL que indique Vite, normalmente `http://localhost:5173`.
 
-Sin `ANTHROPIC_API_KEY`, la interfaz usa el mismo contrato y una respuesta determinista.
+En `localhost`, Vite usa deliberadamente el fallback local para no mostrar un 404 al abrir `/api/chat`. Para probar la función serverless en local, ejecuta `VITE_CHAT_API=true npx vercel dev` (PowerShell: `$env:VITE_CHAT_API='true'; npx vercel dev`). Sin `ANTHROPIC_API_KEY`, la función también responde con el mismo fallback estructurado.
 
 ## Probar frontend + API
 
