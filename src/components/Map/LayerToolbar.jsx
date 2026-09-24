@@ -1,10 +1,11 @@
-﻿import React from 'react';
+import React from 'react';
 
 const LAYER_DEFS = [
   { key: 'route', label: 'Ruta', legendClass: 'legend-line legend-route' },
-  { key: 'cable', label: 'TransMiCable', legendClass: 'legend-line legend-cable' },
-  { key: 'sitp', label: 'SITP', legendClass: 'legend-line legend-sitp' },
-  { key: 'informal', label: 'Veredales', legendClass: 'legend-line legend-informal' },
+  { key: 'cable', label: 'TransMiCable 🚡', legendClass: 'legend-line legend-cable' },
+  { key: 'sitp', label: 'SITP 🚌', legendClass: 'legend-line legend-sitp' },
+  { key: 'informal', label: 'Veredales 🚐', legendClass: 'legend-line legend-informal' },
+  { key: 'boundary', label: 'Límite CB 📍', legendClass: 'legend-line legend-route' },
 ];
 
 export default function LayerToolbar({ layers, reportCount, onToggle }) {
@@ -32,7 +33,7 @@ export default function LayerToolbar({ layers, reportCount, onToggle }) {
         onClick={() => onToggle('reports')}
       >
         <span className="legend-alert">{reportCount}</span>
-        Reportes
+        Alertas ({reportCount})
       </button>
     </div>
   );

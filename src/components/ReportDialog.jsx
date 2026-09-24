@@ -1,4 +1,4 @@
-﻿import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 export default function ReportDialog({ isOpen, onClose, onSubmit }) {
   const dialogRef = useRef(null);
@@ -44,9 +44,9 @@ export default function ReportDialog({ isOpen, onClose, onSubmit }) {
       <form onSubmit={handleSubmit}>
         <header className="dialog-header">
           <div>
-            <span className="section-kicker">Reporte ciudadano</span>
-            <h2 id="report-title">¿Qué está pasando?</h2>
-            <p>Tu aviso ayuda a recalcular la ruta de otros vecinos.</p>
+            <span className="section-kicker">Reporte ciudadano en vivo</span>
+            <h2 id="report-title">¿Qué está pasando en la vía?</h2>
+            <p>Tu aviso ayuda al agente de IA a recalcular la ruta de otros vecinos en tiempo real.</p>
           </div>
           <button
             className="icon-button dialog-close"
@@ -60,7 +60,7 @@ export default function ReportDialog({ isOpen, onClose, onSubmit }) {
           </button>
         </header>
 
-        <fieldset className="report-types">
+        <fieldset className="report-types" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))' }}>
           <legend>Tipo de novedad</legend>
           <label>
             <input
@@ -76,9 +76,10 @@ export default function ReportDialog({ isOpen, onClose, onSubmit }) {
                 <path d="M12 9v5M12 17h.01"/>
               </svg>
               <strong>Bloqueo</strong>
-              <small>La vía está cerrada</small>
+              <small>Vía cerrada</small>
             </span>
           </label>
+
           <label>
             <input
               type="radio"
@@ -93,9 +94,10 @@ export default function ReportDialog({ isOpen, onClose, onSubmit }) {
                 <path d="M12 7v6l4 2"/>
               </svg>
               <strong>Demora</strong>
-              <small>Está avanzando lento</small>
+              <small>Trancón fuerte</small>
             </span>
           </label>
+
           <label>
             <input
               type="radio"
@@ -109,13 +111,31 @@ export default function ReportDialog({ isOpen, onClose, onSubmit }) {
                 <path d="M4 7h13M14 4l3 3-3 3M20 17H7M10 14l-3 3 3 3"/>
               </svg>
               <strong>Cambio</strong>
-              <small>Cambió el recorrido</small>
+              <small>Desvío de ruta</small>
+            </span>
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              name="reportType"
+              value="clima"
+              checked={reportType === 'clima'}
+              onChange={() => setReportType('clima')}
+            />
+            <span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/>
+                <path d="m8 19-2 3M12 19l-2 3M16 19l-2 3"/>
+              </svg>
+              <strong>Clima / Lluvia</strong>
+              <small>Trocha resbalosa</small>
             </span>
           </label>
         </fieldset>
 
         <label className="field dialog-field">
-          <span>Lugar afectado</span>
+          <span>Lugar afectado en Ciudad Bolívar</span>
           <span className="input-wrap">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
@@ -127,15 +147,17 @@ export default function ReportDialog({ isOpen, onClose, onSubmit }) {
               onChange={(e) => setLocation(e.target.value)}
             >
               <option value="alpes">Vía Alpes – Quiba</option>
-              <option value="rosario">Sector Villa del Rosario</option>
-              <option value="tunal">Portal Tunal</option>
+              <option value="rosario">Sector Villa del Rosario / Paraíso</option>
+              <option value="meissen">Av. Boyacá con Meissen</option>
+              <option value="torres">Cruce Sector Las Torres</option>
+              <option value="tunal">Portal Tunal (Entrada peatonal)</option>
             </select>
           </span>
         </label>
 
         <label className="field dialog-field">
           <span>
-            Comentario <small>(opcional)</small>
+            Detalle del reporte <small>(opcional)</small>
           </span>
           <textarea
             name="note"
@@ -143,13 +165,13 @@ export default function ReportDialog({ isOpen, onClose, onSubmit }) {
             rows={3}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Por ejemplo: hay varias personas esperando el colectivo…"
+            placeholder="Ej: Hay árboles caídos o los camperos están subiendo solo hasta la curva..."
           />
         </label>
 
         <label className="privacy-check">
           <input type="checkbox" name="anonymous" defaultChecked/>
-          <span>Mostrar como "Vecino/a de Ciudad Bolívar"</span>
+          <span>Mostrar como "Vecino/a de Ciudad Bolívar" (Sin pedir datos personales)</span>
         </label>
 
         <div className="dialog-actions">
@@ -157,10 +179,10 @@ export default function ReportDialog({ isOpen, onClose, onSubmit }) {
             Cancelar
           </button>
           <button className="button button-primary" type="submit">
-            Enviar y recalcular
+            Publicar reporte y recalcular ruta
           </button>
         </div>
-        <p className="dialog-local-note">En esta demo, el reporte se guarda únicamente en este navegador.</p>
+        <p className="dialog-local-note">En esta demo, el reporte se procesa inmediatamente y reorienta el agente de movilidad.</p>
       </form>
     </dialog>
   );

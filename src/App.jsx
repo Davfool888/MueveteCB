@@ -1,8 +1,9 @@
-﻿import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { ROUTES, REPORT_LOCATIONS, REPORT_TYPE_LABELS } from './data/routes';
 import { normalizeText, destinationPhrase, formatDeadlineLabel, timeToMinutes } from './utils/helpers';
 import { useToast } from './hooks/useToast';
 import { useReports } from './hooks/useReports';
+import { queryMobilityAgent } from './services/aiAgent';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import DemoStrip from './components/DemoStrip';
@@ -10,6 +11,7 @@ import Workspace from './components/Workspace';
 import ValueSection from './components/ValueSection';
 import Footer from './components/Footer';
 import ReportDialog from './components/ReportDialog';
+import WhatsAppModal from './components/WhatsAppModal';
 import Toast from './components/Toast';
 
 let messageIdCounter = 0;
@@ -18,16 +20,18 @@ function makeId() { return ++messageIdCounter; }
 export default function App() {
   // ── Global UI state ────────────────────────────────────────────────────────
   const [activeRouteId, setActiveRouteIdState] = useState('main');
+  const [priorityMode, setPriorityMode] = useState('fastest');
   const [messages, setMessages] = useState([
     {
       id: makeId(),
       role: 'agent',
-      text: 'Hola, soy Ángel. Dime de dónde sales, a dónde vas y a qué hora necesitas llegar. También puedes reportar una novedad con el botón superior.',
+      text: 'Hola, soy Ángel, tu Asistente de Movilidad de Ciudad Bolívar. Dime de dónde sales, a dónde vas y cuál es tu prioridad (rapidez, economía o accesibilidad). También puedes reportar bloqueos o consultar por WhatsApp.',
       routeId: null,
       isTyping: false,
     },
   ]);
   const [layers, setLayers] = useState({
+    boundary: true,
     route: true,
     cable: true,
     sitp: true,
@@ -39,6 +43,7 @@ export default function App() {
   const [destination, setDestination] = useState('Portal Tunal');
   const [deadline, setDeadline] = useState('07:00');
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
 
   const { toast, showToast } = useToast();
@@ -48,7 +53,7 @@ export default function App() {
 
   // ── Derived: compute margin for current route ──────────────────────────────
   const activeRoute = ROUTES[activeRouteId] || ROUTES.main;
-  const margin = timeToMinutes(deadline) - activeRoute.arrivalMinutes;
+  const margin = timeToMinutes(deadline) - (activeRoute?.arrivalMinutes || 389);
 
   // ── Has blocking report? ───────────────────────────────────────────────────
   const hasBlockingReport = useCallback((rpts) => {
@@ -91,7 +96,7 @@ export default function App() {
 
   // ── processQuery (from planner form / demo button) ─────────────────────────
   const processQuery = useCallback(
-    (org, dest, dl, source) => {
+    (org, dest, dl, source, pMode = priorityMode) => {
       clearTimeout(typingTimerRef.current);
       removeTypingIndicator();
 
@@ -104,89 +109,89 @@ export default function App() {
 
       showTypingIndicator();
 
-      const preferredRouteId = normalizedOrigin.includes('quiba') ? 'quiba' : 'main';
-      const routeId =
-        preferredRouteId === 'main' && hasBlockingReport(reports) ? 'alternate' : preferredRouteId;
-      const route = ROUTES[routeId];
+      let targetId = 'main';
+      if (pMode === 'cheapest') {
+        targetId = 'economic';
+      } else if (pMode === 'accessible') {
+        targetId = 'accessible';
+      } else {
+        const preferredRouteId = normalizedOrigin.includes('quiba') ? 'quiba' : 'main';
+        targetId =
+          preferredRouteId === 'main' && hasBlockingReport(reports) ? 'alternate' : preferredRouteId;
+      }
+
+      const route = ROUTES[targetId] || ROUTES.main;
 
       typingTimerRef.current = window.setTimeout(() => {
         removeTypingIndicator();
-        setActiveRoute(routeId);
+        setActiveRoute(targetId);
 
         const goalMessage =
-          routeId === 'alternate'
-            ? `Hay un bloqueo activo, así que ajusté la ruta para llegar antes de las ${formatDeadlineLabel(dl)}`
-            : normalizeText(dest).includes('tunal')
-            ? `Encontré una opción para llegar antes de las ${formatDeadlineLabel(dl)}`
-            : `Para esta demostración tengo un trayecto preparado ${destinationPhrase(dest)}.`;
+          targetId === 'alternate'
+            ? `⚠️ Hay un bloqueo activo en la vía, así que ajusté tu ruta por Las Torres para llegar antes de las ${formatDeadlineLabel(dl)}.`
+            : targetId === 'economic'
+            ? `💰 Te calculé la opción más económica ($2.950 COP tarifa única SITP) para llegar antes de las ${formatDeadlineLabel(dl)}.`
+            : targetId === 'accessible'
+            ? `♿ Ruta 100% Accesible PMR recomendada con TransMiCable continuo sin barreras arquitectónicas.`
+            : `⚡ Encontré la opción más rápida combinando campero y TransMiCable para llegar antes de las ${formatDeadlineLabel(dl)}.`;
+
+        const stepsText = route.segments
+          .map((s, i) => `${i + 1}. ${s.title} (${s.time} - ${s.cost || ''})`)
+          .join('\n');
 
         addRouteMessage(
-          `${goalMessage}\n${route.segments.map((s, i) => `${i + 1}. ${s.title} (${s.time}).`).join('\n')}\nTiempo total estimado: ${route.duration}. ${route.reason}`,
-          routeId
+          `${goalMessage}\n${stepsText}\n⏱️ Duración: ${route.duration} | 💰 Costo total: ${route.costFormatted} (${route.paymentMethod}).\n${route.reason}`,
+          targetId
         );
-        showToast(`Ruta lista: ${route.title}`);
-      }, 720);
+        showToast(`Ruta lista: ${route.title} (${route.costFormatted})`);
+      }, 650);
     },
-    [reports, addMessage, addRouteMessage, showTypingIndicator, removeTypingIndicator, setActiveRoute, showToast, hasBlockingReport]
+    [reports, priorityMode, addMessage, addRouteMessage, showTypingIndicator, removeTypingIndicator, setActiveRoute, showToast, hasBlockingReport]
   );
 
-  // ── processTextMessage (from chat form / quick prompts) ────────────────────
+  // ── processTextMessage (from chat form / quick prompts / voice) ───────────
   const processTextMessage = useCallback(
-    (text) => {
+    async (text) => {
       clearTimeout(typingTimerRef.current);
       removeTypingIndicator();
       addMessage('user', text);
       showTypingIndicator();
 
-      const normalized = normalizeText(text);
-      const isReport = /\b(reporte|reportar|bloqueo|demora|cambio de ruta)\b/.test(normalized);
-
-      if (isReport) {
-        const type = normalized.includes('demora')
-          ? 'demora'
-          : normalized.includes('cambio')
-          ? 'cambio'
-          : 'bloqueo';
-        const location = normalized.includes('rosario')
-          ? 'rosario'
-          : normalized.includes('tunal')
-          ? 'tunal'
-          : 'alpes';
-        const cleanNote = text.replace(/^\s*reporte\s+/i, '').slice(0, 140);
+      try {
+        const agentResponse = await queryMobilityAgent({
+          query: text,
+          activeReports: reports,
+          currentRouteId: activeRouteId,
+          origin,
+          destination,
+          deadline,
+        });
 
         typingTimerRef.current = window.setTimeout(() => {
           removeTypingIndicator();
-          handleAddReport({ type, location, note: cleanNote, source: 'chat' });
-          showToast('Reporte recibido y ruta recalculada');
-        }, 760);
-        return;
-      }
 
-      const preferredRouteId =
-        normalized.includes('quiba') && !normalized.includes('mochuelo') ? 'quiba' : 'main';
-      const routeId =
-        preferredRouteId === 'main' && hasBlockingReport(reports) ? 'alternate' : preferredRouteId;
+          // If a new report was detected by the agent
+          if (agentResponse.newReport) {
+            addReportToState(agentResponse.newReport);
+          }
 
-      typingTimerRef.current = window.setTimeout(() => {
+          if (agentResponse.suggestedRouteId) {
+            setActiveRoute(agentResponse.suggestedRouteId);
+          }
+
+          addRouteMessage(agentResponse.replyText, agentResponse.suggestedRouteId || activeRouteId);
+          showToast('Ángel actualizó tu recomendación');
+        }, 500);
+      } catch (err) {
+        console.error('Error procesando consulta:', err);
         removeTypingIndicator();
-        setActiveRoute(routeId);
-        const route = ROUTES[routeId];
-
-        if (normalized.includes('hola') || normalized.includes('gracias')) {
-          addMessage('agent', 'Con gusto. Estoy listo para comparar rutas o registrar una novedad.');
-          return;
-        }
-
-        addRouteMessage(
-          `Te recomiendo ${route.title}.\n${route.segments.map((s, i) => `${i + 1}. ${s.title}: ${s.time}.`).join('\n')}\nLlegada estimada ${route.arrivalClock}. ${route.reason}`,
-          routeId
-        );
-      }, 720);
+        addMessage('agent', 'Hubo un momento de congestión en la consulta. Puedes elegir una ruta en el mapa o intentar de nuevo.');
+      }
     },
-    [reports, addMessage, addRouteMessage, showTypingIndicator, removeTypingIndicator, setActiveRoute, showToast, hasBlockingReport]
+    [reports, activeRouteId, origin, destination, deadline, addMessage, addRouteMessage, showTypingIndicator, removeTypingIndicator, addReportToState, setActiveRoute, showToast]
   );
 
-  // ── addReport ─────────────────────────────────────────────────────────────
+  // ── handleAddReport ─────────────────────────────────────────────────────────
   const handleAddReport = useCallback(
     ({ type, location, note, source }) => {
       const report = {
@@ -200,7 +205,7 @@ export default function App() {
       addReportToState(report);
 
       const newReports = [report, ...reports];
-      const shouldReroute = report.type === 'bloqueo' || report.type === 'cambio';
+      const shouldReroute = report.type === 'bloqueo' || report.type === 'cambio' || report.type === 'clima';
       const nextRouteId = shouldReroute ? 'alternate' : activeRouteId;
       setActiveRoute(nextRouteId, newReports);
 
@@ -209,19 +214,31 @@ export default function App() {
 
       if (shouldReroute) {
         addRouteMessage(
-          `Recibí el reporte de ${typeLabel.toLowerCase()} en ${locationName}.\nActualicé la recomendación: ahora te sugiero la alternativa por Las Torres. Llega aproximadamente 13 minutos más tarde, pero evita el tramo afectado.`,
+          `🚨 Recibí el reporte de **${typeLabel.toLowerCase()}** en **${locationName}**.\nActualicé la recomendación en el mapa: ahora te sugiero la **Alternativa por Las Torres**. Llega aproximadamente 10 minutos más tarde, pero evita el tramo afectado. Tarifa total: $5.450 COP.`,
           'alternate'
         );
       } else {
         addMessage(
           'agent',
-          `Gracias. Registré una ${typeLabel.toLowerCase()} en ${locationName}. La muestra en el mapa con la hora del reporte; ten en cuenta que aún debe confirmarse con la comunidad.`
+          `Gracias vecino/a. Registré una **${typeLabel.toLowerCase()}** en **${locationName}**. Aparece señalizada en el mapa y la comunidad puede corroborarla en tiempo real.`
         );
       }
 
-      if (source === 'form') showToast('Reporte guardado. La ruta fue recalculada.');
+      if (source === 'form') showToast('Reporte guardado. Ruta recalculada.');
     },
     [reports, activeRouteId, addReportToState, addMessage, addRouteMessage, setActiveRoute, showToast]
+  );
+
+  // ── handleSelectRoute (via route pills in summary) ───────────────────────────
+  const handleSelectRoute = useCallback(
+    (routeId) => {
+      setActiveRoute(routeId);
+      const r = ROUTES[routeId];
+      if (r) {
+        showToast(`Ruta activa: ${r.title} · ${r.costFormatted}`);
+      }
+    },
+    [setActiveRoute, showToast]
   );
 
   // ── resetDemo ─────────────────────────────────────────────────────────────
@@ -229,6 +246,7 @@ export default function App() {
     clearTimeout(typingTimerRef.current);
     clearReports();
     setActiveRouteIdState('main');
+    setPriorityMode('fastest');
     setOrigin('Mochuelo Alto');
     setDestination('Portal Tunal');
     setDeadline('07:00');
@@ -242,19 +260,19 @@ export default function App() {
       },
     ]);
     setIsTyping(false);
-    showToast('Demostración reiniciada');
+    showToast('Demostración reiniciada para el jurado');
   }, [clearReports, showToast]);
 
   // ── shareCurrentRoute ─────────────────────────────────────────────────────
   const shareCurrentRoute = useCallback(() => {
     const route = ROUTES[activeRouteId] || ROUTES.main;
-    const shareText = `Mi ruta en Muevete CB: ${route.title}. Tiempo estimado: ${route.duration}. ${window.location.href}`;
+    const shareText = `Mi ruta en Muevete CB: ${route.title}. Tarifa: ${route.costFormatted}. Tiempo: ${route.duration}. ${window.location.href}`;
     if (navigator.share) {
       navigator.share({ title: 'Muevete CB', text: shareText, url: window.location.href }).catch(() => {});
     } else if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareText).then(() => showToast('Enlace de la demo copiado'));
+      navigator.clipboard.writeText(shareText).then(() => showToast('Enlace de la ruta copiado'));
     } else {
-      showToast('La ruta está lista en la barra del navegador');
+      showToast('Ruta lista para compartir');
     }
   }, [activeRouteId, showToast]);
 
@@ -264,7 +282,7 @@ export default function App() {
     setDestination('Portal Tunal');
     setDeadline('07:00');
     document.querySelector('#workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    processQuery('Mochuelo Alto', 'Portal Tunal', '07:00', 'demo');
+    processQuery('Mochuelo Alto', 'Portal Tunal', '07:00', 'demo', 'fastest');
   }, [processQuery]);
 
   // ── toggleLayer ───────────────────────────────────────────────────────────
@@ -276,17 +294,22 @@ export default function App() {
     <div className="page-shell">
       <a className="skip-link" href="#contenido">Saltar al contenido principal</a>
 
-      <Header onOpenReport={() => setIsReportDialogOpen(true)} />
+      <Header
+        onOpenReport={() => setIsReportDialogOpen(true)}
+        onOpenWhatsApp={() => setIsWhatsAppOpen(true)}
+      />
 
       <main id="contenido">
         <Hero
           origin={origin}
           destination={destination}
           deadline={deadline}
+          priorityMode={priorityMode}
           onOriginChange={setOrigin}
           onDestinationChange={setDestination}
           onDeadlineChange={setDeadline}
-          onSubmit={(org, dest, dl) => processQuery(org, dest, dl, 'form')}
+          onPriorityModeChange={setPriorityMode}
+          onSubmit={(org, dest, dl, pMode) => processQuery(org, dest, dl, 'form', pMode)}
         />
 
         <DemoStrip onRunDemo={runDemo} />
@@ -305,6 +328,7 @@ export default function App() {
           onResetDemo={resetDemo}
           onShareRoute={shareCurrentRoute}
           onToggleLayer={toggleLayer}
+          onSelectRoute={handleSelectRoute}
           onMapConnectionChange={setMapConnected}
           onScrollToMap={() =>
             document.querySelector('#workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -321,6 +345,15 @@ export default function App() {
         isOpen={isReportDialogOpen}
         onClose={() => setIsReportDialogOpen(false)}
         onSubmit={handleAddReport}
+      />
+
+      <WhatsAppModal
+        isOpen={isWhatsAppOpen}
+        onClose={() => setIsWhatsAppOpen(false)}
+        activeRoute={activeRoute}
+        origin={origin}
+        destination={destination}
+        deadline={deadline}
       />
 
       <Toast message={toast.message} visible={toast.visible} />

@@ -1,6 +1,10 @@
-﻿import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import {
+  CIUDAD_BOLIVAR_BOUNDS,
+  CIUDAD_BOLIVAR_CENTER,
+  CIUDAD_BOLIVAR_POLYGON,
+  TRANSMICABLE_STATIONS,
   CABLE_PATH,
   SITP_PATH,
   INFORMAL_PATHS,
@@ -28,16 +32,18 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
   const layerGroupsRef = useRef({});
   const tileErrorsRef = useRef(0);
 
-  // ── Initialise Leaflet map once ───────────────────────────────────────────
+  // ── Initialise Leaflet map strictly bounded to Ciudad Bolívar ──────────────
   useEffect(() => {
     if (mapRef.current || !mapContainerRef.current) return;
 
     try {
       const map = L.map(mapContainerRef.current, {
-        center: [4.535, -74.152],
-        zoom: 12,
-        minZoom: 10,
-        maxZoom: 19,
+        center: CIUDAD_BOLIVAR_CENTER,
+        zoom: 13,
+        minZoom: 11,
+        maxZoom: 18,
+        maxBounds: CIUDAD_BOLIVAR_BOUNDS,
+        maxBoundsViscosity: 0.95,
         zoomControl: false,
         attributionControl: true,
         preferCanvas: false,
@@ -50,7 +56,7 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
       const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         crossOrigin: true,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Muévete CB (Localidad 19)',
       });
       tileLayerRef.current = tileLayer;
 
@@ -63,30 +69,88 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
 
       // Create layer groups
       const groups = {};
-      ['route', 'cable', 'sitp', 'informal', 'reports'].forEach((name) => {
+      ['boundary', 'route', 'cable', 'sitp', 'informal', 'reports'].forEach((name) => {
         groups[name] = L.layerGroup().addTo(map);
       });
       layerGroupsRef.current = groups;
 
-      // Draw static base layers
-      L.polyline(CABLE_PATH, { color: '#d89b18', weight: 5, opacity: 0.92, lineCap: 'round', lineJoin: 'round' })
-        .bindTooltip('TransMiCable · trazado de referencia', { sticky: true })
+      // 1. Draw Ciudad Bolívar boundary (Localidad 19)
+      L.polygon(CIUDAD_BOLIVAR_POLYGON, {
+        color: '#075d50',
+        weight: 3,
+        opacity: 0.85,
+        dashArray: '6 8',
+        fillColor: '#0a9b7d',
+        fillOpacity: 0.04,
+      })
+        .bindTooltip('📍 Localidad 19 · Ciudad Bolívar (Área delimitada)', { sticky: true })
+        .addTo(groups.boundary);
+
+      // 2. TransMiCable aerial path
+      L.polyline(CABLE_PATH, {
+        color: '#d89b18',
+        weight: 6,
+        opacity: 0.95,
+        lineCap: 'round',
+        lineJoin: 'round',
+      })
+        .bindTooltip('🚡 TransMiCable (Portal Tunal ↔ Mirador del Paraíso) · $2.950 TuLlave', { sticky: true })
         .addTo(groups.cable);
 
-      L.polyline(SITP_PATH, { color: '#3478b8', weight: 5, opacity: 0.9, lineCap: 'round' })
-        .bindTooltip('Eje SITP demostrativo', { sticky: true })
+      // 3. TransMiCable Stations
+      TRANSMICABLE_STATIONS.forEach((st) => {
+        const marker = L.marker(st.coordinates, {
+          icon: createIcon('cable', '🚡'),
+          keyboard: true,
+          title: st.name,
+        });
+
+        const popupContent = `
+          <div style="min-width: 190px;">
+            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: #d89b18;">${st.tag}</span>
+            <h4 style="margin: 2px 0 6px; font-size: 1.05rem; color: #062f2b;">${st.name}</h4>
+            <p style="margin: 0 0 6px; font-size: 0.85rem; color: #516564;">${st.detail}</p>
+            <div style="display: flex; gap: 6px; font-size: 0.78rem;">
+              <span style="background: #eef4ef; padding: 2px 6px; border-radius: 6px; font-weight: 600; color: #075d50;">♿ Ascensor 100% PMR</span>
+              <span style="background: #fff3cf; padding: 2px 6px; border-radius: 6px; font-weight: 600; color: #9a6c0b;">$2.950 COP</span>
+            </div>
+          </div>
+        `;
+        marker.bindPopup(popupContent).addTo(groups.cable);
+      });
+
+      // 4. SITP Path
+      L.polyline(SITP_PATH, {
+        color: '#3478b8',
+        weight: 5,
+        opacity: 0.9,
+        lineCap: 'round',
+      })
+        .bindTooltip('🚌 Corredor SITP (Rutas H610 / 6-18) · $2.950 TuLlave (Transbordo $0)', { sticky: true })
         .addTo(groups.sitp);
 
+      // 5. Informal and Veredales paths
       INFORMAL_PATHS.forEach((path) => {
-        L.polyline(path.coordinates, { color: '#ef765f', weight: 4, opacity: 0.9, dashArray: '8 9', lineCap: 'round' })
-          .bindTooltip(path.name, { sticky: true })
+        L.polyline(path.coordinates, {
+          color: '#ef765f',
+          weight: 4,
+          opacity: 0.92,
+          dashArray: '8 9',
+          lineCap: 'round',
+        })
+          .bindTooltip(`🚐 ${path.name} · Tarifa aprox: ${path.cost} (${path.frequency})`, { sticky: true })
           .addTo(groups.informal);
       });
 
+      // 6. Community Points of Interest
       POINTS_OF_INTEREST.forEach((poi) => {
-        L.marker(poi.coordinates, { icon: createIcon('poi', poi.label), keyboard: true, title: poi.name })
-          .bindPopup(`<strong>${poi.name}</strong>${poi.detail}`)
-          .addTo(groups.cable);
+        L.marker(poi.coordinates, {
+          icon: createIcon('poi', poi.label),
+          keyboard: true,
+          title: poi.name,
+        })
+          .bindPopup(`<strong>${poi.name}</strong><div>${poi.detail}</div>`)
+          .addTo(groups.boundary);
       });
 
       setTimeout(() => map.invalidateSize(), 120);
@@ -111,35 +175,66 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
     const groups = layerGroupsRef.current;
     if (!map || !groups.route) return;
 
-    const route = ROUTES[activeRouteId];
+    const route = ROUTES[activeRouteId] || ROUTES.main;
     if (!route) return;
 
     groups.route.clearLayers();
     const isAlternate = route.id === 'alternate';
-    const color = isAlternate ? '#d89b18' : '#087f68';
+    const isEconomic = route.id === 'economic';
+    const isAccessible = route.id === 'accessible';
 
-    // Halo + line
+    const color = isAlternate
+      ? '#d89b18'
+      : isEconomic
+      ? '#3478b8'
+      : isAccessible
+      ? '#0a9b7d'
+      : '#087f68';
+
+    // Halo + main line
     L.polyline(route.mapPath, {
-      color: '#ffffff', weight: 11, opacity: 0.92, lineCap: 'round', lineJoin: 'round',
-      interactive: false, className: 'leaflet-route-halo',
+      color: '#ffffff',
+      weight: 12,
+      opacity: 0.94,
+      lineCap: 'round',
+      lineJoin: 'round',
+      interactive: false,
+      className: 'leaflet-route-halo',
     }).addTo(groups.route);
 
     L.polyline(route.mapPath, {
-      color, weight: 7, opacity: 1, lineCap: 'round', lineJoin: 'round',
+      color,
+      weight: 7,
+      opacity: 1,
+      lineCap: 'round',
+      lineJoin: 'round',
       className: `leaflet-route-line${isAlternate ? ' route-alert' : ''}`,
-    }).bindTooltip(`${route.title} · ${route.duration}`, { sticky: true }).addTo(groups.route);
-
-    // Origin / destination markers
-    L.marker(route.mapPath[0], { icon: createIcon('route', 'A'), keyboard: true, title: `Origen: ${route.origin}`, zIndexOffset: 700 })
-      .bindPopup(`<strong>Origen</strong>${route.origin}`)
+    })
+      .bindTooltip(`📍 ${route.title} · ⏱️ ${route.duration} · 💰 ${route.costFormatted}`, { sticky: true })
       .addTo(groups.route);
 
+    // Origin marker
+    L.marker(route.mapPath[0], {
+      icon: createIcon('route', 'A'),
+      keyboard: true,
+      title: `Origen: ${route.origin}`,
+      zIndexOffset: 700,
+    })
+      .bindPopup(`<strong>Origen</strong><p style="margin:2px 0 0">${route.origin}</p>`)
+      .addTo(groups.route);
+
+    // Destination marker
     const dest = route.mapPath[route.mapPath.length - 1];
-    L.marker(dest, { icon: createIcon('route', 'B'), keyboard: true, title: `Destino: ${route.destination}`, zIndexOffset: 700 })
-      .bindPopup(`<strong>Destino</strong>${route.destination}`)
+    L.marker(dest, {
+      icon: createIcon('route', 'B'),
+      keyboard: true,
+      title: `Destino: ${route.destination}`,
+      zIndexOffset: 700,
+    })
+      .bindPopup(`<strong>Destino</strong><p style="margin:2px 0 0">${route.destination}</p>`)
       .addTo(groups.route);
 
-    // Fit bounds
+    // Fit bounds smoothly within Ciudad Bolívar
     setTimeout(() => {
       map.fitBounds(L.latLngBounds(route.mapPath), {
         paddingTopLeft: [35, 30],
@@ -164,19 +259,38 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
         icon: createIcon('report', '!'),
         keyboard: true,
         title: `${typeLabel}: ${locData.name}`,
-        zIndexOffset: 600,
+        zIndexOffset: 800,
       });
+
       const popupEl = document.createElement('div');
-      const t = document.createElement('strong');
-      t.textContent = `${typeLabel} · ${locData.name}`;
-      const d = document.createElement('div');
-      d.textContent = 'Reportado por la comunidad · hace un momento';
-      popupEl.append(t, d);
+      popupEl.style.minWidth = '200px';
+
+      const tag = document.createElement('span');
+      tag.style.cssText = 'display:inline-block; font-size:0.75rem; font-weight:700; color:#a84335; background:#ffe6e0; padding:2px 6px; border-radius:4px; margin-bottom:4px;';
+      tag.textContent = typeLabel;
+
+      const title = document.createElement('strong');
+      title.style.cssText = 'display:block; font-size:0.95rem; color:#102a2b; margin-bottom:4px;';
+      title.textContent = locData.name;
+
+      const meta = document.createElement('div');
+      meta.style.cssText = 'font-size:0.8rem; color:#516564; margin-bottom:6px;';
+      meta.textContent = 'Reportado por vecino · Activo en tiempo real';
+
+      popupEl.append(tag, title, meta);
+
       if (report.note) {
-        const n = document.createElement('p');
-        n.textContent = report.note;
-        popupEl.append(n);
+        const note = document.createElement('p');
+        note.style.cssText = 'margin:0 0 6px; font-size:0.85rem; background:#f7f5ed; padding:6px; border-radius:6px;';
+        note.textContent = report.note;
+        popupEl.append(note);
       }
+
+      const corroborate = document.createElement('span');
+      corroborate.style.cssText = 'display:inline-block; font-size:0.75rem; color:#087f68; font-weight:600;';
+      corroborate.textContent = '✓ 2 corroboraciones comunitarias';
+      popupEl.append(corroborate);
+
       marker.bindPopup(popupEl).addTo(groups.reports);
     });
   }, [reports]);
@@ -209,7 +323,7 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
     <div
       ref={mapContainerRef}
       id="map"
-      aria-label="Mapa interactivo de rutas formales, informales y reportes"
+      aria-label="Mapa interactivo de Ciudad Bolívar: rutas formales, informales, paraderos y reportes"
     />
   );
 }

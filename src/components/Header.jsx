@@ -1,6 +1,6 @@
-﻿import React from 'react';
+import React from 'react';
 
-export default function Header({ onOpenReport }) {
+export default function Header({ onOpenReport, onOpenWhatsApp }) {
   return (
     <header className="topbar">
       {/* Brand / Logo */}
@@ -14,17 +14,32 @@ export default function Header({ onOpenReport }) {
           </svg>
         </span>
         <span className="brand-copy">
-          <strong>Muevete</strong>
-          <small>Ciudad Bolívar</small>
+          <strong>Muevete CB</strong>
+          <small>Localidad 19 · Ciudad Bolívar</small>
         </span>
       </a>
 
       {/* Actions */}
-      <div className="topbar-actions">
-        <span className="mode-pill">
-          <span className="status-dot" aria-hidden="true"></span>
-          Demo funcional
-        </span>
+      <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        <button
+          className="button button-ghost button-small"
+          type="button"
+          onClick={onOpenWhatsApp}
+          style={{
+            borderColor: '#25d366',
+            color: '#075e54',
+            backgroundColor: '#eefaf1',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontWeight: 600,
+          }}
+          title="Consultar por canal accesible WhatsApp"
+        >
+          <span style={{ fontSize: '1rem' }}>💬</span>
+          <span>Canal WhatsApp</span>
+        </button>
+
         <button
           className="button button-ghost button-small"
           type="button"

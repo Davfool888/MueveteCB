@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ChatPanel from './Chat/ChatPanel';
 import MapPanel from './Map/MapPanel';
 import RouteSummary from './Map/RouteSummary';
@@ -17,6 +17,7 @@ export default function Workspace({
   onResetDemo,
   onShareRoute,
   onToggleLayer,
+  onSelectRoute,
   onMapConnectionChange,
   onScrollToMap,
   showToast,
@@ -52,6 +53,7 @@ export default function Workspace({
           activeRoute={activeRoute}
           margin={margin}
           isAlert={isAlert}
+          onSelectRoute={onSelectRoute}
         />
       </div>
     </section>
