@@ -23,6 +23,8 @@ const mochueloIntegration = {
   id: 'mirador_paraiso',
   name: 'Mirador del Paraíso',
   coordinates: [4.55009985, -74.1588974],
+  stationId: 'paraiso',
+  kind: 'cable_station',
   type: 'integration',
   source: 'existing_transport_fixture',
 };
@@ -31,6 +33,8 @@ const quibaIntegration = {
   id: 'manitas',
   name: 'Estación Manitas',
   coordinates: [4.55028009, -74.15049744],
+  stationId: 'manitas',
+  kind: 'cable_station',
   type: 'integration',
   source: 'existing_transport_fixture',
 };
@@ -39,6 +43,8 @@ const sierraIntegration = {
   id: 'manitas',
   name: 'Estación Manitas',
   coordinates: [4.55028009, -74.15049744],
+  stationId: 'manitas',
+  kind: 'cable_station',
   type: 'integration',
   source: 'existing_transport_fixture',
 };
@@ -51,6 +57,11 @@ const sierraToManitas = [
   [4.559, -74.157],
   INFORMAL_PATHS[3].coordinates.at(-1),
 ];
+
+// CABLE_PATH is ordered from Portal Tunal to Mirador del Paraíso. Quiba and
+// Sierra already arrive at Manitas, so their continuation must leave from
+// Manitas toward the useful exit instead of starting at the other terminal.
+const manitasToPortalTunal = CABLE_PATH.slice(0, 3).reverse();
 
 export const VEREDAL_ROUTES = [
   {
@@ -100,7 +111,7 @@ export const VEREDAL_ROUTES = [
       createStop('manitas-transfer', 'Estación Manitas · integración', quibaIntegration.coordinates, 'integration'),
     ],
     route: quibaToManitas,
-    continuation: joinPaths(CABLE_PATH.slice().reverse()),
+    continuation: manitasToPortalTunal,
     simulated: true,
     geometrySource: 'handcrafted_veredal_fixture',
     sourceNote: 'Recorrido aproximado de prototipo; validar con operadores y comunidad.',
@@ -126,7 +137,7 @@ export const VEREDAL_ROUTES = [
       createStop('manitas-transfer', 'Estación Manitas · integración', sierraIntegration.coordinates, 'integration'),
     ],
     route: sierraToManitas,
-    continuation: CABLE_PATH.slice().reverse(),
+    continuation: manitasToPortalTunal,
     simulated: true,
     geometrySource: 'handcrafted_veredal_fixture',
     sourceNote: 'Recorrido aproximado de prototipo; no es una ruta oficial confirmada.',

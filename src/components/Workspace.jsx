@@ -67,6 +67,7 @@ export default function Workspace({
 
         <RouteSummary
           activeRoute={activeRoute}
+          transportPlan={transportPlan}
           margin={margin}
           isAlert={isAlert}
           onSelectRoute={onSelectRoute}

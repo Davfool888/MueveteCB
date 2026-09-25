@@ -121,6 +121,8 @@ export default function Home() {
   const [roadRoute, setRoadRoute] = useState(null);
   const [roadRouteStatus, setRoadRouteStatus] = useState('idle');
   const [roadRouteMessage, setRoadRouteMessage] = useState('');
+  const [transferRoutes, setTransferRoutes] = useState({});
+  const [transferRoutesStatus, setTransferRoutesStatus] = useState('idle');
   const [hasRouteContext, setHasRouteContext] = useState(hasInitialRouteContext);
   const [deadline, setDeadline] = useState('07:00');
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
@@ -132,6 +134,8 @@ export default function Home() {
   const chatAbortRef = useRef(null);
   const roadRouteAbortRef = useRef(null);
   const roadRouteRequestIdRef = useRef(0);
+  const transferRoutesAbortRef = useRef(null);
+  const transferRoutesRequestIdRef = useRef(0);
   const gpsWatchIdRef = useRef(null);
   const autoRouteTimerRef = useRef(null);
   const lastAutoRouteKeyRef = useRef('');
@@ -196,9 +200,27 @@ export default function Home() {
         destinationLocation,
         activeRoute,
         selectedMode: selectedTransportMode,
+        transferRoutes,
       }),
-    [activeRoute, destinationLocation, originLocation, selectedTransportMode],
+    [
+      activeRoute,
+      destinationLocation,
+      originLocation,
+      selectedTransportMode,
+      transferRoutes,
+    ],
   );
+  const pendingTransferRequests = useMemo(
+    () =>
+      (transportPlan?.routingRequests || []).filter(
+        (request) => !transferRoutes[request.requestKey],
+      ),
+    [transferRoutes, transportPlan],
+  );
+  const transferRequestSignature = pendingTransferRequests
+    .map((request) => request.requestKey)
+    .sort()
+    .join('|');
 
   useEffect(() => {
     roadRouteAbortRef.current?.abort();
@@ -240,6 +262,49 @@ export default function Home() {
 
     return () => controller.abort();
   }, [destinationLocation, originLocation, roadRouteKey]);
+
+  useEffect(() => {
+    transferRoutesAbortRef.current?.abort();
+    transferRoutesRequestIdRef.current += 1;
+    const requestId = transferRoutesRequestIdRef.current;
+
+    if (pendingTransferRequests.length === 0) {
+      setTransferRoutesStatus((transportPlan?.routingRequests || []).length ? 'ready' : 'idle');
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    transferRoutesAbortRef.current = controller;
+    setTransferRoutes({});
+    setTransferRoutesStatus('loading');
+
+    (async () => {
+      const nextRoutes = {};
+
+      for (const request of pendingTransferRequests) {
+        try {
+          const result = await getShortestRoadRoute({
+            originLocation: request.fromLocation,
+            destinationLocation: request.toLocation,
+            signal: controller.signal,
+          });
+          nextRoutes[request.requestKey] = result;
+        } catch {
+          if (controller.signal.aborted) return;
+        }
+      }
+
+      if (requestId !== transferRoutesRequestIdRef.current || controller.signal.aborted) return;
+
+      const fulfilled = Object.keys(nextRoutes).length;
+      setTransferRoutes(nextRoutes);
+      setTransferRoutesStatus(
+        fulfilled === 0 ? 'fallback' : fulfilled < pendingTransferRequests.length ? 'partial' : 'ready',
+      );
+    })();
+
+    return () => controller.abort();
+  }, [transferRequestSignature]);
 
   const addMessage = useCallback((role, text, routeId = null) => {
     setMessages((previous) => [
@@ -613,13 +678,7 @@ export default function Home() {
       const selectedRouteId = setActiveRoute(routeId);
       const route = ROUTES[selectedRouteId];
       if (route) {
-        if (route.segments?.some((segment) => segment.type === 'sitp')) {
-          setSelectedTransportMode('sitp');
-        } else if (route.segments?.some((segment) => segment.type === 'informal')) {
-          setSelectedTransportMode('veredal');
-        } else {
-          setSelectedTransportMode('auto');
-        }
+        setSelectedTransportMode('auto');
         showToast(`Ruta activa: ${route.title}`);
       }
     },
@@ -735,6 +794,7 @@ export default function Home() {
     () => () => {
       chatAbortRef.current?.abort();
       roadRouteAbortRef.current?.abort();
+      transferRoutesAbortRef.current?.abort();
       window.clearTimeout(autoRouteTimerRef.current);
       clearGpsWatch();
     },
@@ -784,7 +844,11 @@ export default function Home() {
           originStatus={originStatus}
           originError={originError}
           plannerError={plannerError}
-          isCalculating={isResolvingPlanner || roadRouteStatus === 'loading'}
+          isCalculating={
+            isResolvingPlanner ||
+            roadRouteStatus === 'loading' ||
+            transferRoutesStatus === 'loading'
+          }
           onDeadlineChange={setDeadline}
           onPriorityModeChange={setPriorityMode}
           onSubmit={handlePlannerSubmit}

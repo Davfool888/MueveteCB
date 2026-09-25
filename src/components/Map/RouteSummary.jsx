@@ -1,5 +1,13 @@
 import React from 'react';
 
+const LEG_ICONS = Object.freeze({
+  walk: '🚶',
+  sitp: '🚌',
+  veredal: '🚐',
+  cable: '🚡',
+  road: '🛣️',
+});
+
 const STEP_COLORS = {
   informal: 'step-informal',
   cable: 'step-cable',
@@ -7,7 +15,13 @@ const STEP_COLORS = {
   walk: 'step-walk',
 };
 
-export default function RouteSummary({ activeRoute, margin, isAlert, onSelectRoute }) {
+export default function RouteSummary({
+  activeRoute,
+  transportPlan,
+  margin,
+  isAlert,
+  onSelectRoute,
+}) {
   if (!activeRoute) return null;
 
   return (
@@ -16,6 +30,26 @@ export default function RouteSummary({ activeRoute, margin, isAlert, onSelectRou
       id="route-summary"
       aria-live="polite"
     >
+      {transportPlan?.integration && transportPlan.legs?.length > 1 && (
+        <section className="route-connection-summary" aria-label="Conexión multimodalCalculada">
+          <div>
+            <span className="section-kicker">Conexión por cercanía</span>
+            <strong>
+              {transportPlan.access?.modeLabel || transportPlan.modeLabel} → {transportPlan.integration.name}
+            </strong>
+          </div>
+          <ol>
+            {transportPlan.legs.map((leg) => (
+              <li key={`${leg.order}-${leg.mode}`} className={leg.status === 'ready' ? 'is-ready' : ''}>
+                <span aria-hidden="true">{LEG_ICONS[leg.mode] || '•'}</span>
+                <span>{leg.label}</span>
+                {leg.status === 'pending' && <small>calculando</small>}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
       {/* Route Mode Switcher tabs */}
       <div className="route-mode-switcher" style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
         <button
@@ -108,7 +142,7 @@ export default function RouteSummary({ activeRoute, margin, isAlert, onSelectRou
         <div>
           <span>Costo Total</span>
           <strong id="trip-cost" style={{ color: 'var(--green-800)' }}>
-            {activeRoute.costFormatted || '$6.050*'}
+            {transportPlan?.price?.formatted || activeRoute.costFormatted || '$6.050*'}
           </strong>
         </div>
         <div>
@@ -136,12 +170,28 @@ export default function RouteSummary({ activeRoute, margin, isAlert, onSelectRou
           borderLeft: '4px solid var(--green-600)',
         }}
       >
-        <span>
-          <strong>Pago:</strong> {activeRoute.paymentMethod || 'Efectivo + TuLlave'}
-        </span>
-        <span style={{ color: 'var(--ink-soft)', fontSize: '0.78rem' }}>
-          {activeRoute.costBreakdown || 'Desglose multimodal'}
-        </span>
+        {transportPlan?.integration ? (
+          <>
+            <span>
+              <strong>Conexión:</strong>{' '}
+              {transportPlan.access?.modeLabel || transportPlan.modeLabel} → {transportPlan.integration.name}
+            </span>
+            <span style={{ color: 'var(--ink-soft)', fontSize: '0.78rem' }}>
+              {(transportPlan.modesUsed || []).map((mode) =>
+                mode === 'cable' ? 'TransMiCable' : mode === 'veredal' ? 'Van veredal' : mode,
+              ).join(' + ')}
+            </span>
+          </>
+        ) : (
+          <>
+            <span>
+              <strong>Pago:</strong> {activeRoute.paymentMethod || 'Efectivo + TuLlave'}
+            </span>
+            <span style={{ color: 'var(--ink-soft)', fontSize: '0.78rem' }}>
+              {activeRoute.costBreakdown || 'Desglose multimodal'}
+            </span>
+          </>
+        )}
       </div>
 
       {/* Step by step segments with segment costs */}

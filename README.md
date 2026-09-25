@@ -11,6 +11,7 @@ Prototipo web de movilidad que compara rutas formales e informales, explica una 
 - Fallback local si no hay clave, red o respuesta válida del proveedor.
 - Formulario y chat en español de Colombia.
 - Mapa con TransMiCable, SITP, veredales, reportes y una ruta vial real entre A y B.
+- Planificador multimodal por proximidad: si A está cerca de una estación TransMiCable o una van veredal, muestra el acceso, el tramo hasta la integración y recalcula la conexión hacia B.
 - La capa inferior muestra distancia, precio estimado y los transportes disponibles para seleccionar.
 - Extracto GTFS oficial del 18 de agosto de 2026 con paradas y servicios de Ciudad Bolívar.
 - Reporte ciudadano con expiración, estado visible y recálculo según el lugar afectado.
@@ -36,7 +37,8 @@ Web / WhatsApp → /api/chat → parser de intención
 La geometría de carretera la determina el router, no Gemini. Entre las alternativas devueltas se conserva la de menor distancia y se etiqueta como **más corta disponible**; no se afirma que sea un mínimo global.
 
 ```text
-A/B geocodificados → OSRM (alternativas) → geometría vial canónica
+A/B geocodificados → OSRM (alternativas) → referencia vial A–B
+A → estación/paradero cercano → tramo cable o van → integración → OSRM integración → B
 ```
 
 El modelo de lenguaje **no dibuja ni inventa rutas**. La función serverless conserva la clave y entrega al modelo únicamente contexto acotado.
@@ -84,6 +86,8 @@ En Vercel, configurar las mismas variables en **Project Settings → Environment
 
 El prototipo consulta `VITE_ROUTING_API_URL`; por defecto usa el servidor público de OSRM y selecciona la alternativa de menor distancia entre las respuestas. Para una demostración es suficiente. En producción se debe reemplazar por un servicio con SLA, cuota y datos de actualización contractual; el fallback nunca une A y B con una línea recta.
 
+La proximidad de abordaje se configura con `VITE_TRANSMICABLE_ACCESS_RADIUS_KM` (0,7 km), `VITE_VEREDAL_SEARCH_RADIUS_KM` (1,0 km) y `VITE_TRANSPORT_MODE_TIE_BREAKER_KM` (0,15 km). El cable solo se activa si el origen tiene una estación real cercana; una van requiere un paradero conocido antes de la integración.
+
 ## Verificación
 
 ```bash
@@ -99,6 +103,7 @@ Las pruebas cubren:
 - ubicación y expiración de reportes;
 - consulta de información oficial;
 - geometría OSRM, selección de la alternativa más corta disponible y fallback sin línea recta;
+- abordaje por proximidad a TransMiCable o van, integración y segundo tramo recalculado;
 - integración de Gemini con salida estructurada y fallback local;
 - rechazo de afirmaciones no soportadas;
 - contrato HTTP de `/api/chat`.

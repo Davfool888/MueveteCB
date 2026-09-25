@@ -1,5 +1,13 @@
 ﻿import React from 'react';
 
+const LEG_ICONS = Object.freeze({
+  walk: '🚶',
+  sitp: '🚌',
+  veredal: '🚐',
+  cable: '🚡',
+  road: '🛣️',
+});
+
 const TRANSPORT_OPTIONS = [
   { id: 'auto', label: 'Automática', shortLabel: 'Auto', icon: '✨' },
   { id: 'sitp', label: 'SITP', shortLabel: 'SITP', icon: '🚌' },
@@ -22,7 +30,8 @@ function routeSupportsMode(activeRoute, mode) {
   return activeRoute.segments?.some((segment) => segment.type === mode) || false;
 }
 
-function getEstimatedPrice(activeRoute, selectedMode, planMode) {
+function getEstimatedPrice(activeRoute, selectedMode, planMode, transportPlan) {
+  if (transportPlan?.price?.formatted) return transportPlan.price.formatted;
   if (!activeRoute) return 'Por validar';
   if (selectedMode === 'sitp' || selectedMode === 'cable') return '$3.550 COP*';
   if (selectedMode === 'veredal') {
@@ -34,7 +43,19 @@ function getEstimatedPrice(activeRoute, selectedMode, planMode) {
   return activeRoute.costFormatted || 'Por validar';
 }
 
-function getContextTitle({ isAlert, isVeredal, isSitp, isCable, roadRouteStatus }) {
+function getContextTitle({
+  isAlert,
+  isVeredal,
+  isSitp,
+  isCable,
+  roadRouteStatus,
+  transportPlan,
+}) {
+  if (transportPlan?.integration) {
+    const firstMode =
+      transportPlan.access?.modeLabel || transportPlan.modeLabel || 'Transporte cercano';
+    return `🔗 ${firstMode} + conexión`;
+  }
   if (roadRouteStatus === 'loading') return 'Calculando ruta vial';
   if (roadRouteStatus === 'fallback') return 'Ruta vial no disponible';
   if (roadRouteStatus === 'ready') return isAlert ? 'Ruta ajustada por carretera' : 'Ruta vial lista';
@@ -44,7 +65,21 @@ function getContextTitle({ isAlert, isVeredal, isSitp, isCable, roadRouteStatus 
   return 'Mapa de movilidad';
 }
 
-function getContextMessage({ roadRouteStatus, roadRouteMessage, isVeredal, isSitp, isCable, isAlert }) {
+function getContextMessage({
+  roadRouteStatus,
+  roadRouteMessage,
+  isVeredal,
+  isSitp,
+  isCable,
+  isAlert,
+  transportPlan,
+}) {
+  if (transportPlan?.reason && transportPlan.status !== 'idle') {
+    if (transportPlan.status === 'routing' || transportPlan.status === 'partial') {
+      return `${transportPlan.reason} El tramo restante está pendiente o no pudo calcularse.`;
+    }
+    return transportPlan.reason;
+  }
   if (roadRouteStatus === 'loading') {
     return roadRouteMessage || 'Consultando la red vial entre A y B...';
   }
@@ -89,7 +124,14 @@ export default function MapBottomCard({
         (option) => option.id === 'auto' || availableModes.has(option.id),
       )
     : [];
-  const title = getContextTitle({ isAlert, isVeredal, isSitp, isCable, roadRouteStatus });
+  const title = getContextTitle({
+    isAlert,
+    isVeredal,
+    isSitp,
+    isCable,
+    roadRouteStatus,
+    transportPlan,
+  });
   const message = getContextMessage({
     roadRouteStatus,
     roadRouteMessage,
@@ -97,11 +139,18 @@ export default function MapBottomCard({
     isSitp,
     isCable,
     isAlert,
+    transportPlan,
   });
   const roadDistance = formatRoadDistance(
     roadRoute?.distanceMeters || activeRoute?.roadDistanceMeters,
   );
-  const price = getEstimatedPrice(activeRoute, selectedTransportMode, transportPlan?.mode);
+  const price = getEstimatedPrice(
+    activeRoute,
+    selectedTransportMode,
+    transportPlan?.mode,
+    transportPlan,
+  );
+  const itineraryLegs = (transportPlan?.legs || []).filter((leg) => leg?.mode);
 
   return (
     <div
@@ -119,19 +168,38 @@ export default function MapBottomCard({
         <div className="map-bottom-copy">
           <div className="map-bottom-title-row">
             <strong id="map-message-title">{title}</strong>
-            {roadRouteStatus === 'ready' && (
-              <span className="map-routing-source">Más corta disponible</span>
+            {transportPlan?.integration ? (
+              <span
+                className="map-routing-source"
+                title={`Transbordo en ${transportPlan.integration.name}`}
+              >
+                Cambio: {transportPlan.integration.name}
+              </span>
+            ) : (
+              roadRouteStatus === 'ready' && (
+                <span className="map-routing-source">Más corta disponible</span>
+              )
             )}
           </div>
           <p id="map-message">{message}</p>
+          {itineraryLegs.length > 1 && (
+            <div className="map-connection-flow" aria-label="Medios conectados en el viaje">
+              {itineraryLegs.map((leg) => (
+                <span key={`${leg.order}-${leg.mode}`} title={leg.label}>
+                  <b aria-hidden="true">{LEG_ICONS[leg.mode] || '•'}</b>
+                  {leg.label}
+                </span>
+              ))}
+            </div>
+          )}
           <div className="map-bottom-metrics" aria-label="Distancia y precio del viaje">
             <span>
-              <small>Distancia vial</small>
+              <small>Distancia A–B</small>
               <strong>{roadDistance}</strong>
             </span>
             <span>
               <small>Precio estimado</small>
-              <strong>{price}</strong>
+              <strong title={price}>{price}</strong>
             </span>
           </div>
         </div>
@@ -139,8 +207,8 @@ export default function MapBottomCard({
 
       {showTransportChoices && (
         <div className="map-transport-picker">
-          <span>Elige tu transporte</span>
-          <div role="group" aria-label="Transportes disponibles para el viaje">
+          <span>Elige el primer medio</span>
+          <div role="group" aria-label="Transportes disponibles cerca del origen">
             {transportChoices.map((option) => {
               const isActive = selectedTransportMode === option.id;
               return (
