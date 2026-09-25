@@ -20,26 +20,34 @@ function createResponse() {
 }
 
 test('POST /api/chat responde con fallback estructurado', async () => {
-  const response = createResponse();
-  await handler(
-    {
-      method: 'POST',
-      body: {
-        message: 'Estoy en Mochuelo Alto y necesito llegar al Portal Tunal antes de las 7',
-        origin: 'Mochuelo Alto',
-        destination: 'Portal Tunal',
-        deadline: '07:00',
-        activeReports: [],
-      },
-    },
-    response
-  );
+  const previousGeminiKey = process.env.GEMINI_API_KEY;
+  delete process.env.GEMINI_API_KEY;
 
-  assert.equal(response.statusCode, 200);
-  assert.equal(response.body.route.id, 'main');
-  assert.equal(response.body.meta.source, 'deterministic-fallback');
-  assert.equal(response.headers['cache-control'], 'no-store, max-age=0');
-  assert.equal(response.headers['x-request-id'], response.body.requestId);
+  try {
+    const response = createResponse();
+    await handler(
+      {
+        method: 'POST',
+        body: {
+          message: 'Estoy en Mochuelo Alto y necesito llegar al Portal Tunal antes de las 7',
+          origin: 'Mochuelo Alto',
+          destination: 'Portal Tunal',
+          deadline: '07:00',
+          activeReports: [],
+        },
+      },
+      response
+    );
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.body.route.id, 'main');
+    assert.equal(response.body.meta.source, 'deterministic-fallback');
+    assert.equal(response.headers['cache-control'], 'no-store, max-age=0');
+    assert.equal(response.headers['x-request-id'], response.body.requestId);
+  } finally {
+    if (previousGeminiKey === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = previousGeminiKey;
+  }
 });
 
 test('rechaza métodos distintos de POST', async () => {

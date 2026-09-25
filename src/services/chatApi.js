@@ -1,4 +1,4 @@
-const DEFAULT_TIMEOUT_MS = 9000;
+const DEFAULT_TIMEOUT_MS = 15000;
 const LOCAL_API_OPT_IN =
   typeof import.meta !== 'undefined' && import.meta.env?.VITE_CHAT_API === 'true';
 

@@ -1,6 +1,6 @@
 import { createChatResponse, DEFAULT_CLAUDE_MODEL } from '../src/core/claudeAgent.js';
 
-export const config = { maxDuration: 10 };
+export const config = { maxDuration: 20 };
 
 function parseRequestBody(request) {
   if (request.body && typeof request.body === 'object' && !Array.isArray(request.body)) {

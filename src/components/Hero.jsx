@@ -195,12 +195,12 @@ export default function Hero({
           disabled={isCalculating}
           style={{ marginTop: '12px' }}
         >
-          {isCalculating ? 'Resolviendo ubicaciones...' : 'Calcular mejor ruta con IA'}
+          {isCalculating ? 'Calculando ruta por carretera...' : 'Calcular ruta y comparar'}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="m9 18 6-6-6-6" />
           </svg>
         </button>
-        <p className="form-hint">Compara alternativas del fixture y considera reportes ciudadanos vigentes.</p>
+        <p className="form-hint">Traza la vía más corta disponible y compara los transportes del proyecto.</p>
       </form>
     </section>
   );

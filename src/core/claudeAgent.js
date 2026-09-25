@@ -1,5 +1,5 @@
 import { buildFallbackAgentResponse, limitSafeAnswer } from './fallbackAgent.js';
-import { callGeminiApi, DEFAULT_GEMINI_MODEL } from './geminiAgent.js';
+import { createChatResponse as createGeminiChatResponse, DEFAULT_GEMINI_MODEL } from './geminiAgent.js';
 
 export const DEFAULT_CLAUDE_MODEL = 'claude-3-5-haiku-20241022';
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
@@ -87,7 +87,7 @@ export async function createChatResponse(input, options = {}) {
     fallbackReason: !apiKey && !geminiApiKey ? 'missing_api_key' : undefined,
   });
 
-  if ((!apiKey && !geminiApiKey) || !fallback.route || typeof fetchImpl !== 'function') {
+  if ((!apiKey && !geminiApiKey) || typeof fetchImpl !== 'function') {
     return fallback;
   }
 
@@ -103,7 +103,7 @@ export async function createChatResponse(input, options = {}) {
   const startedAt = Date.now();
 
   // 1. Intentar Claude si hay apiKey proporcionada
-  if (apiKey) {
+  if (apiKey && fallback.route) {
     const controller = new AbortController();
     const timeoutMs = options.timeoutMs || 8000;
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -171,36 +171,23 @@ export async function createChatResponse(input, options = {}) {
     }
   }
 
-  // 2. Si Claude falla (por ejemplo por saldo) o no tiene clave, intentar con Gemini como respaldo
+  // 2. Si Claude falla (por ejemplo por saldo) o no tiene clave, usar el agente Gemini como respaldo
   if (geminiApiKey) {
-    try {
-      const geminiResult = await callGeminiApi({
-        apiKey: geminiApiKey,
-        model: geminiModel,
-        systemPrompt: SYSTEM_PROMPT,
-        userContent: promptContent,
-        fetchImpl,
-        timeoutMs: options.timeoutMs || 8000,
-      });
-
-      const honestAnswer = /demostr/i.test(geminiResult.answerText)
-        ? geminiResult.answerText
-        : `${geminiResult.answerText} Es una ruta de demostración.`;
-
+    const geminiResult = await createGeminiChatResponse(input, {
+      apiKey: geminiApiKey,
+      model: geminiModel,
+      fetchImpl,
+      timeoutMs: options.timeoutMs,
+    });
+    if (geminiResult.meta?.source === 'gemini') {
       return {
-        ...fallback,
-        answerText: limitSafeAnswer(honestAnswer),
+        ...geminiResult,
         meta: {
-          ...fallback.meta,
-          source: 'gemini',
-          model: geminiResult.model || geminiModel,
-          latencyMs: Date.now() - startedAt,
+          ...geminiResult.meta,
           fallbackFromClaude: Boolean(claudeError),
           claudeErrorReason: claudeError?.fallbackReason || (claudeError ? 'claude_unavailable' : undefined),
         },
       };
-    } catch {
-      // Si Gemini también falla, caemos de forma segura al fallback local
     }
   }
 

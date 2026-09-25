@@ -23,3 +23,15 @@ test('los identificadores de vans son únicos', () => {
   const ids = VEREDAL_ROUTES.map((route) => route.id);
   assert.equal(new Set(ids).size, ids.length);
 });
+
+test('las continuaciones de Quiba y Sierra parten de Manitas', () => {
+  const routeById = Object.fromEntries(VEREDAL_ROUTES.map((route) => [route.id, route]));
+  const manitas = [4.55028009, -74.15049744];
+  const quiba = routeById['van-veredal-quiba-01'];
+  const sierra = routeById['van-veredal-sierra-01'];
+
+  assert.deepEqual(quiba.continuation[0], manitas);
+  assert.deepEqual(sierra.continuation[0], manitas);
+  assert.notDeepEqual(quiba.continuation[0], [4.55009985, -74.1588974]);
+  assert.notDeepEqual(sierra.continuation[0], [4.55009985, -74.1588974]);
+});

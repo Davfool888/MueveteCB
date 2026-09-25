@@ -113,18 +113,9 @@ test('usa Gemini como respaldo si Claude falla', async () => {
       return {
         ok: true,
         json: async () => ({
-          modelVersion: 'gemini-1.5-flash',
-          candidates: [
-            {
-              content: {
-                parts: [
-                  {
-                    text: '{"answerText":"Ruta por TransMiCable calculada con Gemini."}',
-                  },
-                ],
-              },
-            },
-          ],
+          model: 'gemini-3.5-flash-lite',
+          status: 'completed',
+          output_text: '{"answerText":"Ruta por TransMiCable calculada con Gemini."}',
         }),
       };
     }
@@ -150,18 +141,9 @@ test('usa Gemini directamente si no hay clave de Claude', async () => {
       return {
         ok: true,
         json: async () => ({
-          modelVersion: 'gemini-1.5-flash',
-          candidates: [
-            {
-              content: {
-                parts: [
-                  {
-                    text: '{"answerText":"Respuesta directa de Gemini."}',
-                  },
-                ],
-              },
-            },
-          ],
+          model: 'gemini-3.5-flash-lite',
+          status: 'completed',
+          output_text: '{"answerText":"Respuesta directa de Gemini."}',
         }),
       };
     }

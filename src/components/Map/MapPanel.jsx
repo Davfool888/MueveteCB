@@ -8,6 +8,10 @@ export default function MapPanel({
   activeRouteId,
   activeRoute,
   transportPlan,
+  roadRoute,
+  roadRouteStatus,
+  roadRouteMessage,
+  selectedTransportMode,
   originLocation,
   destinationLocation,
   reports,
@@ -79,12 +83,17 @@ export default function MapPanel({
         <MapBottomCard
           activeRoute={activeRoute}
           transportPlan={transportPlan}
+          roadRoute={roadRoute}
+          roadRouteStatus={roadRouteStatus}
+          roadRouteMessage={roadRouteMessage}
+          selectedTransportMode={selectedTransportMode}
           isAlert={isAlert}
+          onSelectTransportMode={onSelectTransportMode}
         />
       </div>
 
       <div className="map-note">
-        <span>Base: OpenStreetMap + paradas GTFS 18-08-2026.</span>
+        <span>Mapa y ruta vial: OpenStreetMap + OSRM + paradas GTFS 18-08-2026.</span>
         <span>Vans y trazados veredales: aproximaciones simuladas para el prototipo.</span>
       </div>
     </article>

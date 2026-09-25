@@ -3,7 +3,6 @@ import L from 'leaflet';
 import { hasLocationCoordinates } from '../../utils/locationRoute';
 import {
   BOGOTA_BOUNDS,
-  CABLE_PATH,
   CIUDAD_BOLIVAR_BOUNDS,
   CIUDAD_BOLIVAR_CENTER,
   CIUDAD_BOLIVAR_POLYGON,
@@ -28,7 +27,9 @@ function createRouteTooltip(route) {
   const title = document.createElement('strong');
   const detail = document.createElement('div');
   title.textContent = `📍 ${route.title}`;
-  detail.textContent = `⏱️ ${route.duration || 'Tiempo por validar'} · 💰 ${route.costFormatted || 'Costo por validar'}`;
+  detail.textContent = route.isRoadRoute
+    ? `🛣️ ${(Number(route.roadDistanceMeters || 0) / 1000).toLocaleString('es-CO', { maximumFractionDigits: 1 })} km · ${route.routingSourceLabel || 'ruta vial'}`
+    : `⏱️ ${route.duration || 'Tiempo por validar'} · 💰 ${route.costFormatted || 'Costo por validar'}`;
   tooltip.append(title, detail);
   return tooltip;
 }
@@ -100,7 +101,31 @@ function drawTransportContext(plan, groups) {
 
   if (!plan || plan.status === 'idle') return;
 
-  if (plan.mode === 'veredal' && plan.veredalRoute) {
+  const legStyles = {
+    walk: { color: '#647a75', weight: 4, dashArray: '2 7', group: 'route' },
+    road: { color: '#3478b8', weight: 5, dashArray: '7 7', group: 'route' },
+    sitp: { color: '#3478b8', weight: 6, dashArray: '10 6', group: 'sitp' },
+    veredal: { color: '#ef765f', weight: 6, dashArray: '8 9', group: 'veredal' },
+    cable: { color: '#d89b18', weight: 6, dashArray: null, group: 'cable' },
+  };
+
+  (plan.legs || []).forEach((leg) => {
+    if (!Array.isArray(leg.path) || leg.path.length < 2) return;
+    const style = legStyles[leg.mode] || legStyles.road;
+    L.polyline(leg.path, {
+      color: style.color,
+      weight: style.weight,
+      opacity: 0.96,
+      dashArray: style.dashArray || undefined,
+      lineCap: 'round',
+      lineJoin: 'round',
+      className: `leaflet-plan-leg leaflet-plan-leg-${leg.mode}`,
+    })
+      .bindTooltip(leg.label || `Tramo ${leg.order}`, { sticky: true })
+      .addTo(groups[style.group]);
+  });
+
+  if (!plan.legs?.some((leg) => leg.mode === 'veredal') && plan.mode === 'veredal' && plan.veredalRoute) {
     const route = plan.veredalRoute;
     L.polyline(route.route, {
       color: '#ef765f',
@@ -113,35 +138,9 @@ function drawTransportContext(plan, groups) {
     })
       .bindTooltip(`🚐 ${route.name} · ruta simulada`, { sticky: true })
       .addTo(groups.veredal);
-
-    route.stops.forEach((stop) => addContextStop(groups.veredal, stop));
-
-    if ((plan.continuationPath || []).length > 1) {
-      L.polyline(plan.continuationPath, {
-        color: '#3478b8',
-        weight: 4,
-        opacity: 0.9,
-        dashArray: '4 7',
-        lineCap: 'round',
-        className: 'leaflet-continuation-line',
-      })
-        .bindTooltip('Continuación hacia el transporte urbano · geometría existente', { sticky: true })
-        .addTo(groups.sitp);
-    }
-    return;
   }
 
-  if (plan.showCable) {
-    L.polyline(CABLE_PATH, {
-      color: '#d89b18',
-      weight: 5,
-      opacity: 0.9,
-      lineCap: 'round',
-      lineJoin: 'round',
-    })
-      .bindTooltip('🚡 TransMiCable · referencia de la estación seleccionada', { sticky: true })
-      .addTo(groups.cable);
-
+  if (plan.showCable || plan.legs?.some((leg) => leg.mode === 'cable')) {
     TRANSMICABLE_STATIONS.forEach((station) => {
       const marker = L.marker(station.coordinates, {
         icon: createIcon('cable', '🚡'),
@@ -152,7 +151,38 @@ function drawTransportContext(plan, groups) {
     });
   }
 
-  (plan.contextStops || []).forEach((stop) => addContextStop(groups.sitp, stop));
+  if (plan.integration?.coordinates) {
+    const marker = L.marker(plan.integration.coordinates, {
+      icon: createIcon('integration', '🔄'),
+      keyboard: true,
+      title: `Transbordo: ${plan.integration.name}`,
+      zIndexOffset: 650,
+    });
+    marker.bindPopup(createStopPopup({ ...plan.integration, source: plan.integration.source })).addTo(groups.route);
+  }
+
+  (plan.contextStops || []).forEach((stop) => {
+    const duplicatesIntegration =
+      plan.integration?.coordinates &&
+      stop.coordinates?.[0] === plan.integration.coordinates[0] &&
+      stop.coordinates?.[1] === plan.integration.coordinates[1];
+    if (duplicatesIntegration) return;
+
+    const targetGroup = stop.kind === 'integration' || stop.type === 'integration'
+      ? groups.route
+      : groups.sitp;
+    addContextStop(targetGroup, stop);
+  });
+
+  if (!plan.legs?.length && Array.isArray(plan.routePath) && plan.routePath.length > 1) {
+    L.polyline(plan.routePath, {
+      color: '#3478b8',
+      weight: 4,
+      opacity: 0.9,
+      dashArray: '4 7',
+      className: 'leaflet-continuation-line',
+    }).addTo(groups.sitp);
+  }
 }
 
 function isOutsideLocality([latitude, longitude]) {
@@ -234,7 +264,6 @@ export default function LeafletMap({
           map.invalidateSize();
         }
       }, 120);
-      onConnectionChange(true);
     } catch (error) {
       console.error('No fue posible inicializar Leaflet', error);
       onConnectionChange(false);
@@ -261,9 +290,16 @@ export default function LeafletMap({
     const hasOriginCoord = hasLocationCoordinates(originLocation);
     const hasDestCoord = hasLocationCoordinates(destinationLocation);
     const isSingleEndpoint = (hasOriginCoord && !hasDestCoord) || (!hasOriginCoord && hasDestCoord);
-
+    const usesRoadRoute = activeRoute?.isRoadRoute === true;
+    const transportFitPath =
+      transportPlan?.geometry?.fitPath || transportPlan?.fitPath || [];
+    const hasTransportItinerary = transportFitPath.length >= 2;
     const contextualRoute =
-      !isVeredalPlan && transportPlan?.routePath && !activeRoute
+      !isVeredalPlan &&
+      !usesRoadRoute &&
+      !hasTransportItinerary &&
+      transportPlan?.routePath &&
+      !activeRoute
         ? {
             id: transportPlan.mode,
             title: transportPlan.modeLabel,
@@ -274,11 +310,13 @@ export default function LeafletMap({
         : null;
 
     // Si solo hay un extremo (ej. ubicación actual sin destino), no mostramos una ruta desconectada
-    const route = isVeredalPlan
+    const route = hasTransportItinerary || isSingleEndpoint
       ? null
-      : isSingleEndpoint
-        ? null
-        : activeRoute || contextualRoute || (activeRouteId ? ROUTES[activeRouteId] : null);
+      : usesRoadRoute
+        ? activeRoute
+        : isVeredalPlan
+          ? null
+          : activeRoute || contextualRoute || (activeRouteId ? ROUTES[activeRouteId] : null);
     const hasRoute = Boolean(route && Array.isArray(route.mapPath) && route.mapPath.length >= 2);
     const isAlternate = route?.id === 'alternate';
     const isEconomic = route?.id === 'economic';
@@ -328,6 +366,19 @@ export default function LeafletMap({
     const originLabel = originLocation?.label || route?.origin || 'Punto A';
     const destinationLabel = destinationLocation?.label || route?.destination || 'Punto B';
 
+    const originAccuracyM = Number(originLocation?.accuracy);
+    if (originPoint && originLocation?.source === 'gps' && originAccuracyM > 0) {
+      // Radio de precisión reportado por el GPS alrededor del punto A.
+      L.circle(originPoint, {
+        radius: originAccuracyM,
+        color: '#2b7de9',
+        weight: 1,
+        fillColor: '#2b7de9',
+        fillOpacity: 0.12,
+        interactive: false,
+      }).addTo(groups.route);
+    }
+
     if (originPoint) {
       const originIcon = createIcon(originLocation?.source === 'gps' ? 'user' : 'route', 'A');
       L.marker(originPoint, {
@@ -352,13 +403,17 @@ export default function LeafletMap({
     }
 
     const endpointPoints = [originPoint, destinationPoint].filter(Boolean);
-    const fitPath = isVeredalPlan
-      ? transportPlan?.fitPath || endpointPoints
-      : isSingleEndpoint && originPoint
-        ? [originPoint]
-        : hasRoute
+    const fitPath = isSingleEndpoint
+      ? endpointPoints
+      : hasTransportItinerary
+        ? transportFitPath
+        : usesRoadRoute
           ? route.mapPath
-          : endpointPoints;
+          : isVeredalPlan
+            ? transportPlan?.fitPath || endpointPoints
+            : hasRoute
+              ? route.mapPath
+              : endpointPoints;
 
     if (fitPath.length === 0) {
       map.setMaxBounds(BOGOTA_BOUNDS);
@@ -474,13 +529,17 @@ export default function LeafletMap({
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, []);
 
-  const mapDescription = transportPlan?.mode === 'veredal'
-    ? 'ruta van veredal simulada con paraderos e integración'
-    : transportPlan?.mode === 'sitp'
-      ? 'ruta SITP y paraderos relacionados'
-      : transportPlan?.mode === 'cable'
-        ? 'tramo TransMiCable relacionado'
-        : 'selecciona origen y destino';
+  const mapDescription = transportPlan?.integration
+    ? `ruta multimodal con conexión en ${transportPlan.integration.name}`
+    : activeRoute?.isRoadRoute
+      ? 'ruta vial más corta entre el origen y el destino'
+      : transportPlan?.mode === 'veredal'
+        ? 'ruta van veredal simulada con paraderos e integración'
+        : transportPlan?.mode === 'sitp'
+          ? 'ruta SITP y paraderos relacionados'
+          : transportPlan?.mode === 'cable'
+            ? 'tramo TransMiCable relacionado'
+            : 'selecciona origen y destino';
 
   return (
     <div

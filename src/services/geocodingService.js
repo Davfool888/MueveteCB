@@ -147,7 +147,8 @@ export async function reverseGeocodeLocation(latitude, longitude, { signal } = {
   const lon = toNumber(longitude);
   if (lat === null || lon === null) return null;
 
-  // 1. Verificar si está muy cerca (≤350 m) de un punto de interés conocido
+  // El punto de interés más cercano solo nombra la ubicación si falla la dirección real;
+  // las coordenadas GPS nunca se reemplazan.
   let nearestPoi = null;
   let minDistance = Infinity;
   for (const poi of POINTS_OF_INTEREST) {
@@ -159,18 +160,7 @@ export async function reverseGeocodeLocation(latitude, longitude, { signal } = {
     }
   }
 
-  if (nearestPoi && minDistance <= 0.35) {
-    return {
-      label: `Ubicación actual (${nearestPoi.name})`,
-      detail: nearestPoi.detail,
-      latitude: lat,
-      longitude: lon,
-      source: 'gps',
-      accuracyKm: minDistance,
-    };
-  }
-
-  // 2. Consultar Nominatim reverse de OpenStreetMap
+  // 1. Consultar Nominatim reverse de OpenStreetMap
   try {
     const reverseBase = GEOCODING_URL.replace(/\/search\b/, '/reverse');
     const reverseUrl = new URL(reverseBase.startsWith('http') ? reverseBase : 'https://nominatim.openstreetmap.org/reverse');
@@ -182,7 +172,7 @@ export async function reverseGeocodeLocation(latitude, longitude, { signal } = {
     reverseUrl.searchParams.set('zoom', '18');
 
     const response = await fetch(reverseUrl, {
-      signal,
+      signal: signal || AbortSignal.timeout(6000),
       headers: {
         Accept: 'application/json',
       },
@@ -192,15 +182,16 @@ export async function reverseGeocodeLocation(latitude, longitude, { signal } = {
       const payload = await response.json();
       const addr = payload.address || {};
       const neighbourhood = addr.neighbourhood || addr.suburb || addr.quarter || addr.residential;
-      const road = addr.road || addr.pedestrian || addr.street;
+      const road = addr.road || addr.pedestrian || addr.street || addr.footway || addr.path;
+      const street = road && addr.house_number ? `${road} # ${addr.house_number}` : road;
       const cityDistrict = addr.city_district || addr.suburb || 'Ciudad Bolívar';
 
-      let shortLabel = neighbourhood || road || payload.name;
+      let shortLabel = [street, neighbourhood].filter(Boolean).join(', ') || payload.name;
       if (!shortLabel && typeof payload.display_name === 'string') {
         shortLabel = payload.display_name.split(',')[0]?.trim();
       }
 
-      const detailParts = [road, neighbourhood, cityDistrict].filter(Boolean);
+      const detailParts = [street, neighbourhood, cityDistrict].filter(Boolean);
       const uniqueDetail = [...new Set(detailParts)].join(', ');
 
       if (shortLabel) {
@@ -217,7 +208,7 @@ export async function reverseGeocodeLocation(latitude, longitude, { signal } = {
     // Si la llamada remota falla, usamos el POI local más cercano
   }
 
-  // 3. Fallback a punto de interés cercano local (≤2.5 km)
+  // 2. Fallback a punto de interés cercano local (≤2.5 km)
   if (nearestPoi && minDistance <= 2.5) {
     return {
       label: `Ubicación actual (cerca de ${nearestPoi.name})`,

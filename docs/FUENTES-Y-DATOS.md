@@ -8,7 +8,7 @@ La guía técnica `Guia_integracion_IA_Muevete_Ciudad_Bolivar.docx` establece la
 datos → red/motor determinista → agente de IA → respuesta
 ```
 
-Eco no memoriza la red de transporte. El motor selecciona una ruta estructurada; Claude solo la interpreta y redacta. Si el modelo no está disponible, la misma ruta se explica con una respuesta determinista.
+Eco no memoriza la red de transporte. El motor selecciona una ruta estructurada; Gemini solo la interpreta y redacta. Si el modelo no está disponible, la misma ruta se explica con una respuesta determinista.
 
 ## GTFS oficial procesado
 
@@ -99,4 +99,4 @@ Cada tramo informal incluye `dataStatus: demo` y una advertencia. El agente debe
 3. Las respuestas se limitan a 450 caracteres.
 4. Se rechazan afirmaciones como “100 % accesible”, “garantizada” o referencias a Villa del Rosario como estación.
 5. Sin clave, red o respuesta válida, se usa el fallback determinista.
-6. La clave de Anthropic vive únicamente en la función serverless `/api/chat`.
+6. La clave de Gemini vive únicamente en la función serverless `/api/chat`.

@@ -110,7 +110,7 @@ Así, una falla de Twilio no rompe el mapa y una falla del mapa no elimina la re
 ## 7. Módulos ya implementados
 
 - `src/App.jsx`: interfaz React, chat, mapa, reportes y estados de demo.
-- `src/core/`: parser, motor determinista, fallback y agente Claude.
+- `src/core/`: parser, motor determinista, fallback y agente Gemini.
 - `api/chat.js`: función serverless con la clave privada fuera del navegador.
 - `src/data/`: catálogo, fuentes y extracto GTFS oficial.
 - `src/components/Map/`: Leaflet, capas, resumen y vista de respaldo.

@@ -11,6 +11,7 @@ import {
   hasLocationCoordinates,
 } from '../../utils/locationRoute';
 import { requestChat } from '../../services/chatApi';
+import { getShortestRoadRoute, getRoadRouteKey } from '../../services/roadRouting';
 import { getTransportPlan } from '../../services/transportRouting';
 import { useToast } from '../../hooks/useToast';
 import { useReports } from '../../hooks/useReports';
@@ -79,6 +80,10 @@ function detectReport(text) {
   return { type, location };
 }
 
+// Precisión con la que se da por buena la ubicación y espera máxima para afinarla.
+const GPS_TARGET_ACCURACY_M = 25;
+const GPS_MAX_WAIT_MS = 12000;
+
 function getGeolocationErrorMessage(code) {
   if (code === 1 || code === 'PERMISSION_DENIED') {
     return 'No pudimos obtener tu ubicación. Verifica que hayas permitido el acceso a la ubicación.';
@@ -119,6 +124,11 @@ export default function Home() {
   const [plannerError, setPlannerError] = useState('');
   const [isLocatingOrigin, setIsLocatingOrigin] = useState(false);
   const [isResolvingPlanner, setIsResolvingPlanner] = useState(false);
+  const [roadRoute, setRoadRoute] = useState(null);
+  const [roadRouteStatus, setRoadRouteStatus] = useState('idle');
+  const [roadRouteMessage, setRoadRouteMessage] = useState('');
+  const [transferRoutes, setTransferRoutes] = useState({});
+  const [transferRoutesStatus, setTransferRoutesStatus] = useState('idle');
   const [hasRouteContext, setHasRouteContext] = useState(hasInitialRouteContext);
   const [deadline, setDeadline] = useState('07:00');
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
@@ -128,7 +138,13 @@ export default function Home() {
   const { toast, showToast } = useToast();
   const { reports, addReport: addReportToState, clearReports, pruneExpiredReports } = useReports();
   const chatAbortRef = useRef(null);
+  const roadRouteAbortRef = useRef(null);
+  const roadRouteRequestIdRef = useRef(0);
+  const transferRoutesAbortRef = useRef(null);
+  const transferRoutesRequestIdRef = useRef(0);
   const gpsWatchIdRef = useRef(null);
+  const gpsTimerRef = useRef(null);
+  const gpsSessionRef = useRef(0);
   const autoRouteTimerRef = useRef(null);
   const lastAutoRouteKeyRef = useRef('');
   const skipAutoRouteKeyRef = useRef('');
@@ -136,27 +152,54 @@ export default function Home() {
   const baseRoute = ROUTES[activeRouteId] || ROUTES.main;
   const hasPlannerLocations =
     hasLocationCoordinates(originLocation) && hasLocationCoordinates(destinationLocation);
-  const activeRoute = useMemo(
-    () =>
-      hasPlannerLocations || hasRouteContext
-        ? buildLocationRoute({
-            baseRoute,
-            originLocation,
-            destinationLocation,
-            originText: origin,
-            destinationText: destination,
-          })
-        : null,
-    [
-      baseRoute,
-      destination,
-      destinationLocation,
-      hasPlannerLocations,
-      hasRouteContext,
-      origin,
-      originLocation,
-    ],
+  const roadRouteKey = useMemo(
+    () => getRoadRouteKey(originLocation, destinationLocation),
+    [destinationLocation, originLocation],
   );
+  const activeRoute = useMemo(() => {
+    if (!hasPlannerLocations && !hasRouteContext) return null;
+
+    const locationRoute = buildLocationRoute({
+      baseRoute,
+      originLocation,
+      destinationLocation,
+      originText: origin,
+      destinationText: destination,
+    });
+    if (!locationRoute) return null;
+
+    if (roadRouteStatus === 'ready' && roadRoute?.requestKey === roadRouteKey) {
+      return {
+        ...locationRoute,
+        mapPath: roadRoute.mapPath,
+        roadDistanceMeters: roadRoute.distanceMeters,
+        roadDurationSeconds: roadRoute.durationSeconds,
+        routingSource: roadRoute.source,
+        routingSourceLabel: roadRoute.sourceLabel,
+        routingSelection: 'shortest_available_alternative',
+        isRoadRoute: true,
+      };
+    }
+
+    return {
+      ...locationRoute,
+      mapPath: [],
+      routingSource: 'unavailable',
+      routingStatus: roadRouteStatus,
+      isRoadRoute: false,
+    };
+  }, [
+    baseRoute,
+    destination,
+    destinationLocation,
+    hasPlannerLocations,
+    hasRouteContext,
+    origin,
+    originLocation,
+    roadRoute,
+    roadRouteKey,
+    roadRouteStatus,
+  ]);
   const margin = activeRoute ? timeToMinutes(deadline) - (activeRoute.arrivalMinutes || 389) : null;
   const transportPlan = useMemo(
     () =>
@@ -165,9 +208,111 @@ export default function Home() {
         destinationLocation,
         activeRoute,
         selectedMode: selectedTransportMode,
+        transferRoutes,
       }),
-    [activeRoute, destinationLocation, originLocation, selectedTransportMode],
+    [
+      activeRoute,
+      destinationLocation,
+      originLocation,
+      selectedTransportMode,
+      transferRoutes,
+    ],
   );
+  const pendingTransferRequests = useMemo(
+    () =>
+      (transportPlan?.routingRequests || []).filter(
+        (request) => !transferRoutes[request.requestKey],
+      ),
+    [transferRoutes, transportPlan],
+  );
+  const transferRequestSignature = pendingTransferRequests
+    .map((request) => request.requestKey)
+    .sort()
+    .join('|');
+
+  useEffect(() => {
+    roadRouteAbortRef.current?.abort();
+    roadRouteRequestIdRef.current += 1;
+    const requestId = roadRouteRequestIdRef.current;
+
+    if (!roadRouteKey) {
+      setRoadRoute(null);
+      setRoadRouteStatus('idle');
+      setRoadRouteMessage('');
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    roadRouteAbortRef.current = controller;
+    setRoadRoute(null);
+    setRoadRouteStatus('loading');
+    setRoadRouteMessage('Calculando la ruta vial más corta...');
+
+    getShortestRoadRoute({
+      originLocation,
+      destinationLocation,
+      signal: controller.signal,
+    })
+      .then((result) => {
+        if (requestId !== roadRouteRequestIdRef.current || controller.signal.aborted) return;
+        setRoadRoute(result);
+        setRoadRouteStatus('ready');
+        setRoadRouteMessage('Ruta vial calculada por OSRM · OpenStreetMap');
+      })
+      .catch((error) => {
+        if (requestId !== roadRouteRequestIdRef.current || controller.signal.aborted) return;
+        setRoadRoute(null);
+        setRoadRouteStatus('fallback');
+        setRoadRouteMessage(
+          error?.message || 'No se pudo calcular una ruta vial para estos puntos.',
+        );
+      });
+
+    return () => controller.abort();
+  }, [destinationLocation, originLocation, roadRouteKey]);
+
+  useEffect(() => {
+    transferRoutesAbortRef.current?.abort();
+    transferRoutesRequestIdRef.current += 1;
+    const requestId = transferRoutesRequestIdRef.current;
+
+    if (pendingTransferRequests.length === 0) {
+      setTransferRoutesStatus((transportPlan?.routingRequests || []).length ? 'ready' : 'idle');
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    transferRoutesAbortRef.current = controller;
+    setTransferRoutes({});
+    setTransferRoutesStatus('loading');
+
+    (async () => {
+      const nextRoutes = {};
+
+      for (const request of pendingTransferRequests) {
+        try {
+          const result = await getShortestRoadRoute({
+            originLocation: request.fromLocation,
+            destinationLocation: request.toLocation,
+            signal: controller.signal,
+          });
+          nextRoutes[request.requestKey] = result;
+        } catch {
+          if (controller.signal.aborted) return;
+        }
+      }
+
+      if (requestId !== transferRoutesRequestIdRef.current || controller.signal.aborted) return;
+
+      const fulfilled = Object.keys(nextRoutes).length;
+      setTransferRoutes(nextRoutes);
+      setTransferRoutesStatus(
+        fulfilled === 0 ? 'fallback' : fulfilled < pendingTransferRequests.length ? 'partial' : 'ready',
+      );
+    })();
+
+    return () => controller.abort();
+  }, [transferRequestSignature]);
 
   const addMessage = useCallback((role, text, routeId = null) => {
     setMessages((previous) => [
@@ -244,6 +389,12 @@ export default function Home() {
   }
 
   function clearGpsWatch() {
+    // Invalida cualquier lectura GPS o geocodificación inversa en curso.
+    gpsSessionRef.current += 1;
+    if (gpsTimerRef.current !== null) {
+      window.clearTimeout(gpsTimerRef.current);
+      gpsTimerRef.current = null;
+    }
     if (
       gpsWatchIdRef.current !== null &&
       typeof navigator !== 'undefined' &&
@@ -254,6 +405,8 @@ export default function Home() {
     }
   }
 
+  useEffect(() => () => clearGpsWatch(), []);
+
   function handleUseCurrentLocation() {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       setOriginError('La ubicación no está disponible en este navegador.');
@@ -261,85 +414,96 @@ export default function Home() {
     }
 
     clearGpsWatch();
+    const session = gpsSessionRef.current;
     setIsLocatingOrigin(true);
     setOriginStatus('Obteniendo tu ubicación GPS con alta precisión...');
     setOriginError('');
     setPlannerError('');
 
-    const applyLocationFix = async (coords) => {
+    // La primera lectura suele venir de Wi-Fi/IP y puede estar a cientos de metros.
+    // Se escucha el GPS hasta lograr la precisión objetivo o agotar el tiempo, y se usa la mejor lectura.
+    let bestFix = null;
+
+    const finishWithBestFix = async () => {
+      if (session !== gpsSessionRef.current) return;
+      if (!bestFix) {
+        clearGpsWatch();
+        setIsLocatingOrigin(false);
+        setOriginStatus('');
+        setOriginError(getGeolocationErrorMessage(3));
+        return;
+      }
+
+      const { latitude, longitude, accuracy } = bestFix;
+      const accuracyText = `±${Math.round(accuracy)} m`;
       clearGpsWatch();
-      const { latitude, longitude, accuracy } = coords;
+      const resolveSession = gpsSessionRef.current;
 
-      const fallbackLabel = 'Ubicación actual';
-      const initialLocation = {
-        label: fallbackLabel,
-        latitude,
-        longitude,
-        source: 'gps',
-        accuracy,
-      };
-
-      setOrigin(fallbackLabel);
-      setOriginLocation(initialLocation);
+      setOrigin('Ubicación actual');
+      setOriginLocation({ label: 'Ubicación actual', latitude, longitude, source: 'gps', accuracy });
       setHasRouteContext(false);
       lastAutoRouteKeyRef.current = '';
       skipAutoRouteKeyRef.current = '';
       setSelectedTransportMode('auto');
-      setOriginStatus(`📍 GPS detectado (precisión ±${Math.round(accuracy || 15)}m). Obteniendo barrio...`);
+      setOriginStatus(`📍 Ubicación detectada (${accuracyText}). Buscando la dirección...`);
       setOriginError('');
 
       try {
         const resolved = await reverseGeocodeLocation(latitude, longitude);
-        if (resolved && resolved.label) {
+        if (resolveSession !== gpsSessionRef.current) return;
+        if (resolved?.label) {
           setOrigin(resolved.label);
-          setOriginLocation(resolved);
-          setOriginStatus(`📍 ${resolved.label}`);
+          setOriginLocation({ ...resolved, latitude, longitude, accuracy });
+          setOriginStatus(`📍 ${resolved.label} (${accuracyText})`);
         } else {
-          setOriginStatus(`📍 Ubicación actual (±${Math.round(accuracy || 15)}m)`);
+          setOriginStatus(`📍 Ubicación actual (${accuracyText})`);
         }
       } catch {
-        setOriginStatus(`📍 Ubicación actual (±${Math.round(accuracy || 15)}m)`);
+        if (resolveSession === gpsSessionRef.current) {
+          setOriginStatus(`📍 Ubicación actual (${accuracyText})`);
+        }
       } finally {
-        setIsLocatingOrigin(false);
+        if (resolveSession === gpsSessionRef.current) setIsLocatingOrigin(false);
       }
     };
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        applyLocationFix(position.coords);
-      },
-      (error) => {
-        // Si getCurrentPosition da timeout o falla, intentar watchPosition una vez
-        try {
-          const watchId = navigator.geolocation.watchPosition(
-            (pos) => {
-              applyLocationFix(pos.coords);
-            },
-            (watchErr) => {
-              clearGpsWatch();
-              setIsLocatingOrigin(false);
-              setOriginStatus('');
-              setOriginError(getGeolocationErrorMessage(watchErr?.code || error?.code));
-            },
-            {
-              enableHighAccuracy: true,
-              timeout: 10000,
-              maximumAge: 5000,
-            }
-          );
-          gpsWatchIdRef.current = watchId;
-        } catch {
+    try {
+      gpsWatchIdRef.current = navigator.geolocation.watchPosition(
+        (position) => {
+          if (session !== gpsSessionRef.current) return;
+          const { latitude, longitude } = position.coords;
+          const accuracy = Number.isFinite(position.coords.accuracy) ? position.coords.accuracy : 999;
+          if (!bestFix || accuracy < bestFix.accuracy) {
+            bestFix = { latitude, longitude, accuracy };
+            setOriginStatus(`Afinando tu ubicación GPS (±${Math.round(accuracy)} m)...`);
+          }
+          if (bestFix.accuracy <= GPS_TARGET_ACCURACY_M) finishWithBestFix();
+        },
+        (error) => {
+          if (session !== gpsSessionRef.current) return;
+          // Sin ninguna lectura no hay nada que aprovechar; con alguna, se usa la mejor.
+          if (bestFix) {
+            finishWithBestFix();
+            return;
+          }
+          clearGpsWatch();
           setIsLocatingOrigin(false);
           setOriginStatus('');
           setOriginError(getGeolocationErrorMessage(error?.code));
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: GPS_MAX_WAIT_MS,
+          maximumAge: 0,
         }
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 8000,
-        maximumAge: 10000,
-      }
-    );
+      );
+      gpsTimerRef.current = window.setTimeout(finishWithBestFix, GPS_MAX_WAIT_MS);
+    } catch {
+      clearGpsWatch();
+      setIsLocatingOrigin(false);
+      setOriginStatus('');
+      setOriginError('La ubicación no está disponible en este navegador.');
+    }
   }
 
   const handleAddReport = useCallback(
@@ -598,13 +762,7 @@ export default function Home() {
       const selectedRouteId = setActiveRoute(routeId);
       const route = ROUTES[selectedRouteId];
       if (route) {
-        if (route.segments?.some((segment) => segment.type === 'sitp')) {
-          setSelectedTransportMode('sitp');
-        } else if (route.segments?.some((segment) => segment.type === 'informal')) {
-          setSelectedTransportMode('veredal');
-        } else {
-          setSelectedTransportMode('auto');
-        }
+        setSelectedTransportMode('auto');
         showToast(`Ruta activa: ${route.title}`);
       }
     },
@@ -613,13 +771,19 @@ export default function Home() {
 
   const handleSelectTransportMode = useCallback(
     (mode) => {
-      if (!['sitp', 'veredal'].includes(mode)) return;
+      if (mode === 'auto') {
+        setSelectedTransportMode('auto');
+        return;
+      }
+      if (!['sitp', 'veredal', 'cable'].includes(mode)) return;
 
       if (!transportPlan.availableModes.includes(mode)) {
         showToast(
           mode === 'veredal'
             ? 'No hay una van veredal disponible cerca del origen'
-            : 'No hay una cobertura SITP confirmada cerca del origen',
+            : mode === 'cable'
+              ? 'No hay un tramo de TransMiCable relacionado con esta ruta'
+              : 'No hay una cobertura SITP confirmada cerca del origen',
         );
         return;
       }
@@ -713,6 +877,8 @@ export default function Home() {
   useEffect(
     () => () => {
       chatAbortRef.current?.abort();
+      roadRouteAbortRef.current?.abort();
+      transferRoutesAbortRef.current?.abort();
       window.clearTimeout(autoRouteTimerRef.current);
       clearGpsWatch();
     },
@@ -762,7 +928,11 @@ export default function Home() {
           originStatus={originStatus}
           originError={originError}
           plannerError={plannerError}
-          isCalculating={isResolvingPlanner}
+          isCalculating={
+            isResolvingPlanner ||
+            roadRouteStatus === 'loading' ||
+            transferRoutesStatus === 'loading'
+          }
           onDeadlineChange={setDeadline}
           onPriorityModeChange={setPriorityMode}
           onSubmit={handlePlannerSubmit}
@@ -776,6 +946,10 @@ export default function Home() {
           activeRouteId={activeRoute ? activeRouteId : null}
           activeRoute={activeRoute}
           transportPlan={transportPlan}
+          roadRoute={roadRoute}
+          roadRouteStatus={roadRouteStatus}
+          roadRouteMessage={roadRouteMessage}
+          selectedTransportMode={selectedTransportMode}
           originLocation={originLocation}
           destinationLocation={destinationLocation}
           reports={reports}
