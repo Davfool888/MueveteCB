@@ -3,7 +3,7 @@ import { ROUTES, REPORT_LOCATIONS, REPORT_TYPE_LABELS } from '../../data/routes'
 import { destinationPhrase, formatDeadlineLabel, normalizeText, timeToMinutes } from '../../utils/helpers';
 import { buildFallbackAgentResponse } from '../../core/fallbackAgent';
 import { resolveRouteIdForReports } from '../../core/recommendationEngine';
-import { getLocationByLabel, resolveLocation } from '../../services/geocodingService';
+import { getLocationByLabel, resolveLocation, reverseGeocodeLocation } from '../../services/geocodingService';
 import {
   buildLocationRoute,
   createEmptyLocation,
@@ -262,51 +262,84 @@ export default function Home() {
 
     clearGpsWatch();
     setIsLocatingOrigin(true);
-    setOriginStatus('Obteniendo tu ubicación...');
+    setOriginStatus('Obteniendo tu ubicación GPS con alta precisión...');
     setOriginError('');
     setPlannerError('');
 
-    try {
-      const watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          clearGpsWatch();
-          const location = {
-            label: 'Ubicación actual',
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            source: 'gps',
-          };
+    const applyLocationFix = async (coords) => {
+      clearGpsWatch();
+      const { latitude, longitude, accuracy } = coords;
 
-          setOrigin(location.label);
-          setOriginLocation(location);
-          setHasRouteContext(false);
-          lastAutoRouteKeyRef.current = '';
-          skipAutoRouteKeyRef.current = '';
-          setSelectedTransportMode('auto');
-          setOriginStatus('📍 Ubicación actual');
-          setOriginError('');
-          setIsLocatingOrigin(false);
-        },
-        (error) => {
-          clearGpsWatch();
+      const fallbackLabel = 'Ubicación actual';
+      const initialLocation = {
+        label: fallbackLabel,
+        latitude,
+        longitude,
+        source: 'gps',
+        accuracy,
+      };
+
+      setOrigin(fallbackLabel);
+      setOriginLocation(initialLocation);
+      setHasRouteContext(false);
+      lastAutoRouteKeyRef.current = '';
+      skipAutoRouteKeyRef.current = '';
+      setSelectedTransportMode('auto');
+      setOriginStatus(`📍 GPS detectado (precisión ±${Math.round(accuracy || 15)}m). Obteniendo barrio...`);
+      setOriginError('');
+
+      try {
+        const resolved = await reverseGeocodeLocation(latitude, longitude);
+        if (resolved && resolved.label) {
+          setOrigin(resolved.label);
+          setOriginLocation(resolved);
+          setOriginStatus(`📍 ${resolved.label}`);
+        } else {
+          setOriginStatus(`📍 Ubicación actual (±${Math.round(accuracy || 15)}m)`);
+        }
+      } catch {
+        setOriginStatus(`📍 Ubicación actual (±${Math.round(accuracy || 15)}m)`);
+      } finally {
+        setIsLocatingOrigin(false);
+      }
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        applyLocationFix(position.coords);
+      },
+      (error) => {
+        // Si getCurrentPosition da timeout o falla, intentar watchPosition una vez
+        try {
+          const watchId = navigator.geolocation.watchPosition(
+            (pos) => {
+              applyLocationFix(pos.coords);
+            },
+            (watchErr) => {
+              clearGpsWatch();
+              setIsLocatingOrigin(false);
+              setOriginStatus('');
+              setOriginError(getGeolocationErrorMessage(watchErr?.code || error?.code));
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 5000,
+            }
+          );
+          gpsWatchIdRef.current = watchId;
+        } catch {
           setIsLocatingOrigin(false);
           setOriginStatus('');
           setOriginError(getGeolocationErrorMessage(error?.code));
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 0,
-          timeout: 12000,
-        },
-      );
-
-      gpsWatchIdRef.current = watchId;
-    } catch {
-      clearGpsWatch();
-      setIsLocatingOrigin(false);
-      setOriginStatus('');
-      setOriginError('No pudimos obtener tu ubicación. Intenta nuevamente.');
-    }
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 8000,
+        maximumAge: 10000,
+      }
+    );
   }
 
   const handleAddReport = useCallback(
@@ -383,6 +416,8 @@ export default function Home() {
         message,
         origin: nextOrigin,
         destination: nextDestination,
+        originLocation,
+        destinationLocation,
         deadline: nextDeadline,
         priority,
         activeReports: reports,
@@ -398,15 +433,29 @@ export default function Home() {
       if (controller.signal.aborted) return;
       removeTypingIndicator();
 
+      const source = result.meta?.source;
+      const fallbackReason = result.meta?.fallbackReason;
+
+      let toastMessage = 'Eco usó el motor local de Ciudad Bolívar';
+      if (source === 'claude') {
+        toastMessage = 'Eco respondió con Claude IA';
+      } else if (source === 'gemini') {
+        toastMessage = result.meta?.fallbackFromClaude
+          ? 'Eco respondió con Gemini IA (respaldo de Claude)'
+          : 'Eco respondió con Gemini IA';
+      } else if (fallbackReason === 'insufficient_credits') {
+        toastMessage = 'Claude sin saldo en Anthropic. Usando motor local.';
+      } else if (fallbackReason === 'invalid_api_key') {
+        toastMessage = 'Claude: Clave de API inválida. Usando motor local.';
+      } else if (fallbackReason === 'missing_api_key') {
+        toastMessage = 'Eco usó la respuesta local de respaldo';
+      }
+      showToast(toastMessage);
+
       const returnedRouteId = result.route?.id;
       if (returnedRouteId && ROUTES[returnedRouteId]) {
         const displayRouteId = setActiveRoute(returnedRouteId);
         addRouteMessage(result.answerText, displayRouteId);
-        showToast(
-          result.meta?.source === 'claude'
-            ? 'Eco respondió con IA'
-            : 'Eco usó la respuesta local de respaldo'
-        );
       } else {
         addMessage('agent', result.answerText);
       }
@@ -414,7 +463,7 @@ export default function Home() {
       if (chatAbortRef.current === controller) chatAbortRef.current = null;
       return result;
     },
-    [activeRouteId, addMessage, addRouteMessage, removeTypingIndicator, reports, setActiveRoute, showToast, showTypingIndicator]
+    [activeRouteId, addMessage, addRouteMessage, destinationLocation, originLocation, removeTypingIndicator, reports, setActiveRoute, showToast, showTypingIndicator]
   );
 
   const processQuery = useCallback(

@@ -60,10 +60,14 @@ export default async function handler(request, response) {
           : undefined,
         channel,
         activeReports,
+        originLocation: body.originLocation,
+        destinationLocation: body.destinationLocation,
       },
       {
         apiKey: process.env.ANTHROPIC_API_KEY,
         model: process.env.ANTHROPIC_MODEL || DEFAULT_CLAUDE_MODEL,
+        geminiApiKey: process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY,
+        geminiModel: process.env.GEMINI_MODEL,
       }
     );
 

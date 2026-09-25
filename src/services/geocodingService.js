@@ -129,3 +129,112 @@ export async function resolveLocation(query, options = {}) {
   const results = await searchLocations(query, { ...options, limit: 1 });
   return results[0] || null;
 }
+
+function haversineDistKm(lat1, lon1, lat2, lon2) {
+  const earthRadiusKm = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+export async function reverseGeocodeLocation(latitude, longitude, { signal } = {}) {
+  const lat = toNumber(latitude);
+  const lon = toNumber(longitude);
+  if (lat === null || lon === null) return null;
+
+  // 1. Verificar si está muy cerca (≤350 m) de un punto de interés conocido
+  let nearestPoi = null;
+  let minDistance = Infinity;
+  for (const poi of POINTS_OF_INTEREST) {
+    if (!Array.isArray(poi?.coordinates) || poi.coordinates.length < 2) continue;
+    const d = haversineDistKm(lat, lon, poi.coordinates[0], poi.coordinates[1]);
+    if (d < minDistance) {
+      minDistance = d;
+      nearestPoi = poi;
+    }
+  }
+
+  if (nearestPoi && minDistance <= 0.35) {
+    return {
+      label: `Ubicación actual (${nearestPoi.name})`,
+      detail: nearestPoi.detail,
+      latitude: lat,
+      longitude: lon,
+      source: 'gps',
+      accuracyKm: minDistance,
+    };
+  }
+
+  // 2. Consultar Nominatim reverse de OpenStreetMap
+  try {
+    const reverseBase = GEOCODING_URL.replace(/\/search\b/, '/reverse');
+    const reverseUrl = new URL(reverseBase.startsWith('http') ? reverseBase : 'https://nominatim.openstreetmap.org/reverse');
+    reverseUrl.searchParams.set('lat', String(lat));
+    reverseUrl.searchParams.set('lon', String(lon));
+    reverseUrl.searchParams.set('format', 'jsonv2');
+    reverseUrl.searchParams.set('addressdetails', '1');
+    reverseUrl.searchParams.set('accept-language', 'es');
+    reverseUrl.searchParams.set('zoom', '18');
+
+    const response = await fetch(reverseUrl, {
+      signal,
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const payload = await response.json();
+      const addr = payload.address || {};
+      const neighbourhood = addr.neighbourhood || addr.suburb || addr.quarter || addr.residential;
+      const road = addr.road || addr.pedestrian || addr.street;
+      const cityDistrict = addr.city_district || addr.suburb || 'Ciudad Bolívar';
+
+      let shortLabel = neighbourhood || road || payload.name;
+      if (!shortLabel && typeof payload.display_name === 'string') {
+        shortLabel = payload.display_name.split(',')[0]?.trim();
+      }
+
+      const detailParts = [road, neighbourhood, cityDistrict].filter(Boolean);
+      const uniqueDetail = [...new Set(detailParts)].join(', ');
+
+      if (shortLabel) {
+        return {
+          label: `Ubicación actual (${shortLabel})`,
+          detail: uniqueDetail || 'Localidad 19 · Ciudad Bolívar',
+          latitude: lat,
+          longitude: lon,
+          source: 'gps',
+        };
+      }
+    }
+  } catch {
+    // Si la llamada remota falla, usamos el POI local más cercano
+  }
+
+  // 3. Fallback a punto de interés cercano local (≤2.5 km)
+  if (nearestPoi && minDistance <= 2.5) {
+    return {
+      label: `Ubicación actual (cerca de ${nearestPoi.name})`,
+      detail: nearestPoi.detail,
+      latitude: lat,
+      longitude: lon,
+      source: 'gps',
+      accuracyKm: minDistance,
+    };
+  }
+
+  return {
+    label: 'Ubicación actual',
+    detail: 'Coordenadas GPS detectadas',
+    latitude: lat,
+    longitude: lon,
+    source: 'gps',
+  };
+}
+

@@ -98,3 +98,83 @@ test('rechaza una afirmación de Claude incompatible con los datos', async () =>
   assert.equal(response.meta.fallbackReason, 'provider_unavailable');
   assert.equal(response.route.id, 'main');
 });
+
+test('usa Gemini como respaldo si Claude falla', async () => {
+  const fakeFetch = async (url) => {
+    if (url.includes('api.anthropic.com')) {
+      return {
+        ok: false,
+        status: 400,
+        text: async () => '{"type":"error","error":{"message":"Your credit balance is too low"}}',
+      };
+    }
+
+    if (url.includes('generativelanguage.googleapis.com')) {
+      return {
+        ok: true,
+        json: async () => ({
+          modelVersion: 'gemini-1.5-flash',
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: '{"answerText":"Ruta por TransMiCable calculada con Gemini."}',
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      };
+    }
+
+    throw new Error(`Unexpected URL: ${url}`);
+  };
+
+  const response = await createChatResponse(INPUT, {
+    apiKey: 'claude-key-without-balance',
+    geminiApiKey: 'valid-gemini-key',
+    fetchImpl: fakeFetch,
+  });
+
+  assert.equal(response.meta.source, 'gemini');
+  assert.equal(response.meta.fallbackFromClaude, true);
+  assert.equal(response.meta.claudeErrorReason, 'insufficient_credits');
+  assert.ok(response.answerText.includes('Gemini'));
+});
+
+test('usa Gemini directamente si no hay clave de Claude', async () => {
+  const fakeFetch = async (url) => {
+    if (url.includes('generativelanguage.googleapis.com')) {
+      return {
+        ok: true,
+        json: async () => ({
+          modelVersion: 'gemini-1.5-flash',
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: '{"answerText":"Respuesta directa de Gemini."}',
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      };
+    }
+    throw new Error(`Unexpected URL: ${url}`);
+  };
+
+  const response = await createChatResponse(INPUT, {
+    apiKey: '',
+    geminiApiKey: 'valid-gemini-key',
+    fetchImpl: fakeFetch,
+  });
+
+  assert.equal(response.meta.source, 'gemini');
+  assert.equal(response.meta.fallbackFromClaude, false);
+});
+

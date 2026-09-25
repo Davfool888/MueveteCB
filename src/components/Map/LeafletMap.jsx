@@ -189,8 +189,8 @@ export default function LeafletMap({
         zoom: 13,
         minZoom: 11,
         maxZoom: 18,
-        maxBounds: CIUDAD_BOLIVAR_BOUNDS,
-        maxBoundsViscosity: 0.95,
+        maxBounds: BOGOTA_BOUNDS,
+        maxBoundsViscosity: 0.35,
         zoomControl: false,
         attributionControl: true,
         preferCanvas: false,
@@ -258,6 +258,10 @@ export default function LeafletMap({
     if (fitTimeoutRef.current) window.clearTimeout(fitTimeoutRef.current);
 
     const isVeredalPlan = transportPlan?.mode === 'veredal';
+    const hasOriginCoord = hasLocationCoordinates(originLocation);
+    const hasDestCoord = hasLocationCoordinates(destinationLocation);
+    const isSingleEndpoint = (hasOriginCoord && !hasDestCoord) || (!hasOriginCoord && hasDestCoord);
+
     const contextualRoute =
       !isVeredalPlan && transportPlan?.routePath && !activeRoute
         ? {
@@ -268,9 +272,13 @@ export default function LeafletMap({
             costFormatted: 'Costo por validar',
           }
         : null;
+
+    // Si solo hay un extremo (ej. ubicación actual sin destino), no mostramos una ruta desconectada
     const route = isVeredalPlan
       ? null
-      : activeRoute || contextualRoute || (activeRouteId ? ROUTES[activeRouteId] : null);
+      : isSingleEndpoint
+        ? null
+        : activeRoute || contextualRoute || (activeRouteId ? ROUTES[activeRouteId] : null);
     const hasRoute = Boolean(route && Array.isArray(route.mapPath) && route.mapPath.length >= 2);
     const isAlternate = route?.id === 'alternate';
     const isEconomic = route?.id === 'economic';
@@ -332,7 +340,7 @@ export default function LeafletMap({
         .addTo(groups.route);
     }
 
-    if (destinationPoint) {
+    if (destinationPoint && (hasDestCoord || hasRoute)) {
       L.marker(destinationPoint, {
         icon: createIcon('route', 'B'),
         keyboard: true,
@@ -346,12 +354,14 @@ export default function LeafletMap({
     const endpointPoints = [originPoint, destinationPoint].filter(Boolean);
     const fitPath = isVeredalPlan
       ? transportPlan?.fitPath || endpointPoints
-      : hasRoute
-        ? route.mapPath
-        : endpointPoints;
+      : isSingleEndpoint && originPoint
+        ? [originPoint]
+        : hasRoute
+          ? route.mapPath
+          : endpointPoints;
 
     if (fitPath.length === 0) {
-      map.setMaxBounds(CIUDAD_BOLIVAR_BOUNDS);
+      map.setMaxBounds(BOGOTA_BOUNDS);
       return;
     }
 
@@ -370,7 +380,7 @@ export default function LeafletMap({
           animate,
         });
       } else {
-        map.setView(fitPath[0], Math.max(map.getZoom(), 14), { animate });
+        map.setView(fitPath[0], 15, { animate });
       }
     }, 60);
   }, [activeRoute, activeRouteId, destinationLocation, originLocation, transportPlan]);

@@ -2,9 +2,11 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
+dotenv.config({ path: '.env.local' });
 dotenv.config();
 
-const { default: handler } = await import("./api/passengers.js");
+const { default: passengersHandler } = await import("./api/passengers.js");
+const { default: chatHandler } = await import("./api/chat.js");
 
 const app = express();
 
@@ -20,9 +22,23 @@ app.use(express.json());
 
 app.post("/api/passengers", async (req, res) => {
   try {
-    await handler(req, res);
+    await passengersHandler(req, res);
   } catch (error) {
-    console.error("Error en API:", error);
+    console.error("Error en API passengers:", error);
+
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: "Error interno del servidor",
+      });
+    }
+  }
+});
+
+app.post("/api/chat", async (req, res) => {
+  try {
+    await chatHandler(req, res);
+  } catch (error) {
+    console.error("Error en API chat:", error);
 
     if (!res.headersSent) {
       res.status(500).json({

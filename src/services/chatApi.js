@@ -44,6 +44,8 @@ export async function requestChat(input, options = {}) {
         message: String(input.message || '').trim().slice(0, 1000),
         origin: input.origin,
         destination: input.destination,
+        originLocation: input.originLocation,
+        destinationLocation: input.destinationLocation,
         deadline: input.deadline,
         priority: input.priority,
         channel: 'web',
