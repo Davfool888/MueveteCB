@@ -58,7 +58,9 @@ function detectReport(text) {
         ? 'torres'
         : normalized.includes('tunal')
           ? 'tunal'
-          : 'alpes';
+          : normalized.includes('alpes') || normalized.includes('quiba')
+            ? 'alpes'
+            : null;
 
   return { type, location };
 }
@@ -113,9 +115,17 @@ export default function Home() {
 
   const handleAddReport = useCallback(
     ({ type, location, note, source }) => {
+      if (!REPORT_LOCATIONS[location]) {
+        addMessage(
+          'agent',
+          'No reconocí el lugar de la novedad, así que no la registré. Indica si es en Alpes–Quiba, Mirador del Paraíso, Meissen, Las Torres o Portal Tunal, o usa el botón “Reportar novedad”.'
+        );
+        return;
+      }
+
       const createdAtMs = Date.now();
-      const normalizedLocation = REPORT_LOCATIONS[location] ? location : 'alpes';
-      const normalizedType = REPORT_TYPE_LABELS[type] ? type : 'bloqueo';
+      const normalizedLocation = location;
+      const normalizedType = REPORT_TYPE_LABELS[type] ? type : 'otro';
       const report = {
         id: `report-${createdAtMs}-${Math.random().toString(16).slice(2)}`,
         type: normalizedType,

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { extractIntent } from './intentParser.js';
-import { isReportActive, resolveRouteIdForReports, selectRoute } from './recommendationEngine.js';
+import { isReportActive, normalizeReport, resolveRouteIdForReports, selectRoute } from './recommendationEngine.js';
 
 const NOW = new Date('2026-09-24T06:00:00.000Z');
 const ACTIVE_REPORT = {
@@ -38,7 +38,7 @@ test('selecciona la ruta principal y conserva coordenadas GeoJSON', () => {
   assert.equal(decision.route.id, 'main');
   assert.equal(decision.route.dataStatus, 'demo');
   assert.equal(decision.route.totalCostCop, 6050);
-  assert.equal(decision.route.bufferMinutes, 31);
+  assert.equal(decision.route.bufferMinutes, 34);
   assert.deepEqual(decision.route.geometry.coordinates[0], [-74.148341, 4.4883574]);
 });
 
@@ -54,7 +54,7 @@ test('la prioridad económica elige la ruta SITP de Mochuelo Bajo', () => {
 
   assert.equal(decision.route.id, 'economic');
   assert.equal(decision.route.totalCostCop, 3550);
-  assert.equal(decision.route.steps[1].source, 'gtfs_20260818');
+  assert.equal(decision.route.steps[0].source, 'gtfs_20260818');
 });
 
 test('la ruta accesible se limita al origen formal disponible', () => {
@@ -168,4 +168,42 @@ test('pide un dato cuando el destino no existe en el catálogo', () => {
 
   assert.equal(decision.status, 'no_route');
   assert.equal(decision.route, null);
+});
+
+test('una consulta de ruta que menciona TransMiCable sigue siendo una ruta', () => {
+  const intent = extractIntent({
+    message: 'Estoy en Quiba y necesito llegar al Portal Tunal en TransMiCable antes de las 7',
+  });
+
+  assert.equal(intent.type, 'route');
+  assert.equal(intent.originId, 'quiba');
+  assert.equal(intent.destinationId, 'portal_tunal');
+});
+
+test('interpreta la hora de la tarde o de la noche', () => {
+  assert.equal(extractIntent({ message: 'Mochuelo Alto al Tunal antes de las 7 pm' }).arrivalBy, '19:00');
+  assert.equal(extractIntent({ message: 'Mochuelo Alto al Tunal antes de las 7pm' }).arrivalBy, '19:00');
+  assert.equal(extractIntent({ message: 'Mochuelo Alto al Tunal antes de las 7 de la noche' }).arrivalBy, '19:00');
+  assert.equal(extractIntent({ message: 'Mochuelo Alto al Tunal antes de las 7 a. m.' }).arrivalBy, '07:00');
+  assert.equal(extractIntent({ message: 'Mochuelo Alto al Tunal antes de las 7 a mi casa' }).arrivalBy, '07:00');
+});
+
+test('un reporte con lugar desconocido no se asigna a Alpes–Quiba ni cambia la ruta', () => {
+  const unknownPlace = { ...ACTIVE_REPORT, location: 'Usme centro' };
+  assert.equal(normalizeReport(unknownPlace).locationId, null);
+
+  const intent = extractIntent({
+    message: 'Mochuelo Alto a Portal Tunal antes de las 7',
+    origin: 'Mochuelo Alto',
+    destination: 'Portal Tunal',
+    deadline: '07:00',
+  });
+  const decision = selectRoute({ intent, reports: [unknownPlace], now: NOW });
+
+  assert.equal(decision.route.id, 'main');
+  assert.ok(decision.warnings.some((warning) => warning.includes('zona no identificada')));
+});
+
+test('un reporte sin fecha de creación ni expiración no queda activo', () => {
+  assert.equal(isReportActive({ type: 'bloqueo', location: 'alpes' }, NOW), false);
 });

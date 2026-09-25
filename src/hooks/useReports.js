@@ -4,7 +4,7 @@ import { STORAGE_KEY } from '../data/routes';
 function isCurrentReport(report, now = Date.now()) {
   if (!report || ['rejected', 'expired'].includes(report.status)) return false;
   const expiresAt = Date.parse(report.expiresAt || '');
-  return !Number.isFinite(expiresAt) || expiresAt > now;
+  return Number.isFinite(expiresAt) && expiresAt > now;
 }
 
 function loadReports() {

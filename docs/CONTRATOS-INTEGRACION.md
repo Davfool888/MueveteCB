@@ -30,7 +30,7 @@ Campos opcionales para la versión mínima:
 ```json
 {
   "requestId": "req_01J...",
-  "answerText": "Toma el colectivo de Quiba, transborda en Mirador del Paraíso y llega por TransMiCable. Salida 5:35 a. m.; llegada 6:29 a. m.",
+  "answerText": "Toma el colectivo de Quiba, transborda en Mirador del Paraíso y llega por TransMiCable. Salida 5:35 a. m.; llegada 6:26 a. m.",
   "intent": "route_planning",
   "needsClarification": false,
   "route": {
@@ -38,9 +38,9 @@ Campos opcionales para la versión mínima:
     "origin": "Mochuelo Alto",
     "destination": "Portal Tunal",
     "departureAt": "2026-09-24T05:35:00-05:00",
-    "arrivalAt": "2026-09-24T06:29:00-05:00",
-    "durationMinutes": 54,
-    "bufferMinutes": 31,
+    "arrivalAt": "2026-09-24T06:26:00-05:00",
+    "durationMinutes": 51,
+    "bufferMinutes": 34,
     "confidence": 0.86,
     "geometry": {
       "type": "LineString",

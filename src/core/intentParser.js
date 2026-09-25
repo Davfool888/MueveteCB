@@ -19,18 +19,20 @@ function formatClock(hour, minute = 0) {
 export function extractArrivalTime(message) {
   const normalized = normalizeText(message);
   const match = normalized.match(
-    /(?:antes de las?|a las?|para las?|llegar a las?)\s*(\d{1,2})(?::(\d{2}))?\s*(a\.\s*m\.|p\.\s*m\.)?/
+    /(?:antes de las?|a las?|para las?|llegar a las?)\s*(\d{1,2})(?::(\d{2}))?\s*(a\.?\s*m\b\.?|p\.?\s*m\b\.?|de la manana|de la tarde|de la noche)?/
   );
 
   if (!match) return null;
 
   let hour = Number.parseInt(match[1], 10);
   const minute = Number.parseInt(match[2] ? Number.parseInt(match[2], 10) : 0, 10);
-  const suffix = match[3]?.replace(/\s/g, '').toLowerCase();
+  const suffix = match[3] || '';
+  const isPm = suffix.startsWith('p') || /tarde|noche/.test(suffix);
+  const isAm = suffix.startsWith('a') || suffix.includes('manana');
 
   if (hour > 23 || minute > 59) return null;
-  if (suffix === 'p.m.' && hour < 12) hour += 12;
-  if (suffix === 'a.m.' && hour === 12) hour = 0;
+  if (isPm && hour < 12) hour += 12;
+  if (isAm && hour === 12) hour = 0;
 
   return formatClock(hour, minute);
 }
@@ -136,7 +138,8 @@ export function extractIntent(input = {}) {
     };
   }
 
-  if (KNOWLEDGE_PATTERN.test(normalized)) {
+  // Mencionar TransMiCable o la tarifa dentro de una consulta con origen y destino sigue siendo una ruta.
+  if (KNOWLEDGE_PATTERN.test(normalized) && !(originId && destinationId)) {
     return {
       type: 'knowledge',
       originId,

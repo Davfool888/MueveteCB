@@ -16,7 +16,7 @@ En pantalla: página inicial, con el caso visible en la franja de demostración.
 
 Pulsar **Repetir caso**. El chat escribe la pregunta y Eco responde.
 
-**Eco:** “Colectivo de Quiba, transbordo en Mirador del Paraíso y TransMiCable directo. Cincuenta y cuatro minutos; llegada estimada 6:29.”
+**Eco:** “Colectivo de Quiba, transbordo en Mirador del Paraíso y TransMiCable directo. Cincuenta y un minutos; llegada estimada 6:26.”
 
 Señalar la ruta resaltada y decir: “La misma recomendación existe como texto y como mapa.”
 

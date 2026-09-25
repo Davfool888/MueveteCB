@@ -57,10 +57,11 @@ export function normalizeReportLocationId(report) {
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase();
 
+  // Un lugar no reconocido queda sin ubicación: se advierte, pero no se asume un tramo afectado.
   return (
     REPORT_LOCATION_BY_LABEL.find((location) =>
       location.aliases.some((alias) => normalized.includes(alias))
-    )?.id || 'alpes'
+    )?.id || null
   );
 }
 
@@ -97,6 +98,8 @@ export function isReportActive(report, now = new Date()) {
   const expiresAtMs = parseDate(normalized.expiresAt);
   const createdAtMs = parseDate(normalized.createdAt);
 
+  // Sin ninguna fecha no se puede saber si sigue vigente.
+  if (expiresAtMs === null && createdAtMs === null) return false;
   if (expiresAtMs !== null && expiresAtMs <= nowMs) return false;
   if (!expiresAtMs && createdAtMs !== null && nowMs - createdAtMs > MAX_REPORT_AGE_MS) {
     return false;
@@ -129,7 +132,7 @@ function reportWarning(report) {
     other: 'una novedad',
   };
 
-  return `Hay ${typeLabels[report.type]} reportado en ${labels[report.locationId] || 'la zona'}.`;
+  return `Hay ${typeLabels[report.type]} reportado en ${labels[report.locationId] || 'una zona no identificada'}.`;
 }
 
 function routeForIntent(intent) {
@@ -238,7 +241,7 @@ export function selectRoute({ intent, reports = [], now = new Date() }) {
       alternatives: [],
       warnings: [DEMO_DATA_WARNING],
       usedReportIds: [],
-      selectionReason: 'La persona intends reportar una novedad.',
+      selectionReason: 'La persona quiere reportar una novedad.',
       clarificationQuestion: null,
     };
   }

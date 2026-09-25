@@ -151,7 +151,7 @@ export default function WhatsAppModal({ isOpen, onClose, activeRoute, origin, de
               <li>🚡 <strong>2. TransMiCable:</strong> En Mirador del Paraíso ($3.550 COP TuLlave, tarifa 2026).</li>
             </ul>
             <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, color: '#087f68' }}>
-              ⏱️ Duración: {activeRoute?.duration || '54 min'} | 💰 Costo estimado: {activeRoute?.costFormatted || '$6.050* COP'}.
+              ⏱️ Duración: {activeRoute?.duration || '51 min'} | 💰 Costo estimado: {activeRoute?.costFormatted || '$6.050* COP'}.
             </p>
             <span style={{ display: 'block', textAlign: 'right', fontSize: '0.7rem', color: '#6b7280', marginTop: '4px' }}>
               Ahora

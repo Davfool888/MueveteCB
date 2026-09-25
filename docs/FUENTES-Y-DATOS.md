@@ -26,9 +26,22 @@ El extracto permite comprobar, entre otros:
 | Servicio | Evidencia en el extracto | Uso en ECO CB |
 |---|---|---|
 | `CABLE` | Tunal ↔ Mirador del Paraíso; incluye Juan Pablo II y Manitas | Topología y nombres de estaciones |
-| `10-12` | Paradas en Quiba y Paraíso | Conexión formal de la ruta Quiba → Tunal |
-| `6-18` | Sector Mochuelo Bajo, Meissen, Tunal y otros | Alternativa económica desde Mochuelo Bajo |
+| `10-12` | Circuito Paraíso ↔ Quiba; baja en IED Paraíso Mirador, a ~352 m de la estación del cable | Ruta Quiba → Tunal: 10 min de bus según el GTFS + caminata estimada |
+| `6-18` | Circuito San Carlos ↔ Lagunitas; **no entra al Portal Tunal** (Pq. El Tunal queda a ~311 m) | Ruta económica desde Ladrillera Los Mochuelos: 25 min según el GTFS + caminata estimada; solo 3 salidas hábiles |
 | Portal Tunal | Paradas troncales y zonales | Punto de integración y destino |
+
+### Corrección del 24 de septiembre de 2026
+
+Al revisar el GTFS completo (`stop_times.txt` y `shapes.txt`) se encontró que el catálogo demo presentaba como verificados datos que el feed contradice. Se corrigieron:
+
+| Dato anterior | Evidencia en el GTFS 2026-08-18 | Valor actual |
+|---|---|---|
+| 6-18 "Mochuelo → Av. Boyacá → Portal Tunal · 54 min", trazado por Mirador del Paraíso | Viaje `BC1D40002.2.11192`: Ladrillera Los Mochuelos 05:46:14 → Pq. El Tunal 06:10:48; el recorrido no pasa por Paraíso ni entra al Portal | 25 min en bus + ~310 m a pie (estimado); trazado desde `shapes.txt` |
+| TransMiCable Paraíso → Tunal · 13–14 min | Viajes `cable_habil_*`: cable_paraiso 06:11:09 → cable_tunal 06:22:18 | 11 min en cabina |
+| 10-12 "Quiba → Mirador del Paraíso · 12 min" y "conexión verificada" | Viaje `BC1E60002.1.10510`: Quiba 06:03:09 → IED Paraíso Mirador 06:13:24; ese paradero está a ~352 m de la estación | 10 min en bus + ~350 m a pie (estimado) |
+| Corredor SITP dibujado a mano en el mapa | — | Capa SITP con los tramos recortados de `shapes.txt` |
+
+Las caminatas se estiman con distancia en línea recta × 1,3 a 4,5 km/h; no son datos oficiales. Los pasos que citan `gtfs_20260818` usan tiempos de un viaje concreto de día hábil, no un promedio.
 
 ### Regenerar el extracto
 

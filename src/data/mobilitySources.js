@@ -48,8 +48,10 @@ export const VERIFIED_FACTS = Object.freeze({
   gtfsSnapshotDate: '2026-08-18',
   verifiedLocalRouteIds: Object.freeze(['6-18', '10-12', 'CABLE']),
   verifiedLocalStops: Object.freeze([
-    'Mochuelo Bajo',
+    'Ladrillera Los Mochuelos',
+    'Pq. El Tunal',
     'Quiba',
+    'IED Paraíso Mirador',
     'Juan Pablo II',
     'Manitas',
     'Mirador del Paraíso',

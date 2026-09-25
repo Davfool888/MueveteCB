@@ -7,7 +7,7 @@ import {
   CIUDAD_BOLIVAR_POLYGON,
   TRANSMICABLE_STATIONS,
   CABLE_PATH,
-  SITP_PATH,
+  SITP_GTFS_PATHS,
   INFORMAL_PATHS,
   POINTS_OF_INTEREST,
   REPORT_LOCATIONS,
@@ -120,15 +120,17 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
         marker.bindPopup(popupContent).addTo(groups.cable);
       });
 
-      // 4. SITP Path
-      L.polyline(SITP_PATH, {
-        color: '#3478b8',
-        weight: 5,
-        opacity: 0.9,
-        lineCap: 'round',
-      })
-        .bindTooltip('🚌 Corredor SITP de demostración · $3.550 (2026)', { sticky: true })
-        .addTo(groups.sitp);
+      // 4. SITP paths from GTFS shapes
+      SITP_GTFS_PATHS.forEach((path) => {
+        L.polyline(path.coordinates, {
+          color: '#3478b8',
+          weight: 5,
+          opacity: 0.9,
+          lineCap: 'round',
+        })
+          .bindTooltip(`🚌 ${path.name} · Trazado GTFS 2026-08-18 · $3.550 (2026)`, { sticky: true })
+          .addTo(groups.sitp);
+      });
 
       // Official GTFS anchor stops. Geometry remains a separate fixture until David supplies route shapes.
       GTFS_ANCHOR_STOPS.forEach((stop) => {
@@ -296,7 +298,9 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
 
     groups.reports.clearLayers();
     reports.forEach((report) => {
-      const locData = REPORT_LOCATIONS[report.location] || REPORT_LOCATIONS.alpes;
+      // Sin un lugar conocido no hay coordenadas verificables para el marcador.
+      const locData = REPORT_LOCATIONS[report.location];
+      if (!locData) return;
       const typeLabel = REPORT_TYPE_LABELS[report.type] || 'Novedad';
       const marker = L.marker(locData.coordinates, {
         icon: createIcon('report', '!'),
