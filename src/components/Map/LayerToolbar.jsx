@@ -1,30 +1,84 @@
 import React from 'react';
 
-const LAYER_DEFS = [
-  { key: 'route', label: 'Ruta', legendClass: 'legend-line legend-route' },
-  { key: 'cable', label: 'TransMiCable 🚡', legendClass: 'legend-line legend-cable' },
-  { key: 'sitp', label: 'SITP 🚌', legendClass: 'legend-line legend-sitp' },
-  { key: 'informal', label: 'Veredales 🚐', legendClass: 'legend-line legend-informal' },
-  { key: 'boundary', label: 'Límite CB 📍', legendClass: 'legend-line legend-route' },
-];
+export default function LayerToolbar({
+  layers,
+  reportCount,
+  transportPlan,
+  onSelectTransportMode,
+  onToggle,
+}) {
+  const availableModes = transportPlan?.availableModes || [];
+  const hasSitp = availableModes.includes('sitp') || transportPlan?.mode === 'sitp';
+  const hasVeredal = availableModes.includes('veredal') || transportPlan?.mode === 'veredal';
+  const hasCable = transportPlan?.showCable || transportPlan?.mode === 'cable';
+  const cableVisible = Boolean(layers.cable || hasCable);
+  const routeVisible = Boolean(
+    layers.route || transportPlan?.activeRoute || (transportPlan?.status && transportPlan.status !== 'idle'),
+  );
 
-export default function LayerToolbar({ layers, reportCount, onToggle }) {
   return (
-    <div className="layer-toolbar" aria-label="Capas del mapa">
-      {LAYER_DEFS.map(({ key, label, legendClass }) => (
+    <div className="layer-toolbar" aria-label="Capas y modos del mapa">
+      <button
+        className={`layer-button${routeVisible ? ' is-active' : ''}`}
+        type="button"
+        data-layer="route"
+        aria-pressed={routeVisible ? 'true' : 'false'}
+        onClick={() => onToggle('route')}
+      >
+        <span className="legend-line legend-route" />
+        Ruta
+      </button>
+
+      <button
+        className={`layer-button${layers.boundary ? ' is-active' : ''}`}
+        type="button"
+        data-layer="boundary"
+        aria-pressed={layers.boundary ? 'true' : 'false'}
+        onClick={() => onToggle('boundary')}
+      >
+        <span className="legend-line legend-boundary" />
+        Límite CB
+      </button>
+
+      {hasSitp && (
         <button
-          key={key}
-          className={`layer-button${layers[key] ? ' is-active' : ''}`}
+          className={`layer-button transport-choice${transportPlan?.mode === 'sitp' ? ' is-active' : ''}`}
           type="button"
-          data-layer={key}
-          aria-pressed={layers[key] ? 'true' : 'false'}
-          onClick={() => onToggle(key)}
+          data-transport-mode="sitp"
+          aria-pressed={transportPlan?.mode === 'sitp' ? 'true' : 'false'}
+          onClick={() => onSelectTransportMode?.('sitp')}
         >
-          <span className={legendClass}/>
-          {label}
+          <span className="legend-line legend-sitp" />
+          SITP
         </button>
-      ))}
-      {/* Reports layer */}
+      )}
+
+      {hasVeredal && (
+        <button
+          className={`layer-button transport-choice transport-veredal-choice${transportPlan?.mode === 'veredal' ? ' is-active' : ''}`}
+          type="button"
+          data-transport-mode="veredal"
+          aria-pressed={transportPlan?.mode === 'veredal' ? 'true' : 'false'}
+          onClick={() => onSelectTransportMode?.('veredal')}
+        >
+          <span className="legend-line legend-informal" />
+          Van veredal
+        </button>
+      )}
+
+      {hasCable && (
+        <button
+          className={`layer-button${cableVisible ? ' is-active' : ''}`}
+          type="button"
+          data-layer="cable"
+          aria-pressed={cableVisible ? 'true' : 'false'}
+          onClick={() => onToggle('cable')}
+        >
+          <span className="legend-line legend-cable" />
+          TransMiCable
+        </button>
+      )}
+
       <button
         className={`layer-button${layers.reports ? ' is-active' : ''}`}
         type="button"

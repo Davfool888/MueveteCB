@@ -1,21 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import { GTFS_ANCHOR_STOPS } from '../../data/gtfsIndex';
+import { hasLocationCoordinates } from '../../utils/locationRoute';
 import {
+  BOGOTA_BOUNDS,
+  CABLE_PATH,
   CIUDAD_BOLIVAR_BOUNDS,
   CIUDAD_BOLIVAR_CENTER,
   CIUDAD_BOLIVAR_POLYGON,
-  TRANSMICABLE_STATIONS,
-  CABLE_PATH,
-  SITP_PATH,
-  INFORMAL_PATHS,
-  POINTS_OF_INTEREST,
   REPORT_LOCATIONS,
   REPORT_TYPE_LABELS,
   ROUTES,
+  TRANSMICABLE_STATIONS,
 } from '../../data/routes';
 
-/** Create a themed divIcon for Leaflet markers */
 function createIcon(kind, label) {
   return L.divIcon({
     className: `muevete-marker marker-${kind}`,
@@ -26,14 +23,163 @@ function createIcon(kind, label) {
   });
 }
 
-export default function LeafletMap({ activeRouteId, reports, layers, onConnectionChange }) {
+function createRouteTooltip(route) {
+  const tooltip = document.createElement('div');
+  const title = document.createElement('strong');
+  const detail = document.createElement('div');
+  title.textContent = `📍 ${route.title}`;
+  detail.textContent = `⏱️ ${route.duration || 'Tiempo por validar'} · 💰 ${route.costFormatted || 'Costo por validar'}`;
+  tooltip.append(title, detail);
+  return tooltip;
+}
+
+function createEndpointPopup(headingText, label) {
+  const popup = document.createElement('div');
+  const heading = document.createElement('strong');
+  const value = document.createElement('p');
+  heading.textContent = headingText;
+  value.style.margin = '2px 0 0';
+  value.textContent = label;
+  popup.append(heading, value);
+  return popup;
+}
+
+function createStopPopup(stop) {
+  const popup = document.createElement('div');
+  const title = document.createElement('strong');
+  const detail = document.createElement('div');
+  title.textContent = stop.name;
+  detail.textContent = stop.source === 'simulated_veredal_fixture'
+    ? 'Paradero veredal simulado para el prototipo'
+    : stop.source === 'gtfs_20260818'
+      ? 'Fuente: GTFS SITP · 18 de agosto de 2026'
+      : 'Punto de integración relacionado con la selección';
+  detail.style.cssText = 'font-size:0.75rem;color:#516564;margin-top:4px;';
+  popup.append(title, detail);
+  return popup;
+}
+
+function isIntegrationStop(stop) {
+  return stop?.kind === 'integration' || stop?.type === 'integration';
+}
+
+function isVeredalStop(stop) {
+  return stop?.source === 'simulated_veredal_fixture' || stop?.kind === 'transfer';
+}
+
+function addContextStop(group, stop) {
+  if (!group || !stop?.coordinates) return;
+
+  if (isVeredalStop(stop) || isIntegrationStop(stop)) {
+    const marker = L.marker(stop.coordinates, {
+      icon: createIcon(isIntegrationStop(stop) ? 'integration' : 'veredal', isIntegrationStop(stop) ? '🚉' : '🚐'),
+      keyboard: true,
+      title: stop.name,
+    });
+    marker.bindPopup(createStopPopup(stop)).addTo(group);
+    return;
+  }
+
+  const marker = L.circleMarker(stop.coordinates, {
+    radius: 5,
+    color: '#174a7e',
+    weight: 2,
+    fillColor: '#ffffff',
+    fillOpacity: 1,
+    keyboard: true,
+    title: stop.name,
+  });
+  marker.bindPopup(createStopPopup(stop)).addTo(group);
+}
+
+function drawTransportContext(plan, groups) {
+  groups.cable.clearLayers();
+  groups.sitp.clearLayers();
+  groups.informal.clearLayers();
+  groups.veredal.clearLayers();
+
+  if (!plan || plan.status === 'idle') return;
+
+  if (plan.mode === 'veredal' && plan.veredalRoute) {
+    const route = plan.veredalRoute;
+    L.polyline(route.route, {
+      color: '#ef765f',
+      weight: 6,
+      opacity: 0.95,
+      dashArray: '8 9',
+      lineCap: 'round',
+      lineJoin: 'round',
+      className: 'leaflet-veredal-line',
+    })
+      .bindTooltip(`🚐 ${route.name} · ruta simulada`, { sticky: true })
+      .addTo(groups.veredal);
+
+    route.stops.forEach((stop) => addContextStop(groups.veredal, stop));
+
+    if ((plan.continuationPath || []).length > 1) {
+      L.polyline(plan.continuationPath, {
+        color: '#3478b8',
+        weight: 4,
+        opacity: 0.9,
+        dashArray: '4 7',
+        lineCap: 'round',
+        className: 'leaflet-continuation-line',
+      })
+        .bindTooltip('Continuación hacia el transporte urbano · geometría existente', { sticky: true })
+        .addTo(groups.sitp);
+    }
+    return;
+  }
+
+  if (plan.showCable) {
+    L.polyline(CABLE_PATH, {
+      color: '#d89b18',
+      weight: 5,
+      opacity: 0.9,
+      lineCap: 'round',
+      lineJoin: 'round',
+    })
+      .bindTooltip('🚡 TransMiCable · referencia de la estación seleccionada', { sticky: true })
+      .addTo(groups.cable);
+
+    TRANSMICABLE_STATIONS.forEach((station) => {
+      const marker = L.marker(station.coordinates, {
+        icon: createIcon('cable', '🚡'),
+        keyboard: true,
+        title: station.name,
+      });
+      marker.bindPopup(createStopPopup({ ...station, source: 'transmilenio_2026' })).addTo(groups.cable);
+    });
+  }
+
+  (plan.contextStops || []).forEach((stop) => addContextStop(groups.sitp, stop));
+}
+
+function isOutsideLocality([latitude, longitude]) {
+  return (
+    latitude < CIUDAD_BOLIVAR_BOUNDS[0][0] ||
+    latitude > CIUDAD_BOLIVAR_BOUNDS[1][0] ||
+    longitude < CIUDAD_BOLIVAR_BOUNDS[0][1] ||
+    longitude > CIUDAD_BOLIVAR_BOUNDS[1][1]
+  );
+}
+
+export default function LeafletMap({
+  activeRouteId,
+  activeRoute,
+  transportPlan,
+  originLocation,
+  destinationLocation,
+  reports,
+  layers,
+  onConnectionChange,
+}) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
-  const tileLayerRef = useRef(null);
   const layerGroupsRef = useRef({});
   const tileErrorsRef = useRef(0);
+  const fitTimeoutRef = useRef(null);
 
-  // ── Initialise Leaflet map strictly bounded to Ciudad Bolívar ──────────────
   useEffect(() => {
     if (mapRef.current || !mapContainerRef.current) return;
 
@@ -59,8 +205,6 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
         crossOrigin: true,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Muévete CB (Localidad 19)',
       });
-      tileLayerRef.current = tileLayer;
-
       tileLayer.on('load', () => onConnectionChange(true));
       tileLayer.on('tileerror', () => {
         tileErrorsRef.current += 1;
@@ -68,14 +212,12 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
       });
       tileLayer.addTo(map);
 
-      // Create layer groups
       const groups = {};
-      ['boundary', 'route', 'cable', 'sitp', 'informal', 'reports'].forEach((name) => {
+      ['boundary', 'route', 'cable', 'sitp', 'informal', 'veredal', 'reports'].forEach((name) => {
         groups[name] = L.layerGroup().addTo(map);
       });
       layerGroupsRef.current = groups;
 
-      // 1. Draw Ciudad Bolívar boundary (Localidad 19)
       L.polygon(CIUDAD_BOLIVAR_POLYGON, {
         color: '#075d50',
         weight: 3,
@@ -87,208 +229,152 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
         .bindTooltip('📍 Localidad 19 · Ciudad Bolívar (Área delimitada)', { sticky: true })
         .addTo(groups.boundary);
 
-      // 2. TransMiCable aerial path
-      L.polyline(CABLE_PATH, {
-        color: '#d89b18',
-        weight: 6,
-        opacity: 0.95,
-        lineCap: 'round',
-        lineJoin: 'round',
-      })
-        .bindTooltip('🚡 TransMiCable (Portal Tunal ↔ Mirador del Paraíso) · $3.550 (2026)', { sticky: true })
-        .addTo(groups.cable);
-
-      // 3. TransMiCable Stations
-      TRANSMICABLE_STATIONS.forEach((st) => {
-        const marker = L.marker(st.coordinates, {
-          icon: createIcon('cable', '🚡'),
-          keyboard: true,
-          title: st.name,
-        });
-
-        const popupContent = `
-          <div style="min-width: 190px;">
-            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: #d89b18;">${st.tag}</span>
-            <h4 style="margin: 2px 0 6px; font-size: 1.05rem; color: #062f2b;">${st.name}</h4>
-            <p style="margin: 0 0 6px; font-size: 0.85rem; color: #516564;">${st.detail}</p>
-            <div style="display: flex; gap: 6px; font-size: 0.78rem;">
-              <span style="background: #eef4ef; padding: 2px 6px; border-radius: 6px; font-weight: 600; color: #075d50;">Fuente: TransMilenio</span>
-              <span style="background: #fff3cf; padding: 2px 6px; border-radius: 6px; font-weight: 600; color: #9a6c0b;">$3.550 COP</span>
-            </div>
-          </div>
-        `;
-        marker.bindPopup(popupContent).addTo(groups.cable);
-      });
-
-      // 4. SITP Path
-      L.polyline(SITP_PATH, {
-        color: '#3478b8',
-        weight: 5,
-        opacity: 0.9,
-        lineCap: 'round',
-      })
-        .bindTooltip('🚌 Corredor SITP de demostración · $3.550 (2026)', { sticky: true })
-        .addTo(groups.sitp);
-
-      // Official GTFS anchor stops. Geometry remains a separate fixture until David supplies route shapes.
-      GTFS_ANCHOR_STOPS.forEach((stop) => {
-        const marker = L.circleMarker(stop.coordinates, {
-          radius: 5,
-          color: '#174a7e',
-          weight: 2,
-          fillColor: '#ffffff',
-          fillOpacity: 1,
-          keyboard: true,
-          title: `${stop.name} — GTFS 2026-08-18`,
-        });
-        const popup = document.createElement('div');
-        popup.style.minWidth = '210px';
-        const title = document.createElement('strong');
-        title.textContent = stop.name;
-        const source = document.createElement('div');
-        source.textContent = 'Fuente: GTFS SITP · 18 de agosto de 2026';
-        source.style.cssText = 'font-size:0.72rem;color:#516564;margin:3px 0 7px;';
-        const routeTitle = document.createElement('div');
-        routeTitle.textContent = 'Servicios que pasan por este punto:';
-        routeTitle.style.cssText = 'font-size:0.78rem;font-weight:700;margin-bottom:4px;';
-        const routeList = document.createElement('ul');
-        routeList.style.cssText = 'margin:0;padding-left:18px;font-size:0.78rem;line-height:1.45;';
-        stop.routes.slice(0, 10).forEach((route) => {
-          const item = document.createElement('li');
-          item.textContent = `${route.shortName || route.id} — ${route.longName || 'SITP'}`;
-          routeList.append(item);
-        });
-        if (stop.routes.length > 10) {
-          const more = document.createElement('li');
-          more.textContent = `y ${stop.routes.length - 10} servicios más`;
-          routeList.append(more);
-        }
-        popup.append(title, source, routeTitle, routeList);
-        marker.bindPopup(popup).addTo(groups.sitp);
-      });
-
-      // 5. Informal and Veredales paths
-      INFORMAL_PATHS.forEach((path) => {
-        L.polyline(path.coordinates, {
-          color: '#ef765f',
-          weight: 4,
-          opacity: 0.92,
-          dashArray: '8 9',
-          lineCap: 'round',
-        })
-          .bindTooltip(`🚐 ${path.name} · Tarifa aprox: ${path.cost} (${path.frequency})`, { sticky: true })
-          .addTo(groups.informal);
-      });
-
-      // 6. Community Points of Interest
-      POINTS_OF_INTEREST.forEach((poi) => {
-        L.marker(poi.coordinates, {
-          icon: createIcon('poi', poi.label),
-          keyboard: true,
-          title: poi.name,
-        })
-          .bindPopup(`<strong>${poi.name}</strong><div>${poi.detail}</div>`)
-          .addTo(groups.boundary);
-      });
-
       setTimeout(() => {
         if (mapRef.current === map && mapContainerRef.current?.isConnected) {
           map.invalidateSize();
         }
       }, 120);
       onConnectionChange(true);
-    } catch (err) {
-      console.error('No fue posible inicializar Leaflet', err);
+    } catch (error) {
+      console.error('No fue posible inicializar Leaflet', error);
       onConnectionChange(false);
     }
 
     return () => {
+      if (fitTimeoutRef.current) window.clearTimeout(fitTimeoutRef.current);
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Redraw active route when activeRouteId changes ────────────────────────
   useEffect(() => {
     const map = mapRef.current;
     const groups = layerGroupsRef.current;
     if (!map || !groups.route) return;
 
-    const route = ROUTES[activeRouteId] || ROUTES.main;
-    if (!route) return;
-
     groups.route.clearLayers();
-    const isAlternate = route.id === 'alternate';
-    const isEconomic = route.id === 'economic';
-    const isAccessible = route.id === 'accessible';
+    if (fitTimeoutRef.current) window.clearTimeout(fitTimeoutRef.current);
 
-    const color = isAlternate
-      ? '#d89b18'
-      : isEconomic
-      ? '#3478b8'
-      : isAccessible
-      ? '#0a9b7d'
-      : '#087f68';
+    const isVeredalPlan = transportPlan?.mode === 'veredal';
+    const contextualRoute =
+      !isVeredalPlan && transportPlan?.routePath && !activeRoute
+        ? {
+            id: transportPlan.mode,
+            title: transportPlan.modeLabel,
+            mapPath: transportPlan.routePath,
+            duration: 'Tiempo por validar',
+            costFormatted: 'Costo por validar',
+          }
+        : null;
+    const route = isVeredalPlan
+      ? null
+      : activeRoute || contextualRoute || (activeRouteId ? ROUTES[activeRouteId] : null);
+    const hasRoute = Boolean(route && Array.isArray(route.mapPath) && route.mapPath.length >= 2);
+    const isAlternate = route?.id === 'alternate';
+    const isEconomic = route?.id === 'economic';
+    const isAccessible = route?.id === 'accessible';
 
-    // Halo + main line
-    L.polyline(route.mapPath, {
-      color: '#ffffff',
-      weight: 12,
-      opacity: 0.94,
-      lineCap: 'round',
-      lineJoin: 'round',
-      interactive: false,
-      className: 'leaflet-route-halo',
-    }).addTo(groups.route);
+    if (hasRoute) {
+      const color = isAlternate
+        ? '#d89b18'
+        : isEconomic
+        ? '#3478b8'
+        : isAccessible
+        ? '#0a9b7d'
+        : '#087f68';
 
-    L.polyline(route.mapPath, {
-      color,
-      weight: 7,
-      opacity: 1,
-      lineCap: 'round',
-      lineJoin: 'round',
-      className: `leaflet-route-line${isAlternate ? ' route-alert' : ''}`,
-    })
-      .bindTooltip(`📍 ${route.title} · ⏱️ ${route.duration} · 💰 ${route.costFormatted}`, { sticky: true })
-      .addTo(groups.route);
+      L.polyline(route.mapPath, {
+        color: '#ffffff',
+        weight: 12,
+        opacity: 0.94,
+        lineCap: 'round',
+        lineJoin: 'round',
+        interactive: false,
+        className: 'leaflet-route-halo',
+      }).addTo(groups.route);
 
-    // Origin marker
-    L.marker(route.mapPath[0], {
-      icon: createIcon('route', 'A'),
-      keyboard: true,
-      title: `Origen: ${route.origin}`,
-      zIndexOffset: 700,
-    })
-      .bindPopup(`<strong>Origen</strong><p style="margin:2px 0 0">${route.origin}</p>`)
-      .addTo(groups.route);
+      L.polyline(route.mapPath, {
+        color,
+        weight: 7,
+        opacity: 1,
+        lineCap: 'round',
+        lineJoin: 'round',
+        className: `leaflet-route-line${isAlternate ? ' route-alert' : ''}`,
+      })
+        .bindTooltip(createRouteTooltip(route), { sticky: true })
+        .addTo(groups.route);
+    }
 
-    // Destination marker
-    const dest = route.mapPath[route.mapPath.length - 1];
-    L.marker(dest, {
-      icon: createIcon('route', 'B'),
-      keyboard: true,
-      title: `Destino: ${route.destination}`,
-      zIndexOffset: 700,
-    })
-      .bindPopup(`<strong>Destino</strong><p style="margin:2px 0 0">${route.destination}</p>`)
-      .addTo(groups.route);
+    const originPoint = hasLocationCoordinates(originLocation)
+      ? [Number(originLocation.latitude), Number(originLocation.longitude)]
+      : hasRoute
+        ? route.mapPath[0]
+        : null;
+    const destinationPoint = hasLocationCoordinates(destinationLocation)
+      ? [Number(destinationLocation.latitude), Number(destinationLocation.longitude)]
+      : hasRoute
+        ? route.mapPath[route.mapPath.length - 1]
+        : null;
+    const originLabel = originLocation?.label || route?.origin || 'Punto A';
+    const destinationLabel = destinationLocation?.label || route?.destination || 'Punto B';
 
-    // Fit bounds smoothly within Ciudad Bolívar
-    setTimeout(() => {
+    if (originPoint) {
+      const originIcon = createIcon(originLocation?.source === 'gps' ? 'user' : 'route', 'A');
+      L.marker(originPoint, {
+        icon: originIcon,
+        keyboard: true,
+        title: `Origen: ${originLabel}`,
+        zIndexOffset: 700,
+      })
+        .bindPopup(createEndpointPopup('Origen', originLabel))
+        .addTo(groups.route);
+    }
+
+    if (destinationPoint) {
+      L.marker(destinationPoint, {
+        icon: createIcon('route', 'B'),
+        keyboard: true,
+        title: `Destino: ${destinationLabel}`,
+        zIndexOffset: 700,
+      })
+        .bindPopup(createEndpointPopup('Destino', destinationLabel))
+        .addTo(groups.route);
+    }
+
+    const endpointPoints = [originPoint, destinationPoint].filter(Boolean);
+    const fitPath = isVeredalPlan
+      ? transportPlan?.fitPath || endpointPoints
+      : hasRoute
+        ? route.mapPath
+        : endpointPoints;
+
+    if (fitPath.length === 0) {
+      map.setMaxBounds(CIUDAD_BOLIVAR_BOUNDS);
+      return;
+    }
+
+    const hasPointOutsideLocality = fitPath.some(isOutsideLocality);
+    map.setMaxBounds(hasPointOutsideLocality ? BOGOTA_BOUNDS : CIUDAD_BOLIVAR_BOUNDS);
+    const animate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    fitTimeoutRef.current = window.setTimeout(() => {
       if (mapRef.current !== map || !map._mapPane || !mapContainerRef.current?.isConnected) return;
-      map.fitBounds(L.latLngBounds(route.mapPath), {
-        paddingTopLeft: [35, 30],
-        paddingBottomRight: [35, 80],
-        maxZoom: 14,
-        animate: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-      });
-    }, 60);
-  }, [activeRouteId]);
 
-  // ── Redraw report markers when reports change ─────────────────────────────
+      if (fitPath.length >= 2) {
+        map.fitBounds(L.latLngBounds(fitPath), {
+          paddingTopLeft: [35, 30],
+          paddingBottomRight: [35, 80],
+          maxZoom: 14,
+          animate,
+        });
+      } else {
+        map.setView(fitPath[0], Math.max(map.getZoom(), 14), { animate });
+      }
+    }, 60);
+  }, [activeRoute, activeRouteId, destinationLocation, originLocation, transportPlan]);
+
   useEffect(() => {
     const map = mapRef.current;
     const groups = layerGroupsRef.current;
@@ -342,20 +428,32 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
     });
   }, [reports]);
 
-  // ── Toggle layer groups when layers prop changes ──────────────────────────
+  useEffect(() => {
+    const groups = layerGroupsRef.current;
+    if (!groups.route) return;
+    drawTransportContext(transportPlan, groups);
+  }, [transportPlan]);
+
   useEffect(() => {
     const map = mapRef.current;
     const groups = layerGroupsRef.current;
     if (!map) return;
-    Object.entries(layers).forEach(([name, isActive]) => {
+
+    const contextualLayers = new Set();
+    if (activeRoute || (transportPlan && transportPlan.status !== 'idle')) contextualLayers.add('route');
+    if (transportPlan?.mode === 'veredal') contextualLayers.add('veredal');
+    if (transportPlan?.mode === 'sitp' || transportPlan?.continuationPath?.length) contextualLayers.add('sitp');
+    if (transportPlan?.showCable || transportPlan?.mode === 'cable') contextualLayers.add('cable');
+
+    ['boundary', 'route', 'cable', 'sitp', 'informal', 'veredal', 'reports'].forEach((name) => {
       const group = groups[name];
       if (!group) return;
-      if (isActive && !map.hasLayer(group)) group.addTo(map);
-      else if (!isActive && map.hasLayer(group)) group.removeFrom(map);
+      const shouldShow = Boolean(layers[name] || contextualLayers.has(name));
+      if (shouldShow && !map.hasLayer(group)) group.addTo(map);
+      if (!shouldShow && map.hasLayer(group)) group.removeFrom(map);
     });
-  }, [layers]);
+  }, [activeRoute, layers, transportPlan]);
 
-  // Invalidate size when tab becomes visible again
   useEffect(() => {
     function handleVisibility() {
       if (!document.hidden && mapRef.current) {
@@ -366,11 +464,19 @@ export default function LeafletMap({ activeRouteId, reports, layers, onConnectio
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, []);
 
+  const mapDescription = transportPlan?.mode === 'veredal'
+    ? 'ruta van veredal simulada con paraderos e integración'
+    : transportPlan?.mode === 'sitp'
+      ? 'ruta SITP y paraderos relacionados'
+      : transportPlan?.mode === 'cable'
+        ? 'tramo TransMiCable relacionado'
+        : 'selecciona origen y destino';
+
   return (
     <div
       ref={mapContainerRef}
       id="map"
-      aria-label="Mapa interactivo de Ciudad Bolívar: rutas formales, informales, paraderos y reportes"
+      aria-label={`Mapa interactivo de Ciudad Bolívar: ${mapDescription}; rutas formales, veredales y reportes`}
     />
   );
 }

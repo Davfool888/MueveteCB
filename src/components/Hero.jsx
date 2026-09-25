@@ -1,4 +1,5 @@
 import React from 'react';
+import LocationInput from './LocationInput';
 
 export default function Hero({
   origin,
@@ -7,6 +8,14 @@ export default function Hero({
   priorityMode,
   onOriginChange,
   onDestinationChange,
+  onOriginLocationSelect,
+  onDestinationLocationSelect,
+  onUseCurrentLocation,
+  isLocatingOrigin,
+  originStatus,
+  originError,
+  plannerError,
+  isCalculating,
   onDeadlineChange,
   onPriorityModeChange,
   onSubmit,
@@ -18,7 +27,6 @@ export default function Hero({
 
   return (
     <section className="hero" aria-labelledby="hero-title">
-      {/* Left copy */}
       <div className="hero-copy">
         <span className="eyebrow">
           <span className="eyebrow-icon" aria-hidden="true">🚡</span>
@@ -52,7 +60,6 @@ export default function Hero({
         </p>
       </div>
 
-      {/* Planner card */}
       <form className="planner-card" onSubmit={handleSubmit}>
         <div className="planner-heading">
           <div>
@@ -62,7 +69,6 @@ export default function Hero({
           <span className="step-badge" style={{ background: '#eef4ef', color: '#075d50' }}>Multimodal</span>
         </div>
 
-        {/* Priority selector */}
         <div style={{ marginBottom: '14px' }}>
           <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--ink-soft)', marginBottom: '6px' }}>
             Tu prioridad hoy:
@@ -120,45 +126,43 @@ export default function Hero({
         </div>
 
         <div className="form-fields">
-          <label className="field">
-            <span>Estoy en</span>
-            <span className="input-wrap">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
+          <LocationInput
+            id="origin"
+            label="¿Dónde estás?"
+            secondaryLabel="Estoy en"
+            value={origin}
+            onChange={(event) => onOriginChange(event.target.value)}
+            onSelect={onOriginLocationSelect}
+            placeholder="Ingresa tu ubicación"
+            required
+            icon={(
+              <svg viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="7" />
                 <circle cx="12" cy="12" r="2" />
               </svg>
-              <input
-                id="origin"
-                name="origin"
-                list="places"
-                value={origin}
-                onChange={(e) => onOriginChange(e.target.value)}
-                autoComplete="off"
-                placeholder="Ej. Mochuelo Alto, Quiba, Manitas..."
-                required
-              />
-            </span>
-          </label>
+            )}
+            onUseCurrentLocation={onUseCurrentLocation}
+            isLocating={isLocatingOrigin}
+            locationStatus={originStatus}
+            locationError={originError}
+          />
 
-          <label className="field">
-            <span>Quiero llegar a</span>
-            <span className="input-wrap">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
+          <LocationInput
+            id="destination"
+            label="¿A dónde vas?"
+            secondaryLabel="Quiero llegar a"
+            value={destination}
+            onChange={(event) => onDestinationChange(event.target.value)}
+            onSelect={onDestinationLocationSelect}
+            placeholder="Ingresa tu destino"
+            required
+            icon={(
+              <svg viewBox="0 0 24 24">
                 <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
                 <circle cx="12" cy="10" r="2.5" />
               </svg>
-              <input
-                id="destination"
-                name="destination"
-                list="places"
-                value={destination}
-                onChange={(e) => onDestinationChange(e.target.value)}
-                autoComplete="off"
-                placeholder="Ej. Portal Tunal, Hospital Meissen..."
-                required
-              />
-            </span>
-          </label>
+            )}
+          />
 
           <label className="field field-time">
             <span>Llegar antes de</span>
@@ -179,23 +183,19 @@ export default function Hero({
           </label>
         </div>
 
-        <datalist id="places">
-          <option value="Mochuelo Alto" />
-          <option value="Mochuelo Bajo" />
-          <option value="Quiba Alta" />
-          <option value="Quiba Bajo" />
-          <option value="Mirador del Paraíso (TransMiCable)" />
-          <option value="Estación Manitas" />
-          <option value="Estación Juan Pablo II" />
-          <option value="Portal Tunal" />
-          <option value="Hospital Meissen" />
-          <option value="Sierra Morena" />
-          <option value="Bella Flor" />
-          <option value="Sector Las Torres" />
-        </datalist>
+        {plannerError && (
+          <p className="planner-feedback planner-feedback-error" role="alert">
+            {plannerError}
+          </p>
+        )}
 
-        <button className="button button-primary button-full" type="submit" style={{ marginTop: '12px' }}>
-          Calcular mejor ruta con IA
+        <button
+          className="button button-primary button-full"
+          type="submit"
+          disabled={isCalculating}
+          style={{ marginTop: '12px' }}
+        >
+          {isCalculating ? 'Resolviendo ubicaciones...' : 'Calcular mejor ruta con IA'}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="m9 18 6-6-6-6" />
           </svg>

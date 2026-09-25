@@ -8,6 +8,9 @@ export default function Workspace({
   isTyping,
   activeRouteId,
   activeRoute,
+  transportPlan,
+  originLocation,
+  destinationLocation,
   reports,
   layers,
   mapConnected,
@@ -18,6 +21,7 @@ export default function Workspace({
   onShareRoute,
   onToggleLayer,
   onSelectRoute,
+  onSelectTransportMode,
   onMapConnectionChange,
   onScrollToMap,
   showToast,
@@ -41,11 +45,15 @@ export default function Workspace({
         <MapPanel
           activeRouteId={activeRouteId}
           activeRoute={activeRoute}
+          transportPlan={transportPlan}
+          originLocation={originLocation}
+          destinationLocation={destinationLocation}
           reports={reports}
           layers={layers}
           mapConnected={mapConnected}
           onToggleLayer={onToggleLayer}
           onShareRoute={onShareRoute}
+          onSelectTransportMode={onSelectTransportMode}
           onMapConnectionChange={onMapConnectionChange}
         />
 

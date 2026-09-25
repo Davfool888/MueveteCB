@@ -1253,6 +1253,49 @@ svg {
   background: var(--coral);
 }
 
+.marker-veredal .marker-core {
+  background: var(--coral);
+}
+
+.marker-integration .marker-core {
+  background: var(--yellow);
+}
+
+.marker-cable .marker-core {
+  background: var(--yellow);
+}
+
+.legend-boundary {
+  border-top: 2px dashed var(--green-700);
+}
+
+.leaflet-veredal-line,
+.leaflet-continuation-line {
+  vector-effect: non-scaling-stroke;
+}
+
+.leaflet-veredal-line {
+  filter: drop-shadow(0 2px 2px rgba(168, 67, 53, 0.18));
+}
+
+.transport-choice {
+  border-style: dashed;
+}
+
+.transport-veredal-choice:not(.is-active) {
+  color: var(--coral-deep);
+}
+
+.map-bottom-card.is-veredal {
+  border-color: rgba(239, 118, 95, 0.45);
+  background: rgba(255, 247, 244, 0.96);
+}
+
+.map-bottom-card.is-veredal .map-bottom-icon {
+  background: var(--coral-soft);
+  color: var(--coral-deep);
+}
+
 .map-bottom-card {
   position: absolute;
   z-index: 500;
@@ -3215,6 +3258,279 @@ svg {
 
 @media (forced-colors: active) {
   .login-card {
+    border: 1px solid CanvasText;
+  }
+}
+
+.location-field {
+  position: relative;
+  display: grid;
+  gap: 7px;
+}
+
+.location-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.location-label {
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.location-secondary-label {
+  color: var(--ink-faint);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.location-input-container {
+  position: relative;
+}
+
+.location-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.location-input-icon {
+  position: absolute;
+  z-index: 1;
+  left: 14px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  color: var(--green-700);
+  pointer-events: none;
+}
+
+.location-input-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.location-input-wrap input {
+  width: 100%;
+  min-height: 50px;
+  padding: 11px 42px 11px 43px;
+  border: 1px solid #d5e0da;
+  border-radius: 13px;
+  background: #fbfcfa;
+  color: var(--ink);
+  font-weight: 650;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.location-input-wrap input:focus,
+.location-input-wrap.is-focused input {
+  border-color: var(--green-600);
+  background: #fff;
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+.location-search-spinner {
+  position: absolute;
+  right: 14px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--green-200);
+  border-top-color: var(--green-700);
+  border-radius: 50%;
+  animation: location-spin 700ms linear infinite;
+}
+
+.location-suggestions {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 7px);
+  right: 0;
+  left: 0;
+  display: grid;
+  max-height: 245px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow-md);
+}
+
+.location-suggestion {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.location-suggestion:hover,
+.location-suggestion.is-active {
+  border-color: rgba(8, 127, 104, 0.16);
+  background: var(--green-100);
+}
+
+.location-suggestion-icon {
+  flex: 0 0 auto;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.location-suggestion-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.location-suggestion-copy strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.location-suggestion-copy small {
+  overflow: hidden;
+  color: var(--ink-faint);
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.location-gps-button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px dashed rgba(8, 127, 104, 0.36);
+  border-radius: 12px;
+  background: rgba(223, 244, 236, 0.56);
+  color: var(--green-800);
+  font-size: 0.78rem;
+  font-weight: 800;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.location-gps-button:hover {
+  border-color: var(--green-600);
+  background: var(--green-100);
+  transform: translateY(-1px);
+}
+
+.location-gps-button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+  transform: none;
+}
+
+.location-gps-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.location-status,
+.location-error,
+.location-no-results,
+.location-search-error {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.location-status {
+  color: var(--green-800);
+}
+
+.location-error {
+  color: var(--coral-deep);
+  font-weight: 650;
+}
+
+.location-no-results {
+  padding: 9px 10px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  color: var(--ink-faint);
+}
+
+.location-search-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  background: var(--coral-soft);
+  color: var(--coral-deep);
+}
+
+.location-search-error button {
+  flex: 0 0 auto;
+  padding: 3px 0;
+  border: 0;
+  background: transparent;
+  color: var(--coral-deep);
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.planner-feedback {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 11px;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.planner-feedback-error {
+  border: 1px solid rgba(168, 67, 53, 0.24);
+  background: var(--coral-soft);
+  color: var(--coral-deep);
+}
+
+.marker-user .marker-core {
+  background: var(--blue);
+}
+
+@keyframes location-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+  .location-suggestions {
+    max-height: 220px;
+  }
+
+  .location-input-wrap input {
+    padding-right: 40px;
+  }
+
+  .location-gps-button {
+    min-height: 44px;
+  }
+}
+
+@media (forced-colors: active) {
+  .location-suggestions,
+  .location-gps-button {
     border: 1px solid CanvasText;
   }
 }
