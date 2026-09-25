@@ -1,9 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ROUTES, REPORT_LOCATIONS, REPORT_TYPE_LABELS } from '../../data/routes';
 import { destinationPhrase, formatDeadlineLabel, normalizeText, timeToMinutes } from '../../utils/helpers';
 import { buildFallbackAgentResponse } from '../../core/fallbackAgent';
 import { resolveRouteIdForReports } from '../../core/recommendationEngine';
+import { getLocationByLabel, resolveLocation } from '../../services/geocodingService';
+import {
+  buildLocationRoute,
+  createEmptyLocation,
+  getLocationKey,
+  hasLocationCoordinates,
+} from '../../utils/locationRoute';
 import { requestChat } from '../../services/chatApi';
+import { getTransportPlan } from '../../services/transportRouting';
 import { useToast } from '../../hooks/useToast';
 import { useReports } from '../../hooks/useReports';
 import Header from '../../components/Header';
@@ -39,6 +47,12 @@ function getInitialRouteId() {
   return requestedRoute && ROUTES[requestedRoute] ? requestedRoute : 'main';
 }
 
+function hasInitialRouteContext() {
+  if (typeof window === 'undefined') return false;
+  const requestedRoute = new URLSearchParams(window.location.search).get('ruta');
+  return Boolean(requestedRoute && ROUTES[requestedRoute]);
+}
+
 function detectReport(text) {
   const normalized = normalizeText(text);
   if (!/\b(reporte|reportar|bloqueo|bloquearon|demora|tranc[oó]n|cambio de ruta)\b/.test(normalized)) {
@@ -65,21 +79,47 @@ function detectReport(text) {
   return { type, location };
 }
 
+function getGeolocationErrorMessage(code) {
+  if (code === 1 || code === 'PERMISSION_DENIED') {
+    return 'No pudimos obtener tu ubicación. Verifica que hayas permitido el acceso a la ubicación.';
+  }
+
+  if (code === 2 || code === 'POSITION_UNAVAILABLE') {
+    return 'No fue posible determinar tu ubicación. Intenta nuevamente.';
+  }
+
+  if (code === 3 || code === 'TIMEOUT') {
+    return 'La solicitud de ubicación tardó demasiado. Intenta nuevamente.';
+  }
+
+  return 'No pudimos obtener tu ubicación. Intenta nuevamente.';
+}
+
 export default function Home() {
   const [activeRouteId, setActiveRouteIdState] = useState(getInitialRouteId);
   const [priorityMode, setPriorityMode] = useState('fastest');
+  const [selectedTransportMode, setSelectedTransportMode] = useState('auto');
   const [messages, setMessages] = useState(() => [initialAgentMessage()]);
   const [layers, setLayers] = useState({
     boundary: true,
-    route: true,
-    cable: true,
-    sitp: true,
-    informal: true,
+    route: false,
+    cable: false,
+    sitp: false,
+    informal: false,
+    veredal: false,
     reports: true,
   });
   const [mapConnected, setMapConnected] = useState(false);
-  const [origin, setOrigin] = useState('Mochuelo Alto');
-  const [destination, setDestination] = useState('Portal Tunal');
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
+  const [originLocation, setOriginLocation] = useState(() => createEmptyLocation());
+  const [destinationLocation, setDestinationLocation] = useState(() => createEmptyLocation());
+  const [originStatus, setOriginStatus] = useState('');
+  const [originError, setOriginError] = useState('');
+  const [plannerError, setPlannerError] = useState('');
+  const [isLocatingOrigin, setIsLocatingOrigin] = useState(false);
+  const [isResolvingPlanner, setIsResolvingPlanner] = useState(false);
+  const [hasRouteContext, setHasRouteContext] = useState(hasInitialRouteContext);
   const [deadline, setDeadline] = useState('07:00');
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
@@ -88,9 +128,46 @@ export default function Home() {
   const { toast, showToast } = useToast();
   const { reports, addReport: addReportToState, clearReports, pruneExpiredReports } = useReports();
   const chatAbortRef = useRef(null);
+  const gpsWatchIdRef = useRef(null);
+  const autoRouteTimerRef = useRef(null);
+  const lastAutoRouteKeyRef = useRef('');
+  const skipAutoRouteKeyRef = useRef('');
 
-  const activeRoute = ROUTES[activeRouteId] || ROUTES.main;
-  const margin = timeToMinutes(deadline) - (activeRoute?.arrivalMinutes || 389);
+  const baseRoute = ROUTES[activeRouteId] || ROUTES.main;
+  const hasPlannerLocations =
+    hasLocationCoordinates(originLocation) && hasLocationCoordinates(destinationLocation);
+  const activeRoute = useMemo(
+    () =>
+      hasPlannerLocations || hasRouteContext
+        ? buildLocationRoute({
+            baseRoute,
+            originLocation,
+            destinationLocation,
+            originText: origin,
+            destinationText: destination,
+          })
+        : null,
+    [
+      baseRoute,
+      destination,
+      destinationLocation,
+      hasPlannerLocations,
+      hasRouteContext,
+      origin,
+      originLocation,
+    ],
+  );
+  const margin = activeRoute ? timeToMinutes(deadline) - (activeRoute.arrivalMinutes || 389) : null;
+  const transportPlan = useMemo(
+    () =>
+      getTransportPlan({
+        originLocation,
+        destinationLocation,
+        activeRoute,
+        selectedMode: selectedTransportMode,
+      }),
+    [activeRoute, destinationLocation, originLocation, selectedTransportMode],
+  );
 
   const addMessage = useCallback((role, text, routeId = null) => {
     setMessages((previous) => [
@@ -110,8 +187,127 @@ export default function Home() {
   const setActiveRoute = useCallback((routeId) => {
     const selectedRouteId = ROUTES[routeId] ? routeId : 'main';
     setActiveRouteIdState(selectedRouteId);
+    setHasRouteContext(true);
     return selectedRouteId;
   }, []);
+
+  function updateOriginText(value) {
+    chatAbortRef.current?.abort();
+    chatAbortRef.current = null;
+    removeTypingIndicator();
+    clearGpsWatch();
+    setIsLocatingOrigin(false);
+    setOrigin(value);
+    setOriginLocation(createEmptyLocation(value));
+    setHasRouteContext(false);
+    lastAutoRouteKeyRef.current = '';
+    skipAutoRouteKeyRef.current = '';
+    setSelectedTransportMode('auto');
+    setOriginStatus('');
+    setOriginError('');
+    setPlannerError('');
+  }
+
+  function updateDestinationText(value) {
+    chatAbortRef.current?.abort();
+    chatAbortRef.current = null;
+    removeTypingIndicator();
+    setDestination(value);
+    setDestinationLocation(createEmptyLocation(value));
+    setHasRouteContext(false);
+    lastAutoRouteKeyRef.current = '';
+    skipAutoRouteKeyRef.current = '';
+    setSelectedTransportMode('auto');
+    setPlannerError('');
+  }
+
+  function selectOriginLocation(location) {
+    setOrigin(location.label);
+    setOriginLocation(location);
+    setHasRouteContext(false);
+    lastAutoRouteKeyRef.current = '';
+    skipAutoRouteKeyRef.current = '';
+    setSelectedTransportMode('auto');
+    setOriginStatus(location.source === 'gps' ? '📍 Ubicación actual' : '');
+    setOriginError('');
+    setPlannerError('');
+  }
+
+  function selectDestinationLocation(location) {
+    setDestination(location.label);
+    setDestinationLocation(location);
+    setHasRouteContext(false);
+    lastAutoRouteKeyRef.current = '';
+    skipAutoRouteKeyRef.current = '';
+    setSelectedTransportMode('auto');
+    setPlannerError('');
+  }
+
+  function clearGpsWatch() {
+    if (
+      gpsWatchIdRef.current !== null &&
+      typeof navigator !== 'undefined' &&
+      navigator.geolocation
+    ) {
+      navigator.geolocation.clearWatch(gpsWatchIdRef.current);
+      gpsWatchIdRef.current = null;
+    }
+  }
+
+  function handleUseCurrentLocation() {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setOriginError('La ubicación no está disponible en este navegador.');
+      return;
+    }
+
+    clearGpsWatch();
+    setIsLocatingOrigin(true);
+    setOriginStatus('Obteniendo tu ubicación...');
+    setOriginError('');
+    setPlannerError('');
+
+    try {
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          clearGpsWatch();
+          const location = {
+            label: 'Ubicación actual',
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            source: 'gps',
+          };
+
+          setOrigin(location.label);
+          setOriginLocation(location);
+          setHasRouteContext(false);
+          lastAutoRouteKeyRef.current = '';
+          skipAutoRouteKeyRef.current = '';
+          setSelectedTransportMode('auto');
+          setOriginStatus('📍 Ubicación actual');
+          setOriginError('');
+          setIsLocatingOrigin(false);
+        },
+        (error) => {
+          clearGpsWatch();
+          setIsLocatingOrigin(false);
+          setOriginStatus('');
+          setOriginError(getGeolocationErrorMessage(error?.code));
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 12000,
+        },
+      );
+
+      gpsWatchIdRef.current = watchId;
+    } catch {
+      clearGpsWatch();
+      setIsLocatingOrigin(false);
+      setOriginStatus('');
+      setOriginError('No pudimos obtener tu ubicación. Intenta nuevamente.');
+    }
+  }
 
   const handleAddReport = useCallback(
     ({ type, location, note, source }) => {
@@ -144,6 +340,7 @@ export default function Home() {
         reports: nextReports,
       });
       setActiveRouteIdState(nextRouteId);
+      setHasRouteContext(true);
 
       const locationName = REPORT_LOCATIONS[report.location].name;
       const typeLabel = REPORT_TYPE_LABELS[report.type];
@@ -215,6 +412,7 @@ export default function Home() {
       }
 
       if (chatAbortRef.current === controller) chatAbortRef.current = null;
+      return result;
     },
     [activeRouteId, addMessage, addRouteMessage, removeTypingIndicator, reports, setActiveRoute, showToast, showTypingIndicator]
   );
@@ -233,6 +431,59 @@ export default function Home() {
     },
     [addMessage, priorityMode, requestEcoResponse]
   );
+
+  async function handlePlannerSubmit(
+    nextOrigin,
+    nextDestination,
+    nextDeadline,
+    nextPriority = priorityMode,
+  ) {
+    if (isResolvingPlanner) return;
+
+    setPlannerError('');
+    setIsResolvingPlanner(true);
+
+    try {
+      const resolvedOrigin = hasLocationCoordinates(originLocation)
+        ? originLocation
+        : await resolveLocation(nextOrigin);
+      const resolvedDestination = hasLocationCoordinates(destinationLocation)
+        ? destinationLocation
+        : await resolveLocation(nextDestination);
+
+      if (!resolvedOrigin || !resolvedDestination) {
+        setPlannerError('Selecciona una sugerencia válida para el origen y el destino.');
+        return;
+      }
+
+      setOrigin(resolvedOrigin.label);
+      setOriginLocation(resolvedOrigin);
+      setDestination(resolvedDestination.label);
+      setDestinationLocation(resolvedDestination);
+      setOriginStatus(resolvedOrigin.source === 'gps' ? '📍 Ubicación actual' : '');
+      setOriginError('');
+
+      const routeKey = getLocationKey(
+        resolvedOrigin,
+        resolvedDestination,
+        nextPriority,
+        nextDeadline,
+      );
+      skipAutoRouteKeyRef.current = routeKey;
+      processQuery(
+        resolvedOrigin.label,
+        resolvedDestination.label,
+        nextDeadline,
+        'form',
+        nextPriority,
+      );
+    } catch (error) {
+      console.error('No se pudieron resolver las ubicaciones:', error);
+      setPlannerError('No pudimos resolver las ubicaciones. Intenta nuevamente.');
+    } finally {
+      setIsResolvingPlanner(false);
+    }
+  }
 
   const processTextMessage = useCallback(
     (text) => {
@@ -258,30 +509,114 @@ export default function Home() {
     [addMessage, deadline, destination, handleAddReport, origin, priorityMode, requestEcoResponse]
   );
 
+  useEffect(() => {
+    const hasOrigin = hasLocationCoordinates(originLocation);
+    const hasDestination = hasLocationCoordinates(destinationLocation);
+
+    if (!hasOrigin || !hasDestination) return undefined;
+
+    const routeKey = getLocationKey(
+      originLocation,
+      destinationLocation,
+      priorityMode,
+      deadline,
+    );
+
+    if (skipAutoRouteKeyRef.current === routeKey) {
+      skipAutoRouteKeyRef.current = '';
+      return undefined;
+    }
+
+    if (lastAutoRouteKeyRef.current === routeKey) return undefined;
+
+    window.clearTimeout(autoRouteTimerRef.current);
+    autoRouteTimerRef.current = window.setTimeout(() => {
+      lastAutoRouteKeyRef.current = routeKey;
+      requestEcoResponse({
+        message: `Estoy en ${originLocation.label} y necesito llegar ${destinationLocation.label} antes de las ${formatDeadlineLabel(deadline)}`,
+        origin: originLocation.label,
+        destination: destinationLocation.label,
+        deadline,
+        priority: priorityMode,
+      });
+    }, 450);
+
+    return () => window.clearTimeout(autoRouteTimerRef.current);
+  }, [deadline, destinationLocation, originLocation, priorityMode, requestEcoResponse]);
+
   const handleSelectRoute = useCallback(
     (routeId) => {
       const selectedRouteId = setActiveRoute(routeId);
       const route = ROUTES[selectedRouteId];
-      if (route) showToast(`Ruta activa: ${route.title}`);
+      if (route) {
+        if (route.segments?.some((segment) => segment.type === 'sitp')) {
+          setSelectedTransportMode('sitp');
+        } else if (route.segments?.some((segment) => segment.type === 'informal')) {
+          setSelectedTransportMode('veredal');
+        } else {
+          setSelectedTransportMode('auto');
+        }
+        showToast(`Ruta activa: ${route.title}`);
+      }
     },
     [setActiveRoute, showToast]
+  );
+
+  const handleSelectTransportMode = useCallback(
+    (mode) => {
+      if (!['sitp', 'veredal'].includes(mode)) return;
+
+      if (!transportPlan.availableModes.includes(mode)) {
+        showToast(
+          mode === 'veredal'
+            ? 'No hay una van veredal disponible cerca del origen'
+            : 'No hay una cobertura SITP confirmada cerca del origen',
+        );
+        return;
+      }
+
+      setSelectedTransportMode(mode);
+    },
+    [showToast, transportPlan.availableModes],
   );
 
   const resetDemo = useCallback(() => {
     chatAbortRef.current?.abort();
     chatAbortRef.current = null;
+    clearGpsWatch();
     clearReports();
     setActiveRouteIdState('main');
     setPriorityMode('fastest');
-    setOrigin('Mochuelo Alto');
-    setDestination('Portal Tunal');
+
+    const demoOrigin = getLocationByLabel('Mochuelo Alto') || createEmptyLocation('Mochuelo Alto');
+    const demoDestination = getLocationByLabel('Portal Tunal') || createEmptyLocation('Portal Tunal');
+    setOrigin(demoOrigin.label);
+    setOriginLocation(demoOrigin);
+    setDestination(demoDestination.label);
+    setDestinationLocation(demoDestination);
+    setOriginStatus('');
+    setOriginError('');
+    setPlannerError('');
+    setIsLocatingOrigin(false);
     setDeadline('07:00');
     setMessages([initialAgentMessage()]);
     setIsTyping(false);
+    setSelectedTransportMode('auto');
+    skipAutoRouteKeyRef.current = getLocationKey(
+      demoOrigin,
+      demoDestination,
+      'fastest',
+      '07:00',
+    );
     showToast('Demostración reiniciada para el jurado');
   }, [clearReports, showToast]);
 
   const shareCurrentRoute = useCallback(() => {
+    if (!activeRoute) {
+      showToast('Selecciona un origen y un destino para compartir una ruta');
+      return;
+    }
+
     const url = new URL(window.location.href);
     url.searchParams.set('ruta', activeRouteId);
     window.history.replaceState({}, '', url);
@@ -294,22 +629,46 @@ export default function Home() {
     } else {
       showToast('Ruta lista para compartir');
     }
-  }, [activeRouteId, showToast]);
+  }, [activeRoute, activeRouteId, showToast]);
 
   const runDemo = useCallback(() => {
+    const demoOrigin = getLocationByLabel('Mochuelo Alto') || createEmptyLocation('Mochuelo Alto');
+    const demoDestination = getLocationByLabel('Portal Tunal') || createEmptyLocation('Portal Tunal');
+
     setPriorityMode('fastest');
-    setOrigin('Mochuelo Alto');
-    setDestination('Portal Tunal');
+    setOrigin(demoOrigin.label);
+    setOriginLocation(demoOrigin);
+    setDestination(demoDestination.label);
+    setDestinationLocation(demoDestination);
+    setOriginStatus('');
+    setOriginError('');
+    setPlannerError('');
+    setIsLocatingOrigin(false);
+    clearGpsWatch();
+    setSelectedTransportMode('auto');
     setDeadline('07:00');
+    skipAutoRouteKeyRef.current = getLocationKey(
+      demoOrigin,
+      demoDestination,
+      'fastest',
+      '07:00',
+    );
     document.querySelector('#workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    processQuery('Mochuelo Alto', 'Portal Tunal', '07:00', 'demo', 'fastest');
+    processQuery(demoOrigin.label, demoDestination.label, '07:00', 'demo', 'fastest');
   }, [processQuery]);
 
   const toggleLayer = useCallback((layerName) => {
     setLayers((previous) => ({ ...previous, [layerName]: !previous[layerName] }));
   }, []);
 
-  useEffect(() => () => chatAbortRef.current?.abort(), []);
+  useEffect(
+    () => () => {
+      chatAbortRef.current?.abort();
+      window.clearTimeout(autoRouteTimerRef.current);
+      clearGpsWatch();
+    },
+    [],
+  );
 
   useEffect(() => {
     const futureExpiries = reports
@@ -345,13 +704,19 @@ export default function Home() {
           destination={destination}
           deadline={deadline}
           priorityMode={priorityMode}
-          onOriginChange={setOrigin}
-          onDestinationChange={setDestination}
+          onOriginChange={updateOriginText}
+          onDestinationChange={updateDestinationText}
+          onOriginLocationSelect={selectOriginLocation}
+          onDestinationLocationSelect={selectDestinationLocation}
+          onUseCurrentLocation={handleUseCurrentLocation}
+          isLocatingOrigin={isLocatingOrigin}
+          originStatus={originStatus}
+          originError={originError}
+          plannerError={plannerError}
+          isCalculating={isResolvingPlanner}
           onDeadlineChange={setDeadline}
           onPriorityModeChange={setPriorityMode}
-          onSubmit={(nextOrigin, nextDestination, nextDeadline, nextPriority) =>
-            processQuery(nextOrigin, nextDestination, nextDeadline, 'form', nextPriority)
-          }
+          onSubmit={handlePlannerSubmit}
         />
 
         <DemoStrip onRunDemo={runDemo} />
@@ -359,8 +724,11 @@ export default function Home() {
         <Workspace
           messages={messages}
           isTyping={isTyping}
-          activeRouteId={activeRouteId}
+          activeRouteId={activeRoute ? activeRouteId : null}
           activeRoute={activeRoute}
+          transportPlan={transportPlan}
+          originLocation={originLocation}
+          destinationLocation={destinationLocation}
           reports={reports}
           layers={layers}
           mapConnected={mapConnected}
@@ -371,6 +739,7 @@ export default function Home() {
           onShareRoute={shareCurrentRoute}
           onToggleLayer={toggleLayer}
           onSelectRoute={handleSelectRoute}
+          onSelectTransportMode={handleSelectTransportMode}
           onMapConnectionChange={setMapConnected}
           onScrollToMap={() =>
             document.querySelector('#workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' })

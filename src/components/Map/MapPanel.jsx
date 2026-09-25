@@ -7,11 +7,15 @@ import MapBottomCard from './MapBottomCard';
 export default function MapPanel({
   activeRouteId,
   activeRoute,
+  transportPlan,
+  originLocation,
+  destinationLocation,
   reports,
   layers,
   mapConnected,
   onToggleLayer,
   onShareRoute,
+  onSelectTransportMode,
   onMapConnectionChange,
 }) {
   const isAlert = activeRoute?.id === 'alternate';
@@ -49,23 +53,39 @@ export default function MapPanel({
       <LayerToolbar
         layers={layers}
         reportCount={reports.length}
+        transportPlan={transportPlan}
+        onSelectTransportMode={onSelectTransportMode}
         onToggle={onToggleLayer}
       />
 
       <div className={`map-wrap${mapConnected ? ' is-online' : ' is-schematic'}`} id="map-wrap">
-        <FallbackMap activeRoute={activeRoute} isOnline={mapConnected} />
+        <FallbackMap
+          activeRoute={activeRoute}
+          transportPlan={transportPlan}
+          originLocation={originLocation}
+          destinationLocation={destinationLocation}
+          isOnline={mapConnected}
+        />
         <LeafletMap
           activeRouteId={activeRouteId}
+          activeRoute={activeRoute}
+          transportPlan={transportPlan}
+          originLocation={originLocation}
+          destinationLocation={destinationLocation}
           reports={reports}
           layers={layers}
           onConnectionChange={onMapConnectionChange}
         />
-        <MapBottomCard activeRoute={activeRoute} isAlert={isAlert} />
+        <MapBottomCard
+          activeRoute={activeRoute}
+          transportPlan={transportPlan}
+          isAlert={isAlert}
+        />
       </div>
 
       <div className="map-note">
-        <span>Base: OpenStreetMap + corte GTFS 18-08-2026.</span>
-        <span>Los trayectos veredales y sus tiempos siguen en validación.</span>
+        <span>Base: OpenStreetMap + paradas GTFS 18-08-2026.</span>
+        <span>Vans y trazados veredales: aproximaciones simuladas para el prototipo.</span>
       </div>
     </article>
   );

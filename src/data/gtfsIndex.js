@@ -1,4 +1,4 @@
-import snapshot from './gtfs-ciudad-bolivar-snapshot.json';
+import snapshot from './gtfs-ciudad-bolivar-snapshot.json' with { type: 'json' };
 
 export const GTFS_CB_SNAPSHOT = snapshot;
 

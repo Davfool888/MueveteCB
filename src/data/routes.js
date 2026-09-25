@@ -8,6 +8,12 @@ export const CIUDAD_BOLIVAR_BOUNDS = [
 
 export const CIUDAD_BOLIVAR_CENTER = [4.5360, -74.1530];
 
+/** límites amplios para puntos seleccionados fuera de ciudad bolívar */
+export const BOGOTA_BOUNDS = [
+  [4.35, -74.35],
+  [4.95, -73.90],
+];
+
 /** Approximate perimeter polygon of Localidad 19 (Ciudad Bolívar) */
 export const CIUDAD_BOLIVAR_POLYGON = [
   [4.5980, -74.1380], // Autopista Sur / Perdomo
@@ -263,6 +269,7 @@ export const ROUTES = {
   },
 };
 
+// geometría aproximada de veredales; no representa rutas oficiales verificadas
 export const INFORMAL_PATHS = [
   {
     name: 'Mochuelo Alto – Quiba – Mirador del Paraíso (Camperos)',

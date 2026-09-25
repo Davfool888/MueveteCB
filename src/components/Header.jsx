@@ -1,12 +1,70 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Header({
   onOpenReport,
   onOpenWhatsApp,
   customActions,
   showRegisterLink = true,
+  showAuthActions = true,
 }) {
+  const { user, loading: authLoading, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    setIsLoggingOut(true);
+
+    try {
+      await logout();
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error('No se pudo cerrar la sesión:', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
+
+  const authActions = !showAuthActions
+    ? null
+    : authLoading
+      ? <span className="auth-session-loading" role="status">Verificando sesión...</span>
+      : isAuthenticated
+        ? (
+          <div className="auth-header-actions">
+            <span className="auth-user-summary" title={user?.email || user?.displayName || 'Mi cuenta'}>
+              <strong>Mi cuenta</strong>
+              <small>{user?.email || user?.displayName || 'Sesión activa'}</small>
+            </span>
+            <button
+              className="button button-ghost button-small auth-header-button"
+              type="button"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              aria-label="Cerrar sesión"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 17l5-5-5-5M15 12H3" />
+                <path d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5" />
+              </svg>
+              <span>{isLoggingOut ? 'Cerrando...' : 'Cerrar sesión'}</span>
+            </button>
+          </div>
+        )
+        : (
+          <Link
+            to="/login"
+            className="button button-ghost button-small auth-header-button"
+            aria-label="Iniciar sesión"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2" />
+              <path d="M11 12h9m-3-3 3 3-3 3" />
+            </svg>
+            <span>Iniciar sesión</span>
+          </Link>
+        );
   return (
     <header className="topbar">
       {/* Brand / Logo */}
@@ -28,7 +86,10 @@ export default function Header({
       {/* Actions */}
       <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
         {customActions ? (
-          customActions
+          <>
+            {customActions}
+            {authActions}
+          </>
         ) : (
           <>
             {onOpenWhatsApp && (
@@ -65,7 +126,7 @@ export default function Header({
               </button>
             )}
 
-            {showRegisterLink && (
+            {showRegisterLink && !isAuthenticated && (
               <Link
                 to="/registro"
                 className="button button-primary button-small"
@@ -79,6 +140,8 @@ export default function Header({
                 <span>Registrarse</span>
               </Link>
             )}
+
+            {authActions}
           </>
         )}
       </div>

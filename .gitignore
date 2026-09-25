@@ -37,6 +37,10 @@ coverage/
 .vscode/
 .idea/
 
+
+.env
+.env.local
+
 # operating system files
 
 .DS_Store
@@ -57,3 +61,6 @@ desktop.ini
 # optional: local server output
 
 server.log
+.vercel
+.env*
+!.env.example
