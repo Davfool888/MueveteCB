@@ -63,3 +63,4 @@ desktop.ini
 server.log
 .vercel
 .env*
+!.env.example
