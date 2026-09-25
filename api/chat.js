@@ -1,6 +1,6 @@
-import { createChatResponse, DEFAULT_CLAUDE_MODEL } from '../src/core/claudeAgent.js';
+import { createChatResponse, DEFAULT_GEMINI_MODEL } from '../src/core/geminiAgent.js';
 
-export const config = { maxDuration: 10 };
+export const config = { maxDuration: 20 };
 
 function parseRequestBody(request) {
   if (request.body && typeof request.body === 'object' && !Array.isArray(request.body)) {
@@ -62,8 +62,8 @@ export default async function handler(request, response) {
         activeReports,
       },
       {
-        apiKey: process.env.ANTHROPIC_API_KEY,
-        model: process.env.ANTHROPIC_MODEL || DEFAULT_CLAUDE_MODEL,
+        apiKey: process.env.GEMINI_API_KEY,
+        model: process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
       }
     );
 

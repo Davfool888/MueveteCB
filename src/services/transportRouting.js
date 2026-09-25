@@ -378,7 +378,7 @@ export function getTransportPlan({
   const availableModes = [];
 
   if (originStop) availableModes.push('sitp');
-  if (veredalMatch && (!originStop || selectedMode === 'veredal')) {
+  if (veredalMatch) {
     availableModes.push('veredal');
   }
   if (getRouteModes(activeRoute).has('cable')) availableModes.push('cable');
@@ -407,6 +407,7 @@ export function getTransportPlan({
   const hasActiveCable = routeModes.has('cable');
   const canUseSitp = Boolean(originStop || hasActiveSitp);
   const canUseVeredal = Boolean(veredalMatch);
+  const canUseCable = hasActiveCable;
   const prefersVeredal = selectedMode === 'veredal' || (selectedMode === 'auto' && isRuralOrigin);
 
   if (prefersVeredal && canUseVeredal) {
@@ -423,6 +424,23 @@ export function getTransportPlan({
       activeRoute,
       contextStops: veredalMatch.route.stops,
       reason: 'El origen queda fuera de la cobertura SITP cercana; se propone una van veredal y su integración.',
+    });
+  }
+
+  if (selectedMode === 'cable' && canUseCable) {
+    return makeBasePlan({
+      status: 'route-selected',
+      mode: 'cable',
+      origin,
+      destination,
+      originStop,
+      destinationStop,
+      nearestIntegration: getNearestIntegrationPoint(origin),
+      veredalRoute: null,
+      availableModes,
+      activeRoute,
+      contextStops: [],
+      reason: 'Se selecciona el tramo formal de TransMiCable relacionado con la ruta activa.',
     });
   }
 

@@ -67,13 +67,19 @@ Campos opcionales para la versión mínima:
   "warnings": [
     "Horarios de rutas informales estimados; confirma con el conductor."
   ],
-  "disclaimer": "Demostración; no usar para decisiones operativas."
+  "disclaimer": "Demostración; no usar para decisiones operativas.",
+  "meta": {
+    "source": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "dataStatus": "demo"
+  }
 }
 ```
 
 ### Reglas
 
 - `answerText`: máximo 450 caracteres y cuatro pasos.
+- `meta.source`: `gemini` o `deterministic-fallback`; nunca anunciar un proveedor que no generó la respuesta.
 - `confidence`: de 0 a 1; no se debe presentar como probabilidad de seguridad.
 - `geometry.coordinates`: `[lon, lat]`, con el orden de GeoJSON.
 - `steps[].source` y `verifiedAt`: obligatorios antes de usar datos reales.

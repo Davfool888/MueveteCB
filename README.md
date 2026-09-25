@@ -6,11 +6,12 @@ Prototipo web de movilidad que compara rutas formales e informales, explica una 
 
 ## Funcionalidades
 
-- Agente **Eco** conectado a `POST /api/chat`.
-- Claude redacta la respuesta únicamente a partir de una ruta seleccionada por el motor determinista.
+- Agente **Eco** conectado a `POST /api/chat` y respaldado por Gemini.
+- Gemini redacta la respuesta con salida estructurada; el motor determinista conserva la selección de ruta y sus datos.
 - Fallback local si no hay clave, red o respuesta válida del proveedor.
 - Formulario y chat en español de Colombia.
-- Mapa con TransMiCable, SITP, veredales, reportes y ruta recomendada.
+- Mapa con TransMiCable, SITP, veredales, reportes y una ruta vial real entre A y B.
+- La capa inferior muestra distancia, precio estimado y los transportes disponibles para seleccionar.
 - Extracto GTFS oficial del 18 de agosto de 2026 con paradas y servicios de Ciudad Bolívar.
 - Reporte ciudadano con expiración, estado visible y recálculo según el lugar afectado.
 - Enlace por ruta mediante `?ruta=alternate`.
@@ -27,9 +28,15 @@ Web / WhatsApp → /api/chat → parser de intención
                               ↓
                     objeto de ruta único
                        ↙               ↘
-              Claude redacta      fallback local
+              Gemini redacta      fallback local
                        ↘               ↙
                     respuesta + mapa
+```
+
+La geometría de carretera la determina el router, no Gemini. Entre las alternativas devueltas se conserva la de menor distancia y se etiqueta como **más corta disponible**; no se afirma que sea un mínimo global.
+
+```text
+A/B geocodificados → OSRM (alternativas) → geometría vial canónica
 ```
 
 El modelo de lenguaje **no dibuja ni inventa rutas**. La función serverless conserva la clave y entrega al modelo únicamente contexto acotado.
@@ -38,7 +45,7 @@ El modelo de lenguaje **no dibuja ni inventa rutas**. La función serverless con
 
 - Node.js 18 o superior.
 - npm 9 o superior.
-- Opcional: cuenta de Anthropic para respuestas reales con Claude.
+- Opcional: API key de Gemini en Google AI Studio para respuestas reales con Gemini.
 - Opcional: CLI de Vercel para probar funciones serverless localmente.
 
 ## Ejecutar el frontend
@@ -50,7 +57,7 @@ npm run dev
 
 Abrir la URL que indique Vite, normalmente `http://localhost:5173`.
 
-En `localhost`, Vite usa deliberadamente el fallback local para no mostrar un 404 al abrir `/api/chat`. Para probar la función serverless en local, ejecuta `VITE_CHAT_API=true npx vercel dev` (PowerShell: `$env:VITE_CHAT_API='true'; npx vercel dev`). Sin `ANTHROPIC_API_KEY`, la función también responde con el mismo fallback estructurado.
+En `localhost`, Vite usa deliberadamente el fallback local para no mostrar un 404 al abrir `/api/chat`. Para probar la función serverless en local, ejecuta `VITE_CHAT_API=true npx vercel dev` (PowerShell: `$env:VITE_CHAT_API='true'; npx vercel dev`). Sin `GEMINI_API_KEY`, la función responde con el mismo fallback estructurado.
 
 ## Probar frontend + API
 
@@ -60,18 +67,22 @@ npx vercel dev
 
 La reescritura de `vercel.json` excluye `/api/*`; por eso la función `api/chat.js` no se convierte en una respuesta HTML de la SPA.
 
-## Configurar Claude
+## Configurar Gemini
 
-1. Crear una clave en Anthropic.
+1. Crear una API key en Google AI Studio.
 2. Copiar `.env.example` a `.env.local`.
 3. Completar:
 
 ```dotenv
-ANTHROPIC_API_KEY=tu_clave_privada
-ANTHROPIC_MODEL=claude-sonnet-5
+GEMINI_API_KEY=tu_clave_privada
+GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
-En Vercel, configurar las mismas variables en **Project Settings → Environment Variables**. Nunca usar `VITE_` para una clave privada.
+En Vercel, configurar las mismas variables en **Project Settings → Environment Variables**. Nunca usar `VITE_` para una clave privada. La llamada usa `store: false` y el encabezado `x-goog-api-key`; la clave no se envía al navegador.
+
+## Configurar la ruta vial
+
+El prototipo consulta `VITE_ROUTING_API_URL`; por defecto usa el servidor público de OSRM y selecciona la alternativa de menor distancia entre las respuestas. Para una demostración es suficiente. En producción se debe reemplazar por un servicio con SLA, cuota y datos de actualización contractual; el fallback nunca une A y B con una línea recta.
 
 ## Verificación
 
@@ -87,7 +98,8 @@ Las pruebas cubren:
 - selección de rutas;
 - ubicación y expiración de reportes;
 - consulta de información oficial;
-- fallback sin clave o con proveedor caído;
+- geometría OSRM, selección de la alternativa más corta disponible y fallback sin línea recta;
+- integración de Gemini con salida estructurada y fallback local;
 - rechazo de afirmaciones no soportadas;
 - contrato HTTP de `/api/chat`.
 

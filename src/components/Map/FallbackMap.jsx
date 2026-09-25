@@ -66,6 +66,7 @@ export default function FallbackMap({
   const isVeredal = transportPlan?.mode === 'veredal';
   const isSitp = transportPlan?.mode === 'sitp';
   const isCable = transportPlan?.mode === 'cable';
+  const isRoadRoute = activeRoute?.isRoadRoute === true;
   const staticOrigin = [75, 485];
   const staticDestination = [765, 105];
   const hasBogotaPoint = [originLocation, destinationLocation].some(
@@ -81,12 +82,24 @@ export default function FallbackMap({
   const integration = isVeredal && transportPlan.veredalRoute?.integration
     ? projectCoordinate(transportPlan.veredalRoute.integration.coordinates, mapBounds)
     : null;
-  const routePoints = isVeredal && transportPlan.veredalRoute?.route
-    ? transportPlan.veredalRoute.route.map((point) => projectCoordinate(point, mapBounds))
-    : (transportPlan?.routePath || []).map((point) => projectCoordinate(point, mapBounds));
-  const showRoute = Boolean(activeRoute || isVeredal || (isSitp && routePoints.length > 1) || isCable);
+  const routePoints = isRoadRoute
+    ? activeRoute.mapPath.map((point) => projectCoordinate(point, mapBounds))
+    : isVeredal && transportPlan.veredalRoute?.route
+      ? transportPlan.veredalRoute.route.map((point) => projectCoordinate(point, mapBounds))
+      : (transportPlan?.routePath || []).map((point) => projectCoordinate(point, mapBounds));
+  const showRoute = isRoadRoute
+    ? routePoints.length > 1
+    : Boolean(activeRoute || isVeredal || (isSitp && routePoints.length > 1) || isCable);
   const pathD = showRoute ? pathThroughPoints(routePoints) : '';
-  const pathStroke = isVeredal ? '#ef765f' : isSitp ? '#3478b8' : isCable ? '#d89b18' : '#087f68';
+  const pathStroke = isRoadRoute
+    ? '#087f68'
+    : isVeredal
+      ? '#ef765f'
+      : isSitp
+        ? '#3478b8'
+        : isCable
+          ? '#d89b18'
+          : '#087f68';
   const originLabel = formatLabel(
     originLocation?.label || activeRoute?.origin,
     'Mochuelo Alto',
@@ -126,10 +139,10 @@ export default function FallbackMap({
           d={pathD}
           fill="none"
           stroke={pathStroke}
-          strokeWidth={isVeredal ? 7 : 12}
+          strokeWidth={isRoadRoute || !isVeredal ? 12 : 7}
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeDasharray={isVeredal ? '10 9' : undefined}
+          strokeDasharray={!isRoadRoute && isVeredal ? '10 9' : undefined}
           filter="url(#soft-shadow)"
         />
         <g fontFamily="Segoe UI, sans-serif" fontSize="15" fontWeight="700" fill="#173d35">
@@ -154,7 +167,7 @@ export default function FallbackMap({
               <text x="20" y="-18">Integración</text>
             </g>
           )}
-          {isVeredal && (
+          {isVeredal && !isRoadRoute && (
             <text x={origin[0] + 22} y={origin[1] - 22} fill="#a84335">🚐 Van veredal · simulada</text>
           )}
           {!showRoute && (

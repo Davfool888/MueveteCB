@@ -11,6 +11,7 @@ import {
   hasLocationCoordinates,
 } from '../../utils/locationRoute';
 import { requestChat } from '../../services/chatApi';
+import { getShortestRoadRoute, getRoadRouteKey } from '../../services/roadRouting';
 import { getTransportPlan } from '../../services/transportRouting';
 import { useToast } from '../../hooks/useToast';
 import { useReports } from '../../hooks/useReports';
@@ -117,6 +118,9 @@ export default function Home() {
   const [plannerError, setPlannerError] = useState('');
   const [isLocatingOrigin, setIsLocatingOrigin] = useState(false);
   const [isResolvingPlanner, setIsResolvingPlanner] = useState(false);
+  const [roadRoute, setRoadRoute] = useState(null);
+  const [roadRouteStatus, setRoadRouteStatus] = useState('idle');
+  const [roadRouteMessage, setRoadRouteMessage] = useState('');
   const [hasRouteContext, setHasRouteContext] = useState(hasInitialRouteContext);
   const [deadline, setDeadline] = useState('07:00');
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
@@ -126,6 +130,8 @@ export default function Home() {
   const { toast, showToast } = useToast();
   const { reports, addReport: addReportToState, clearReports, pruneExpiredReports } = useReports();
   const chatAbortRef = useRef(null);
+  const roadRouteAbortRef = useRef(null);
+  const roadRouteRequestIdRef = useRef(0);
   const gpsWatchIdRef = useRef(null);
   const autoRouteTimerRef = useRef(null);
   const lastAutoRouteKeyRef = useRef('');
@@ -134,27 +140,54 @@ export default function Home() {
   const baseRoute = ROUTES[activeRouteId] || ROUTES.main;
   const hasPlannerLocations =
     hasLocationCoordinates(originLocation) && hasLocationCoordinates(destinationLocation);
-  const activeRoute = useMemo(
-    () =>
-      hasPlannerLocations || hasRouteContext
-        ? buildLocationRoute({
-            baseRoute,
-            originLocation,
-            destinationLocation,
-            originText: origin,
-            destinationText: destination,
-          })
-        : null,
-    [
-      baseRoute,
-      destination,
-      destinationLocation,
-      hasPlannerLocations,
-      hasRouteContext,
-      origin,
-      originLocation,
-    ],
+  const roadRouteKey = useMemo(
+    () => getRoadRouteKey(originLocation, destinationLocation),
+    [destinationLocation, originLocation],
   );
+  const activeRoute = useMemo(() => {
+    if (!hasPlannerLocations && !hasRouteContext) return null;
+
+    const locationRoute = buildLocationRoute({
+      baseRoute,
+      originLocation,
+      destinationLocation,
+      originText: origin,
+      destinationText: destination,
+    });
+    if (!locationRoute) return null;
+
+    if (roadRouteStatus === 'ready' && roadRoute?.requestKey === roadRouteKey) {
+      return {
+        ...locationRoute,
+        mapPath: roadRoute.mapPath,
+        roadDistanceMeters: roadRoute.distanceMeters,
+        roadDurationSeconds: roadRoute.durationSeconds,
+        routingSource: roadRoute.source,
+        routingSourceLabel: roadRoute.sourceLabel,
+        routingSelection: 'shortest_available_alternative',
+        isRoadRoute: true,
+      };
+    }
+
+    return {
+      ...locationRoute,
+      mapPath: [],
+      routingSource: 'unavailable',
+      routingStatus: roadRouteStatus,
+      isRoadRoute: false,
+    };
+  }, [
+    baseRoute,
+    destination,
+    destinationLocation,
+    hasPlannerLocations,
+    hasRouteContext,
+    origin,
+    originLocation,
+    roadRoute,
+    roadRouteKey,
+    roadRouteStatus,
+  ]);
   const margin = activeRoute ? timeToMinutes(deadline) - (activeRoute.arrivalMinutes || 389) : null;
   const transportPlan = useMemo(
     () =>
@@ -166,6 +199,47 @@ export default function Home() {
       }),
     [activeRoute, destinationLocation, originLocation, selectedTransportMode],
   );
+
+  useEffect(() => {
+    roadRouteAbortRef.current?.abort();
+    roadRouteRequestIdRef.current += 1;
+    const requestId = roadRouteRequestIdRef.current;
+
+    if (!roadRouteKey) {
+      setRoadRoute(null);
+      setRoadRouteStatus('idle');
+      setRoadRouteMessage('');
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    roadRouteAbortRef.current = controller;
+    setRoadRoute(null);
+    setRoadRouteStatus('loading');
+    setRoadRouteMessage('Calculando la ruta vial más corta...');
+
+    getShortestRoadRoute({
+      originLocation,
+      destinationLocation,
+      signal: controller.signal,
+    })
+      .then((result) => {
+        if (requestId !== roadRouteRequestIdRef.current || controller.signal.aborted) return;
+        setRoadRoute(result);
+        setRoadRouteStatus('ready');
+        setRoadRouteMessage('Ruta vial calculada por OSRM · OpenStreetMap');
+      })
+      .catch((error) => {
+        if (requestId !== roadRouteRequestIdRef.current || controller.signal.aborted) return;
+        setRoadRoute(null);
+        setRoadRouteStatus('fallback');
+        setRoadRouteMessage(
+          error?.message || 'No se pudo calcular una ruta vial para estos puntos.',
+        );
+      });
+
+    return () => controller.abort();
+  }, [destinationLocation, originLocation, roadRouteKey]);
 
   const addMessage = useCallback((role, text, routeId = null) => {
     setMessages((previous) => [
@@ -393,8 +467,8 @@ export default function Home() {
         const displayRouteId = setActiveRoute(returnedRouteId);
         addRouteMessage(result.answerText, displayRouteId);
         showToast(
-          result.meta?.source === 'claude'
-            ? 'Eco respondió con IA'
+          result.meta?.source === 'gemini'
+            ? 'Eco respondió con Gemini'
             : 'Eco usó la respuesta local de respaldo'
         );
       } else {
@@ -554,13 +628,19 @@ export default function Home() {
 
   const handleSelectTransportMode = useCallback(
     (mode) => {
-      if (!['sitp', 'veredal'].includes(mode)) return;
+      if (mode === 'auto') {
+        setSelectedTransportMode('auto');
+        return;
+      }
+      if (!['sitp', 'veredal', 'cable'].includes(mode)) return;
 
       if (!transportPlan.availableModes.includes(mode)) {
         showToast(
           mode === 'veredal'
             ? 'No hay una van veredal disponible cerca del origen'
-            : 'No hay una cobertura SITP confirmada cerca del origen',
+            : mode === 'cable'
+              ? 'No hay un tramo de TransMiCable relacionado con esta ruta'
+              : 'No hay una cobertura SITP confirmada cerca del origen',
         );
         return;
       }
@@ -654,6 +734,7 @@ export default function Home() {
   useEffect(
     () => () => {
       chatAbortRef.current?.abort();
+      roadRouteAbortRef.current?.abort();
       window.clearTimeout(autoRouteTimerRef.current);
       clearGpsWatch();
     },
@@ -703,7 +784,7 @@ export default function Home() {
           originStatus={originStatus}
           originError={originError}
           plannerError={plannerError}
-          isCalculating={isResolvingPlanner}
+          isCalculating={isResolvingPlanner || roadRouteStatus === 'loading'}
           onDeadlineChange={setDeadline}
           onPriorityModeChange={setPriorityMode}
           onSubmit={handlePlannerSubmit}
@@ -717,6 +798,10 @@ export default function Home() {
           activeRouteId={activeRoute ? activeRouteId : null}
           activeRoute={activeRoute}
           transportPlan={transportPlan}
+          roadRoute={roadRoute}
+          roadRouteStatus={roadRouteStatus}
+          roadRouteMessage={roadRouteMessage}
+          selectedTransportMode={selectedTransportMode}
           originLocation={originLocation}
           destinationLocation={destinationLocation}
           reports={reports}

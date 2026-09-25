@@ -11,7 +11,7 @@ test('envía una solicitud acotada y devuelve la respuesta validada', async () =
       json: async () => ({
         answerText: 'Respuesta de Eco',
         route: { id: 'main' },
-        meta: { source: 'claude' },
+        meta: { source: 'gemini' },
       }),
     };
   };
@@ -33,6 +33,7 @@ test('envía una solicitud acotada y devuelve la respuesta validada', async () =
   assert.equal(sentBody.priority, 'fastest');
   assert.equal(sentBody.activeReports.length, 1);
   assert.equal(result.answerText, 'Respuesta de Eco');
+  assert.equal(result.meta.source, 'gemini');
 });
 
 test('convierte una respuesta HTTP inválida en un error controlado', async () => {

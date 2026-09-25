@@ -28,7 +28,9 @@ function createRouteTooltip(route) {
   const title = document.createElement('strong');
   const detail = document.createElement('div');
   title.textContent = `📍 ${route.title}`;
-  detail.textContent = `⏱️ ${route.duration || 'Tiempo por validar'} · 💰 ${route.costFormatted || 'Costo por validar'}`;
+  detail.textContent = route.isRoadRoute
+    ? `🛣️ ${(Number(route.roadDistanceMeters || 0) / 1000).toLocaleString('es-CO', { maximumFractionDigits: 1 })} km · ${route.routingSourceLabel || 'ruta vial'}`
+    : `⏱️ ${route.duration || 'Tiempo por validar'} · 💰 ${route.costFormatted || 'Costo por validar'}`;
   tooltip.append(title, detail);
   return tooltip;
 }
@@ -234,7 +236,6 @@ export default function LeafletMap({
           map.invalidateSize();
         }
       }, 120);
-      onConnectionChange(true);
     } catch (error) {
       console.error('No fue posible inicializar Leaflet', error);
       onConnectionChange(false);
@@ -258,8 +259,9 @@ export default function LeafletMap({
     if (fitTimeoutRef.current) window.clearTimeout(fitTimeoutRef.current);
 
     const isVeredalPlan = transportPlan?.mode === 'veredal';
+    const usesRoadRoute = activeRoute?.isRoadRoute === true;
     const contextualRoute =
-      !isVeredalPlan && transportPlan?.routePath && !activeRoute
+      !isVeredalPlan && !usesRoadRoute && transportPlan?.routePath && !activeRoute
         ? {
             id: transportPlan.mode,
             title: transportPlan.modeLabel,
@@ -268,9 +270,11 @@ export default function LeafletMap({
             costFormatted: 'Costo por validar',
           }
         : null;
-    const route = isVeredalPlan
-      ? null
-      : activeRoute || contextualRoute || (activeRouteId ? ROUTES[activeRouteId] : null);
+    const route = usesRoadRoute
+      ? activeRoute
+      : isVeredalPlan
+        ? null
+        : activeRoute || contextualRoute || (activeRouteId ? ROUTES[activeRouteId] : null);
     const hasRoute = Boolean(route && Array.isArray(route.mapPath) && route.mapPath.length >= 2);
     const isAlternate = route?.id === 'alternate';
     const isEconomic = route?.id === 'economic';
@@ -344,11 +348,13 @@ export default function LeafletMap({
     }
 
     const endpointPoints = [originPoint, destinationPoint].filter(Boolean);
-    const fitPath = isVeredalPlan
-      ? transportPlan?.fitPath || endpointPoints
-      : hasRoute
-        ? route.mapPath
-        : endpointPoints;
+    const fitPath = usesRoadRoute
+      ? route.mapPath
+      : isVeredalPlan
+        ? transportPlan?.fitPath || endpointPoints
+        : hasRoute
+          ? route.mapPath
+          : endpointPoints;
 
     if (fitPath.length === 0) {
       map.setMaxBounds(CIUDAD_BOLIVAR_BOUNDS);
@@ -464,13 +470,15 @@ export default function LeafletMap({
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, []);
 
-  const mapDescription = transportPlan?.mode === 'veredal'
-    ? 'ruta van veredal simulada con paraderos e integración'
-    : transportPlan?.mode === 'sitp'
-      ? 'ruta SITP y paraderos relacionados'
-      : transportPlan?.mode === 'cable'
-        ? 'tramo TransMiCable relacionado'
-        : 'selecciona origen y destino';
+  const mapDescription = activeRoute?.isRoadRoute
+    ? 'ruta vial más corta entre el origen y el destino'
+    : transportPlan?.mode === 'veredal'
+      ? 'ruta van veredal simulada con paraderos e integración'
+      : transportPlan?.mode === 'sitp'
+        ? 'ruta SITP y paraderos relacionados'
+        : transportPlan?.mode === 'cable'
+          ? 'tramo TransMiCable relacionado'
+          : 'selecciona origen y destino';
 
   return (
     <div

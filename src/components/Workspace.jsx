@@ -9,6 +9,10 @@ export default function Workspace({
   activeRouteId,
   activeRoute,
   transportPlan,
+  roadRoute,
+  roadRouteStatus,
+  roadRouteMessage,
+  selectedTransportMode,
   originLocation,
   destinationLocation,
   reports,
@@ -46,6 +50,10 @@ export default function Workspace({
           activeRouteId={activeRouteId}
           activeRoute={activeRoute}
           transportPlan={transportPlan}
+          roadRoute={roadRoute}
+          roadRouteStatus={roadRouteStatus}
+          roadRouteMessage={roadRouteMessage}
+          selectedTransportMode={selectedTransportMode}
           originLocation={originLocation}
           destinationLocation={destinationLocation}
           reports={reports}

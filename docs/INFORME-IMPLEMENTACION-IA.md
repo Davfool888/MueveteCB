@@ -2,27 +2,26 @@
 
 ## Resultado
 
-- Se integró un agente de IA con arquitectura híbrida: parser/motor determinista primero y Claude como redactor.
-- La API serverless `api/chat.js` usa la clave solo en el servidor y devuelve el mismo contrato con o sin proveedor.
+- Eco usa una arquitectura híbrida: parser y motor determinista primero; Gemini redacta después con salida estructurada.
+- La API serverless `api/chat.js` conserva la clave únicamente en el servidor y mantiene el mismo contrato con o sin proveedor.
+- Gemini también puede responder saludos y preguntas generales sin inventar una ruta.
+- Las afirmaciones de precio, tiempo, horario y accesibilidad se validan contra el contexto autorizado.
+- El mapa consulta una geometría vial entre A y B, conserva la alternativa de menor distancia entre las respuestas de OSRM y no sustituye sus extremos por una geometría fija.
+- La parte inferior del mapa muestra distancia vial, precio estimado y los transportes disponibles.
 - Se procesó el GTFS oficial del SITP del 18-08-2026 y se versionó un extracto liviano de 113 paradas y 75 rutas.
-- Se conectaron a la interfaz las paradas relevantes del GTFS, las tarifas oficiales de 2026 y las cuatro estaciones reales de TransMiCable.
-- Los bloques por ubicación, la expiración y la respuesta diferenciada para Portal Tunal funcionan sin inventar una alternativa.
-- La interfaz usa el nombre **Eco** y el fallback local evita llamadas 404 durante `npm run dev`.
 
 ## Evidencia
 
 ### Pruebas y compilación
 
 ```text
-npm ci
-added 134 packages
-found 0 vulnerabilities
-
-npm run check
-20 tests passed
+npm test
+42 tests passed
 0 failed
+
+npm run build
 Vite build completed successfully
-64 modules transformed
+105 modules transformed
 ```
 
 Las pruebas incluyen:
@@ -32,8 +31,9 @@ Las pruebas incluyen:
 - conocimiento oficial de TransMiCable/SITP;
 - bloqueo en Alpes–Quiba versus Portal Tunal;
 - expiración de reportes;
-- fallback sin clave, error de red y JSON inválido;
-- rechazo de afirmaciones de Claude no soportadas;
+- normalización GeoJSON y alternativa vial de menor distancia entre las opciones de OSRM;
+- timeout y errores controlados del router;
+- éxito, saludos genéricos, fallback y validación de Gemini;
 - endpoint HTTP y cliente del navegador.
 
 ### Prueba manual en navegador
@@ -42,50 +42,56 @@ En `http://127.0.0.1:5173` se verificó:
 
 1. carga de React + Leaflet sin errores de consola;
 2. caso Mochuelo Alto → Portal Tunal;
-3. respuesta local estructurada en modo Vite;
-4. reporte Alpes–Quiba cambia a la alternativa;
-5. reporte en Portal Tunal genera advertencia sin cambiar a una ruta inventada;
-6. mapa, capas y datos de resumen.
+3. solicitud real a OSRM y geometría vial visible sobre el mapa;
+4. Marcadores A/B, distancia y fuente OSRM visibles;
+5. selección de Van veredal y TransMiCable desde la parte inferior;
+6. respuesta local estructurada en modo Vite;
+7. reporte Alpes–Quiba cambia a la alternativa;
+8. reporte en Portal Tunal genera advertencia sin cambiar a una ruta inventada.
 
 ## Decisiones
 
-1. **No se usa Gemini en el navegador.** La clave de un proveedor no debe terminar en el bundle. Se eliminó `src/services/aiAgent.js`.
-2. **Claude no selecciona la ruta.** La IA solo recibe el objeto de ruta y sus advertencias. Esto sigue la guía técnica adjunta y hace auditable la recomendación.
-3. **El fallback es una función de primera clase.** Sin `ANTHROPIC_API_KEY`, timeout o red, Eco responde con la misma estructura.
-4. **Los datos oficiales y los estimados están separados.** Las tarifas, transbordo, estaciones y presencia de rutas GTFS están verificados; los camperos y tiempos combinados siguen marcados como demostración.
-5. **El servidor local no simula una API con un 404.** Vite usa fallback por defecto; `VITE_CHAT_API=true` habilita la prueba local de Vercel.
+1. **No se usa Gemini en el navegador.** La clave de un proveedor no debe terminar en el bundle; la función serverless la recibe por `process.env`.
+2. **Gemini no selecciona la ruta.** Recibe el objeto de ruta, knowledgeContext, advertencias y una respuesta determinista base.
+3. **La ruta vial es independiente del modelo.** OSRM entrega la geometría; Gemini no dibuja ni modifica A/B.
+4. **El fallback es una función de primera clase.** Sin `GEMINI_API_KEY`, timeout o red, Eco responde con la misma estructura.
+5. **Los datos oficiales y los estimados están separados.** Las tarifas, transbordo, estaciones y presencia de rutas GTFS están verificados; los camperos y tiempos combinados siguen marcados como demostración.
+6. **El servidor local no simula una API con un 404.** Vite usa fallback por defecto; `VITE_CHAT_API=true` habilita la prueba local de Vercel.
 
 ## Riesgos para la demo
 
-- **Clave de Anthropic:** la clave proporcionada en la sesión fue rechazada por el proveedor con HTTP 401 `API key is invalid`; la interfaz y el fallback funcionan, pero hace falta una clave válida para probar la respuesta real. No se registra ni se expone esa clave en Git.
-- **Geometría del GTFS:** el extracto prueba paradas y servicios; la geometría completa de rutas aún necesita los trazados del GTFS y el GeoJSON de David.
+- **Clave de Gemini:** hace falta configurar `GEMINI_API_KEY` en Vercel para probar la respuesta real. No se registra ni se expone esa clave.
+- **OSRM público:** el servidor de demostración no ofrece SLA ni garantía de mínimo global. Para producción se requiere un router alojado con cuota, SLA y actualización de datos; la interfaz etiqueta el resultado como “más corta disponible”.
+- **Geocodificación:** Nominatim público se usa para el prototipo. Antes de producción se debe migrar el autocomplete a un proveedor o instancia con política de uso compatible.
+- **Geometría del GTFS:** el extracto prueba paradas y servicios; la geometría completa de rutas aún necesita los trazados del GTFS y el GeoJSON comunitario.
 - **Reportes compartidos:** el formulario guarda en `localStorage`; otro dispositivo no ve el reporte hasta que exista una base/API compartida.
 - **WhatsApp:** el modal prepara el mensaje; falta el webhook Twilio y el número Sandbox.
 - **Rutas informales:** no se deben presentar como operación en tiempo real hasta que la comunidad valide el dataset.
 
 ## Pendientes / siguientes pasos
 
-1. Configurar la clave de Anthropic en Vercel y repetir el caso con un mensaje real.
-2. Pedir a David `routes.txt`, `trips.txt`, `stop_times.txt` y shapes del GTFS, o su GeoJSON equivalente.
-3. Acordar con David el estado de verificación de cada parada informal.
-4. Implementar `/api/reports` con almacenamiento persistente y moderación antes de prometer sincronización entre celulares.
-5. Implementar `/api/whatsapp` con validación de firma y el mismo `createChatResponse`.
-6. Grabar el video de respaldo y generar el QR después de fijar la URL pública.
+1. Configurar `GEMINI_API_KEY` en Vercel y repetir el caso con mensajes reales.
+2. Configurar un router con SLA para producción y revisar sus límites de uso.
+3. Pedir a la comunidad `routes.txt`, `trips.txt`, `stop_times.txt` y shapes del GTFS, o su GeoJSON equivalente.
+4. Acordar el estado de verificación de cada parada informal.
+5. Implementar `/api/reports` con almacenamiento persistente y moderación.
+6. Implementar `/api/whatsapp` con validación de firma y el mismo agente.
+7. Grabar el video de respaldo y generar el QR después de fijar la URL pública.
 
 ## Cómo probarlo
 
 ```powershell
-cd "C:\Users\oscar\OneDrive\Datos adjuntos\Documentos\MueveteCBGit\MueveteCB"
-npm ci
+cd MueveteCB
+npm install
 npm run check
 npm run dev
 ```
 
-Para probar la función serverless en local:
+Para probar la función serverless y Gemini en local:
 
 ```powershell
 $env:VITE_CHAT_API='true'
-$env:ANTHROPIC_API_KEY='tu_clave_de_prueba'
+$env:GEMINI_API_KEY='tu_clave_de_prueba'
 npx vercel dev
 ```
 
