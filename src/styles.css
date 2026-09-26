@@ -1066,6 +1066,42 @@ svg {
   border-top-style: dashed;
 }
 
+/* Capas del extracto oficial del SITP */
+.legend-sitp-official {
+  color: #2f6f9f;
+  border-top-width: 4px;
+}
+
+.legend-stop {
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid #1d5c86;
+  border-radius: 50%;
+  background: #cfe6f5;
+}
+
+.legend-count {
+  margin-left: 2px;
+  padding: 0 5px;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--ink-soft);
+  font-size: 0.64rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.layer-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.layer-button.layer-official.is-active {
+  border-color: #1d5c86;
+  background: #eaf3fa;
+  color: #14496b;
+}
+
 .legend-alert {
   display: grid;
   width: 19px;
@@ -3789,3 +3825,280 @@ svg {
   }
 }
 
+
+/* ============================================================
+   ALTERNATIVA OFICIAL DEL SITP
+   ============================================================ */
+
+.mode-pill-official {
+  border-style: solid;
+}
+
+.official-badge {
+  background: #eaf3fa;
+  color: #14496b;
+}
+
+.official-corridor {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.official-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px 14px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 4px solid #1d5c86;
+  border-radius: 10px;
+  background: var(--surface-soft);
+}
+
+.official-facts div {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.official-facts dt {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.official-facts dd {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.official-why {
+  margin: 0 0 12px;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+}
+
+.official-why strong {
+  color: var(--ink);
+}
+
+.official-caveats {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: var(--surface-soft);
+}
+
+.official-caveats summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.official-caveats ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.official-caveats li + li {
+  margin-top: 5px;
+}
+
+@media (max-width: 600px) {
+  .official-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   ITINERARIO: DÓNDE ABORDAR Y DÓNDE BAJARSE
+   ============================================================ */
+
+.route-mode-switcher {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.itinerary-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+}
+
+.itinerary-subtitle-heading {
+  margin: 16px 0 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.itinerary-steps {
+  margin: 0;
+}
+
+.itinerary-steps > li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+  padding: 10px 0;
+}
+
+.itinerary-steps > li.is-pending {
+  opacity: 0.65;
+}
+
+.itinerary-step-body {
+  min-width: 0;
+}
+
+.itinerary-step-head {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.itinerary-step-head strong {
+  font-size: 0.92rem;
+}
+
+.mode-tag {
+  padding: 1px 7px;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mode-tag-sitp { background: #e6f0f8; color: #1d5c86; }
+.mode-tag-cable { background: #fdf3d9; color: #8c6004; }
+.mode-tag-veredal { background: #fdece8; color: #a3412a; }
+.mode-tag-walk, .mode-tag-road { background: var(--surface-soft); color: var(--ink-soft); }
+
+.itinerary-boarding {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 6px 0 0;
+}
+
+.itinerary-boarding > div {
+  min-width: 0;
+}
+
+.itinerary-boarding dt {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.itinerary-boarding dd {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.boarding-name {
+  font-weight: 600;
+  color: var(--green-900);
+}
+
+.boarding-empty {
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.itinerary-step-detail {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.itinerary-step-source {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  opacity: 0.85;
+}
+
+.itinerary-step-source.is-verified {
+  color: var(--green-800);
+  opacity: 1;
+}
+
+.itinerary-step-tail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+  white-space: nowrap;
+}
+
+.itinerary-duration,
+.itinerary-cost {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--surface-soft);
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.itinerary-cost {
+  background: #fdf3d9;
+  color: #9a6c0b;
+}
+
+.best-badge.has-alert {
+  background: var(--coral-soft);
+  color: var(--coral-deep);
+}
+
+@media (max-width: 600px) {
+  .itinerary-steps > li {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+
+  .itinerary-step-tail {
+    grid-column: 2;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+}
+
+.legend-stop-trunk {
+  border-color: #7a1f16;
+  background: #b3352a;
+}
+
+.mode-pill-separator {
+  align-self: center;
+  padding: 0 2px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  opacity: 0.8;
+}

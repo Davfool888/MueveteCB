@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "node --test \"src/**/*.test.js\" \"api/**/*.test.js\"",
     "extract:gtfs": "node scripts/build-gtfs-snapshot.mjs",
+    "extract:sitp": "node scripts/build-sitp-snapshot.mjs",
     "check": "npm test && npm run build"
   },
   "dependencies": {

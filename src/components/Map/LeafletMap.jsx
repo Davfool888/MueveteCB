@@ -64,6 +64,184 @@ function isIntegrationStop(stop) {
   return stop?.kind === 'integration' || stop?.type === 'integration';
 }
 
+/* -------------------------------------------------------------------------- */
+/* Capa oficial del SITP                                                       */
+/* -------------------------------------------------------------------------- */
+
+/** Paleta por componente: la troncal pesa más que la zonal para no saturar el mapa. */
+const SITP_ROUTE_STYLE = {
+  Transmilenio: { color: '#8a3b1c', weight: 3.5, opacity: 0.85 },
+  TransMiZonal: { color: '#2f6f9f', weight: 2, opacity: 0.7 },
+};
+
+const TRUNK_CORRIDOR_STYLE = { color: '#b3352a', weight: 3, opacity: 0.8 };
+
+const STATION_MARKER_STYLE = {
+  Portal: { color: '#7a1f16', fill: '#b3352a', radius: 7 },
+  Intercambio: { color: '#7a1f16', fill: '#d4705f', radius: 6 },
+  Intermedia: { color: '#7a4a20', fill: '#c98a3a', radius: 5 },
+  Sencilla: { color: '#5a5f5e', fill: '#9aa3a1', radius: 4 },
+};
+
+function formatOfficialKm(value) {
+  if (!Number.isFinite(value)) return 'sin dato';
+  return `${value.toLocaleString('es-CO', { maximumFractionDigits: 1 })} km`;
+}
+
+function createSitpRoutePopup(route) {
+  const popup = document.createElement('div');
+  const title = document.createElement('strong');
+  const corridor = document.createElement('div');
+  const facts = document.createElement('div');
+  const source = document.createElement('div');
+
+  title.textContent = `🚌 Ruta ${route.code} · ${route.name}`;
+  corridor.textContent = route.corridorLabel;
+  facts.textContent = [
+    route.serviceType,
+    route.busType,
+    route.isRural ? 'rural' : null,
+    formatOfficialKm(route.lengthKm),
+    route.operator,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+  source.textContent = 'Trazado oficial · TRANSMILENIO S.A. (CC BY 4.0)';
+  source.style.cssText = 'font-size:0.72rem;color:#6b7c7a;margin-top:6px;';
+
+  corridor.style.cssText = 'font-size:0.82rem;margin-top:2px;';
+  facts.style.cssText = 'font-size:0.78rem;color:#516564;margin-top:4px;';
+  popup.append(title, corridor, facts, source);
+  return popup;
+}
+
+function createSitpStopPopup(stop) {
+  const popup = document.createElement('div');
+  const title = document.createElement('strong');
+  const street = document.createElement('div');
+  const meta = document.createElement('div');
+  const source = document.createElement('div');
+
+  title.textContent = `🚏 ${stop.name}`;
+  street.textContent = [stop.street, stop.address].filter(Boolean).join(' · ');
+  meta.textContent = `Cenefa ${stop.id} · Zona ${stop.zone.name}`;
+  source.textContent = 'Paradero oficial · TRANSMILENIO S.A. (CC BY 4.0)';
+  source.style.cssText = 'font-size:0.72rem;color:#6b7c7a;margin-top:6px;';
+
+  street.style.cssText = 'font-size:0.82rem;margin-top:2px;';
+  meta.style.cssText = 'font-size:0.76rem;color:#516564;margin-top:4px;';
+  popup.append(title, street, meta, source);
+  return popup;
+}
+
+function drawSitpOfficialLayers(sitpData, groups, options = {}) {
+  const { highlightRouteId = null, visibleRouteIds = null } = options;
+  groups.sitpRoutes.clearLayers();
+  groups.sitpStops.clearLayers();
+  if (!sitpData) return;
+
+  // `visibleRouteIds` en `null` significa "sin destino seleccionado": se pinta el
+  // catálogo completo. Con destino, la capa se reduce a los corredores A → B.
+  const allowed = Array.isArray(visibleRouteIds) ? new Set(visibleRouteIds) : null;
+  const routes = (sitpData.routes ?? []).filter((route) => !allowed || allowed.has(route.id));
+
+  for (const route of routes) {
+    const base = SITP_ROUTE_STYLE[route.component] ?? SITP_ROUTE_STYLE.TransMiZonal;
+    const highlighted = Boolean(highlightRouteId) && route.id === highlightRouteId;
+    for (const path of route.paths) {
+      L.polyline(path, {
+        ...base,
+        color: highlighted ? '#0a9b7d' : base.color,
+        weight: highlighted ? base.weight + 2 : base.weight,
+        opacity: highlighted ? 1 : base.opacity,
+        dashArray: route.isRural ? '7 7' : undefined,
+      })
+        .bindPopup(createSitpRoutePopup(route))
+        .addTo(groups.sitpRoutes);
+    }
+  }
+
+  for (const stop of sitpData.stops ?? []) {
+    L.circleMarker([stop.latitude, stop.longitude], {
+      radius: 3.5,
+      color: '#1d5c86',
+      weight: 1,
+      fillColor: '#cfe6f5',
+      fillOpacity: 0.95,
+    })
+      .bindPopup(createSitpStopPopup(stop))
+      .addTo(groups.sitpStops);
+  }
+}
+
+function createTrunkStationPopup(station) {
+  const popup = document.createElement('div');
+  const title = document.createElement('strong');
+  const facts = document.createElement('div');
+  const access = document.createElement('div');
+  const source = document.createElement('div');
+
+  title.textContent = `🚍 ${station.name} · ${station.type}`;
+  facts.textContent = [
+    station.corridorName,
+    station.capacityLabel,
+    station.location,
+    station.isTemporarilyClosed ? station.stage : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+  access.textContent = station.accessSummary.length
+    ? `Accesos: ${station.accessSummary.join(', ')}`
+    : 'Sin accesos registrados';
+  source.textContent = 'Inventario oficial · TRANSMILENIO S.A. (CC BY 4.0)';
+  source.style.cssText = 'font-size:0.72rem;color:#6b7c7a;margin-top:6px;';
+
+  facts.style.cssText = 'font-size:0.78rem;color:#516564;margin-top:4px;';
+  access.style.cssText = 'font-size:0.76rem;color:#516564;margin-top:2px;';
+  popup.append(title, facts, access, source);
+  return popup;
+}
+
+/**
+ * Dibuja la red troncal: corredores más estaciones.
+ *
+ * El tipo de estación se codifica en el tamaño y el color del punto, de modo que
+ * un portal se distinga de una estación sencilla sin abrir cada marcador.
+ */
+function drawTrunkLayers(sitpData, groups) {
+  groups.trunkCorridors.clearLayers();
+  groups.trunkStations.clearLayers();
+  if (!sitpData) return;
+
+  const corridorById = new Map((sitpData.trunkCorridors ?? []).map((corridor) => [corridor.id, corridor]));
+
+  for (const corridor of sitpData.trunkCorridors ?? []) {
+    for (const path of corridor.paths) {
+      L.polyline(path, TRUNK_CORRIDOR_STYLE)
+        .bindTooltip(
+          `${corridor.name} · ${corridor.type} · ${corridor.stationIds.length} estaciones`,
+          { sticky: true },
+        )
+        .addTo(groups.trunkCorridors);
+    }
+  }
+
+  for (const station of sitpData.trunkStations ?? []) {
+    const style = STATION_MARKER_STYLE[station.type] ?? STATION_MARKER_STYLE.Sencilla;
+    const corridor = corridorById.get(station.corridorId);
+    L.circleMarker([station.latitude, station.longitude], {
+      radius: style.radius,
+      color: station.isTemporarilyClosed ? '#6b6b6b' : style.color,
+      weight: station.isTemporarilyClosed ? 1.5 : 2,
+      dashArray: station.isTemporarilyClosed ? '3 3' : undefined,
+      fillColor: station.isTemporarilyClosed ? '#bdbdbd' : style.fill,
+      fillOpacity: 0.95,
+    })
+      .bindPopup(createTrunkStationPopup({ ...station, corridorName: corridor?.name ?? null }))
+      .addTo(groups.trunkStations);
+  }
+}
+
 function isVeredalStop(stop) {
   return stop?.source === 'simulated_veredal_fixture' || stop?.kind === 'transfer';
 }
@@ -202,6 +380,9 @@ export default function LeafletMap({
   destinationLocation,
   reports,
   layers,
+  sitpData,
+  visibleSitpRouteIds,
+  highlightRouteId,
   onConnectionChange,
 }) {
   const mapContainerRef = useRef(null);
@@ -243,9 +424,11 @@ export default function LeafletMap({
       tileLayer.addTo(map);
 
       const groups = {};
-      ['boundary', 'route', 'cable', 'sitp', 'informal', 'veredal', 'reports'].forEach((name) => {
-        groups[name] = L.layerGroup().addTo(map);
-      });
+      ['boundary', 'route', 'cable', 'sitp', 'informal', 'veredal', 'reports', 'sitpRoutes', 'sitpStops', 'trunkCorridors', 'trunkStations'].forEach(
+        (name) => {
+          groups[name] = L.layerGroup();
+        }
+      );
       layerGroupsRef.current = groups;
 
       L.polygon(CIUDAD_BOLIVAR_POLYGON, {
@@ -500,6 +683,33 @@ export default function LeafletMap({
   }, [transportPlan]);
 
   useEffect(() => {
+    const groups = layerGroupsRef.current;
+    if (!groups.sitpRoutes) return;
+    const wantsRoutes = Boolean(layers?.sitpRoutes);
+    const wantsStops = Boolean(layers?.sitpStops);
+    if (!wantsRoutes && !wantsStops) {
+      groups.sitpRoutes.clearLayers();
+      groups.sitpStops.clearLayers();
+      return;
+    }
+    drawSitpOfficialLayers(sitpData, groups, {
+      highlightRouteId: highlightRouteId ?? null,
+      visibleRouteIds: visibleSitpRouteIds,
+    });
+  }, [sitpData, layers?.sitpRoutes, layers?.sitpStops, highlightRouteId, visibleSitpRouteIds]);
+
+  useEffect(() => {
+    const groups = layerGroupsRef.current;
+    if (!groups.trunkStations) return;
+    if (!layers?.trunkStations) {
+      groups.trunkCorridors.clearLayers();
+      groups.trunkStations.clearLayers();
+      return;
+    }
+    drawTrunkLayers(sitpData, groups);
+  }, [sitpData, layers?.trunkStations]);
+
+  useEffect(() => {
     const map = mapRef.current;
     const groups = layerGroupsRef.current;
     if (!map) return;
@@ -510,13 +720,15 @@ export default function LeafletMap({
     if (transportPlan?.mode === 'sitp' || transportPlan?.continuationPath?.length) contextualLayers.add('sitp');
     if (transportPlan?.showCable || transportPlan?.mode === 'cable') contextualLayers.add('cable');
 
-    ['boundary', 'route', 'cable', 'sitp', 'informal', 'veredal', 'reports'].forEach((name) => {
-      const group = groups[name];
-      if (!group) return;
-      const shouldShow = Boolean(layers[name] || contextualLayers.has(name));
-      if (shouldShow && !map.hasLayer(group)) group.addTo(map);
-      if (!shouldShow && map.hasLayer(group)) group.removeFrom(map);
-    });
+    ['boundary', 'route', 'cable', 'sitp', 'informal', 'veredal', 'reports', 'sitpRoutes', 'sitpStops', 'trunkCorridors', 'trunkStations'].forEach(
+      (name) => {
+        const group = groups[name];
+        if (!group) return;
+        const shouldShow = Boolean(layers[name] || contextualLayers.has(name));
+        if (shouldShow && !map.hasLayer(group)) group.addTo(map);
+        if (!shouldShow && map.hasLayer(group)) group.removeFrom(map);
+      }
+    );
   }, [activeRoute, layers, transportPlan]);
 
   useEffect(() => {

@@ -4,6 +4,12 @@ export default function LayerToolbar({
   layers,
   reportCount,
   transportPlan,
+  sitpStatus = 'idle',
+  sitpStopCount = 0,
+  sitpRouteCount = 0,
+  trunkStationCount = 0,
+  visibleSitpRouteCount = null,
+  isFiltered = false,
   onSelectTransportMode,
   onToggle,
 }) {
@@ -15,6 +21,8 @@ export default function LayerToolbar({
   const routeVisible = Boolean(
     layers.route || transportPlan?.activeRoute || (transportPlan?.status && transportPlan.status !== 'idle'),
   );
+  const officialLoading = sitpStatus === 'loading' || sitpStatus === 'idle';
+  const officialFailed = sitpStatus === 'error';
 
   return (
     <div className="layer-toolbar" aria-label="Capas y modos del mapa">
@@ -38,6 +46,36 @@ export default function LayerToolbar({
       >
         <span className="legend-line legend-boundary" />
         Límite CB
+      </button>
+
+      <button
+        className={`layer-button layer-official${layers.sitpRoutes ? ' is-active' : ''}`}
+        type="button"
+        data-layer="sitpRoutes"
+        aria-pressed={layers.sitpRoutes ? 'true' : 'false'}
+        disabled={officialFailed}
+        onClick={() => onToggle('sitpRoutes')}
+      >
+        <span className="legend-line legend-sitp-official" />
+        {officialFailed ? 'Rutas SITP no disponible' : officialLoading ? 'Rutas SITP…' : 'Rutas SITP'}
+        {sitpRouteCount > 0 && (
+          <span className="legend-count">
+            {isFiltered ? `${visibleSitpRouteCount ?? 0}/${sitpRouteCount}` : sitpRouteCount}
+          </span>
+        )}
+      </button>
+
+      <button
+        className={`layer-button layer-official${layers.sitpStops ? ' is-active' : ''}`}
+        type="button"
+        data-layer="sitpStops"
+        aria-pressed={layers.sitpStops ? 'true' : 'false'}
+        disabled={officialFailed}
+        onClick={() => onToggle('sitpStops')}
+      >
+        <span className="legend-stop" />
+        {officialFailed ? 'Paradas no disponibles' : officialLoading ? 'Paradas SITP…' : 'Paradas SITP'}
+        {sitpStopCount > 0 && <span className="legend-count">{sitpStopCount}</span>}
       </button>
 
       {hasSitp && (
@@ -78,6 +116,19 @@ export default function LayerToolbar({
           TransMiCable
         </button>
       )}
+
+      <button
+        className={`layer-button layer-official${layers.trunkStations ? ' is-active' : ''}`}
+        type="button"
+        data-layer="trunkStations"
+        aria-pressed={layers.trunkStations ? 'true' : 'false'}
+        disabled={officialFailed}
+        onClick={() => onToggle('trunkStations')}
+      >
+        <span className="legend-stop legend-stop-trunk" />
+        {officialFailed ? 'Troncales no disponible' : officialLoading ? 'Estaciones…' : 'Estaciones troncales'}
+        {trunkStationCount > 0 && <span className="legend-count">{trunkStationCount}</span>}
+      </button>
 
       <button
         className={`layer-button${layers.reports ? ' is-active' : ''}`}

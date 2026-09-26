@@ -18,6 +18,13 @@ export default function Workspace({
   reports,
   layers,
   mapConnected,
+  sitpData,
+  sitpStatus,
+  visibleSitpRouteIds,
+  activePlan,
+  alternatives,
+  activeAlternativeId,
+  itinerary,
   deadline,
   margin,
   onSendMessage,
@@ -25,6 +32,7 @@ export default function Workspace({
   onShareRoute,
   onToggleLayer,
   onSelectRoute,
+  onSelectAlternative,
   onSelectTransportMode,
   onMapConnectionChange,
   onScrollToMap,
@@ -59,6 +67,10 @@ export default function Workspace({
           reports={reports}
           layers={layers}
           mapConnected={mapConnected}
+          sitpData={sitpData}
+          sitpStatus={sitpStatus}
+          visibleSitpRouteIds={visibleSitpRouteIds}
+          highlightRouteId={activePlan?.routeId ?? null}
           onToggleLayer={onToggleLayer}
           onShareRoute={onShareRoute}
           onSelectTransportMode={onSelectTransportMode}
@@ -70,7 +82,11 @@ export default function Workspace({
           transportPlan={transportPlan}
           margin={margin}
           isAlert={isAlert}
+          alternatives={alternatives}
+          activeAlternativeId={activeAlternativeId}
+          itinerary={itinerary}
           onSelectRoute={onSelectRoute}
+          onSelectAlternative={onSelectAlternative}
         />
       </div>
     </section>

@@ -17,6 +17,10 @@ export default function MapPanel({
   reports,
   layers,
   mapConnected,
+  sitpData,
+  sitpStatus,
+  visibleSitpRouteIds,
+  highlightRouteId,
   onToggleLayer,
   onShareRoute,
   onSelectTransportMode,
@@ -58,6 +62,14 @@ export default function MapPanel({
         layers={layers}
         reportCount={reports.length}
         transportPlan={transportPlan}
+        sitpStatus={sitpStatus}
+        sitpStopCount={sitpData?.stops?.length ?? 0}
+        sitpRouteCount={sitpData?.routes?.length ?? 0}
+        trunkStationCount={sitpData?.trunkStations?.length ?? 0}
+        visibleSitpRouteCount={
+          Array.isArray(visibleSitpRouteIds) ? visibleSitpRouteIds.length : (sitpData?.routes?.length ?? 0)
+        }
+        isFiltered={Array.isArray(visibleSitpRouteIds)}
         onSelectTransportMode={onSelectTransportMode}
         onToggle={onToggleLayer}
       />
@@ -78,6 +90,9 @@ export default function MapPanel({
           destinationLocation={destinationLocation}
           reports={reports}
           layers={layers}
+          sitpData={sitpData}
+          visibleSitpRouteIds={visibleSitpRouteIds}
+          highlightRouteId={highlightRouteId}
           onConnectionChange={onMapConnectionChange}
         />
         <MapBottomCard
@@ -94,6 +109,7 @@ export default function MapPanel({
 
       <div className="map-note">
         <span>Mapa y ruta vial: OpenStreetMap + OSRM + paradas GTFS 18-08-2026.</span>
+        <span>Rutas, paraderos SITP y estaciones troncales: servicio oficial de TRANSMILENIO S.A. (CC BY 4.0).</span>
         <span>Vans y trazados veredales: aproximaciones simuladas para el prototipo.</span>
       </div>
     </article>

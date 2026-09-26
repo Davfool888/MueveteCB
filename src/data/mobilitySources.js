@@ -28,6 +28,24 @@ export const MOBILITY_SOURCES = Object.freeze({
     localSnapshot: 'src/data/gtfs-ciudad-bolivar-snapshot.json',
     checkedAt: DATA_CHECKED_AT,
   },
+  sitpServices: {
+    title: 'Servicios (Rutas Troncales y Zonales) del SITP',
+    url: 'https://gis.transmilenio.gov.co/arcgis/rest/services/ConsultaSubgerenciaPlanificacionSITP/Consulta_Planificacion_SITP/FeatureServer/15',
+    publisher: 'TransMilenio S.A.',
+    license: 'CC BY 4.0',
+    localSnapshot: 'src/data/sitp-routes-snapshot.json',
+    note: 'Trazados, longitud, tipo de bus, operador y ventanas de horario. No incluye despachos programados.',
+    checkedAt: DATA_CHECKED_AT,
+  },
+  sitpStops: {
+    title: 'Paraderos Zonales del SITP',
+    url: 'https://gis.transmilenio.gov.co/arcgis/rest/services/Zonal/consulta_paraderos/FeatureServer/0',
+    publisher: 'TransMilenio S.A.',
+    license: 'CC BY 4.0',
+    localSnapshot: 'src/data/sitp-stops-snapshot.json',
+    note: 'Paraderoszonales de Ciudad Bolívar. La cenefa identifica el paradero, no la ruta que lo sirve.',
+    checkedAt: DATA_CHECKED_AT,
+  },
   openStreetMap: {
     title: 'OpenStreetMap',
     url: 'https://www.openstreetmap.org/copyright',
@@ -63,6 +81,7 @@ export const VERIFIED_FACTS = Object.freeze({
 export const DATA_BOUNDARIES = Object.freeze([
   'Las tarifas y transbordos del SITP provienen de fuentes oficiales de 2026.',
   'La línea y los nombres de estación de TransMiCable están verificados.',
+  'Los trazados, paraderos, tipos de bus y ventanas de horario de la alternativa oficial vienen del servicio de TransMilenio; el tiempo de viaje se estima por distancia porque el extracto no trae despachos programados.',
   'Los tramos veredales, frecuencias, costos informales y tiempos combinados siguen marcados como demostración hasta validarlos con la comunidad.',
   'Los reportes ciudadanos no sustituyen una verificación operativa ni garantizan que una vía esté segura.',
 ]);

@@ -1,28 +1,168 @@
 import React from 'react';
 
-const LEG_ICONS = Object.freeze({
-  walk: '🚶',
-  sitp: '🚌',
-  veredal: '🚐',
-  cable: '🚡',
-  road: '🛣️',
-});
+/**
+ * Resumen del viaje que describe exactamente dónde abordar cada modo.
+ *
+ * Este componente ya no pinta los `segments` de `ROUTES[id]`: esos son fixtures
+ * de demostración que describían una ruta que el mapa no estaba dibujando. Todo
+ * lo que se muestra aquí viene de `itinerary`, que se construye a partir del
+ * plan que sí se está pintando (`services/itineraryBuilder.js`).
+ */
 
 const STEP_COLORS = {
-  informal: 'step-informal',
-  cable: 'step-cable',
-  sitp: 'step-sitp',
   walk: 'step-walk',
+  road: 'step-walk',
+  sitp: 'step-sitp',
+  trunk: 'step-sitp',
+  veredal: 'step-informal',
+  cable: 'step-cable',
 };
+
+const KIND_META = {
+  trunk: { icon: '🚍', label: 'Troncal' },
+  sitp: { icon: '🚌', label: 'SITP' },
+  veredal: { icon: '🚐', label: 'Van veredal' },
+};
+
+const SOURCE_META = {
+  trunk_stations_2026: { label: 'Inventario de estaciones · Transmilenio', verified: true },
+  trunk_corridors_2026: { label: 'Trazado troncal · Transmilenio', verified: true },
+  planner_estimate: { label: 'Estimación del planificador', verified: false },
+};
+
+function BoardingCell({ label, empty = '—' }) {
+  if (!label) return <span className="boarding-empty">{empty}</span>;
+  return <span className="boarding-name">{label}</span>;
+}
+
+function ItineraryBody({ itinerary }) {
+  return (
+    <>
+      <header className="summary-header">
+        <div>
+          <span className="section-kicker">
+            {itinerary.kicker ??
+              (itinerary.kind === 'official-sitp' || itinerary.kind === 'official-trunk'
+                ? 'Alternativa oficial'
+                : 'Itinerario calculado')}
+          </span>
+          <h2 id="summary-title" style={{ fontSize: '1.25rem', marginTop: '2px' }}>
+            {itinerary.title}
+          </h2>
+          {itinerary.subtitle && <p className="itinerary-subtitle">{itinerary.subtitle}</p>}
+        </div>
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+          {itinerary.kind !== 'planner' && <span className="best-badge official-badge">Datos oficiales</span>}
+          <span
+            className={`best-badge${itinerary.badgeTone === 'alert' ? ' has-alert' : ''}`}
+            id="route-badge"
+          >
+            {itinerary.badge}
+          </span>
+        </div>
+      </header>
+
+      <div
+        className="trip-stats"
+        aria-label="Resumen del viaje"
+        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(84px, 1fr))' }}
+      >
+        {itinerary.stats.map((stat) => (
+          <div key={stat.id ?? stat.label}>
+            <span>{stat.label}</span>
+            <strong id={stat.id}>{stat.value}</strong>
+          </div>
+        ))}
+      </div>
+
+      <dl className="official-facts">
+        {itinerary.facts.map((fact) => (
+          <div key={fact.label}>
+            <dt>{fact.label}</dt>
+            <dd>{fact.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      {itinerary.reason && (
+        <p className="official-why">
+          <strong>Por qué esta:</strong> {itinerary.reason}
+        </p>
+      )}
+
+      <h3 className="itinerary-subtitle-heading">Dónde abordar y dónde bajarse</h3>
+      <ol className="route-steps itinerary-steps" id="route-steps">
+        {itinerary.steps.map((step) => (
+          <li key={step.order} className={step.pending ? 'is-pending' : ''}>
+            <span className={`step-icon ${STEP_COLORS[step.mode] || 'step-walk'}`}>{step.order}</span>
+            <div className="itinerary-step-body">
+              <div className="itinerary-step-head">
+                <strong>{step.title}</strong>
+                <span className={`mode-tag mode-tag-${step.mode}`}>
+                  <span aria-hidden="true">{step.icon}</span> {step.modeLabel}
+                </span>
+              </div>
+              <dl className="itinerary-boarding">
+                <div>
+                  <dt>Abordas en</dt>
+                  <dd>
+                    <BoardingCell label={step.boardAt} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>Bajas en</dt>
+                  <dd>
+                    <BoardingCell label={step.alightAt} />
+                  </dd>
+                </div>
+              </dl>
+              {step.detail && <span className="itinerary-step-detail">{step.detail}</span>}
+              <span className={`itinerary-step-source${step.verified ? ' is-verified' : ''}`}>
+                {step.verified ? '✓ ' : '~ '}
+                {step.sourceLabel}
+              </span>
+            </div>
+            <div className="itinerary-step-tail">
+              {step.durationLabel && <span className="itinerary-duration">{step.durationLabel}</span>}
+              {step.costFormatted && <span className="itinerary-cost">{step.costFormatted}</span>}
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      {itinerary.warnings.length > 0 && (
+        <details className="official-caveats" open={itinerary.badgeTone === 'alert'}>
+          <summary>Qué no podemos afirmar con estos datos</summary>
+          <ul>
+            {itinerary.warnings.map((warning) => (
+              <li key={warning}>{warning}</li>
+            ))}
+          </ul>
+        </details>
+      )}
+
+      <p className="map-note" style={{ marginTop: '12px' }}>
+        {itinerary.disclaimer}
+      </p>
+    </>
+  );
+}
 
 export default function RouteSummary({
   activeRoute,
-  transportPlan,
   margin,
   isAlert,
+  alternatives = [],
+  activeAlternativeId = null,
+  itinerary = null,
   onSelectRoute,
+  onSelectAlternative,
 }) {
-  if (!activeRoute) return null;
+  if (!itinerary && !activeRoute && alternatives.length === 0) return null;
+
+  // El tipo de itinerario es la única fuente de verdad de qué se está mostrando,
+  // así la pestaña activa no puede desincronizarse del contenido.
+  const showOfficial = itinerary?.kind === 'official-sitp' || itinerary?.kind === 'official-trunk';
 
   return (
     <article
@@ -30,233 +170,78 @@ export default function RouteSummary({
       id="route-summary"
       aria-live="polite"
     >
-      {transportPlan?.integration && transportPlan.legs?.length > 1 && (
-        <section className="route-connection-summary" aria-label="Conexión multimodalCalculada">
-          <div>
-            <span className="section-kicker">Conexión por cercanía</span>
-            <strong>
-              {transportPlan.access?.modeLabel || transportPlan.modeLabel} → {transportPlan.integration.name}
-            </strong>
-          </div>
-          <ol>
-            {transportPlan.legs.map((leg) => (
-              <li key={`${leg.order}-${leg.mode}`} className={leg.status === 'ready' ? 'is-ready' : ''}>
-                <span aria-hidden="true">{LEG_ICONS[leg.mode] || '•'}</span>
-                <span>{leg.label}</span>
-                {leg.status === 'pending' && <small>calculando</small>}
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
+      <div className="route-mode-switcher">
+        {[
+          { id: 'main', label: '⚡ Más Rápida (Cable + Veredal)', color: 'var(--green-700)' },
+          { id: 'economic', label: '💰 Más económica ($3.550*)', color: 'var(--blue)' },
+          { id: 'accessible', label: '♿ Ruta formal PMR*', color: 'var(--yellow)' },
+        ].map((option) => {
+          const isActive = !showOfficial && activeRoute?.id === option.id;
+          return (
+            <button
+              key={option.id}
+              type="button"
+              className={`mode-pill${isActive ? ' is-active' : ''}`}
+              onClick={() => onSelectRoute && onSelectRoute(option.id)}
+              aria-pressed={isActive ? 'true' : 'false'}
+              style={{
+                fontSize: '0.82rem',
+                padding: '5px 12px',
+                borderRadius: '20px',
+                border: `1.5px solid ${option.color}`,
+                background: isActive ? option.color : 'transparent',
+                color: isActive ? '#fff' : option.id === 'accessible' ? '#8c6004' : option.color,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.18s ease',
+              }}
+            >
+              {option.label}
+            </button>
+          );
+        })}
 
-      {/* Route Mode Switcher tabs */}
-      <div className="route-mode-switcher" style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
-        <button
-          type="button"
-          className={`mode-pill ${activeRoute.id === 'main' ? 'is-active' : ''}`}
-          onClick={() => onSelectRoute && onSelectRoute('main')}
-          style={{
-            fontSize: '0.82rem',
-            padding: '5px 12px',
-            borderRadius: '20px',
-            border: '1.5px solid var(--green-700)',
-            background: activeRoute.id === 'main' ? 'var(--green-700)' : 'transparent',
-            color: activeRoute.id === 'main' ? '#fff' : 'var(--green-950)',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.18s ease',
-          }}
-        >
-          ⚡ Más Rápida (Cable + Veredal)
-        </button>
-        <button
-          type="button"
-          className={`mode-pill ${activeRoute.id === 'economic' ? 'is-active' : ''}`}
-          onClick={() => onSelectRoute && onSelectRoute('economic')}
-          style={{
-            fontSize: '0.82rem',
-            padding: '5px 12px',
-            borderRadius: '20px',
-            border: '1.5px solid var(--blue)',
-            background: activeRoute.id === 'economic' ? 'var(--blue)' : 'transparent',
-            color: activeRoute.id === 'economic' ? '#fff' : 'var(--blue)',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.18s ease',
-          }}
-        >
-          💰 Más económica ($3.550*)
-        </button>
-        <button
-          type="button"
-          className={`mode-pill ${activeRoute.id === 'accessible' ? 'is-active' : ''}`}
-          onClick={() => onSelectRoute && onSelectRoute('accessible')}
-          style={{
-            fontSize: '0.82rem',
-            padding: '5px 12px',
-            borderRadius: '20px',
-            border: '1.5px solid var(--yellow)',
-            background: activeRoute.id === 'accessible' ? 'var(--yellow)' : 'transparent',
-            color: activeRoute.id === 'accessible' ? '#fff' : '#8c6004',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.18s ease',
-          }}
-        >
-          ♿ Ruta formal PMR*
-        </button>
-      </div>
-
-      <header className="summary-header">
-        <div>
-          <span className="section-kicker">Recomendación Multimodal</span>
-          <h2 id="summary-title" style={{ fontSize: '1.25rem', marginTop: '2px' }}>{activeRoute.title}</h2>
-        </div>
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-          {activeRoute.qualityBadge && (
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 8px', borderRadius: '12px', background: 'var(--green-100)', color: 'var(--green-900)' }}>
-              {activeRoute.qualityBadge}
-            </span>
-          )}
-          <span className="best-badge" id="route-badge">
-            {isAlert ? '⚠️ Ruta ajustada' : activeRoute.modeLabel || 'Mejor opción'}
+        {alternatives.length > 0 && (
+          <span className="mode-pill-separator" aria-hidden="true">
+            Alternativas oficiales
           </span>
-        </div>
-      </header>
-
-      {/* Main Stats: Times + Cost ($ COP) + Margin */}
-      <div className="trip-stats" aria-label="Resumen del viaje" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))' }}>
-        <div>
-          <span>Salir</span>
-          <strong id="departure-time">{activeRoute.departureClock}</strong>
-        </div>
-        <div>
-          <span>Llegar</span>
-          <strong id="arrival-time">{activeRoute.arrivalClock}</strong>
-        </div>
-        <div>
-          <span>Duración</span>
-          <strong id="trip-duration">{activeRoute.duration}</strong>
-        </div>
-        <div>
-          <span>Costo Total</span>
-          <strong id="trip-cost" style={{ color: 'var(--green-800)' }}>
-            {transportPlan?.price?.formatted || activeRoute.costFormatted || '$6.050*'}
-          </strong>
-        </div>
-        <div>
-          <span>Margen</span>
-          <strong
-            id="trip-buffer"
-            style={{ color: margin < 10 ? 'var(--coral-deep)' : undefined }}
-          >
-            {margin >= 0 ? `${margin} min` : 'Revisar'}
-          </strong>
-        </div>
-      </div>
-
-      {/* Payment methods alert box */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: 'var(--surface-soft)',
-          padding: '8px 12px',
-          borderRadius: '10px',
-          margin: '10px 0 14px',
-          fontSize: '0.82rem',
-          borderLeft: '4px solid var(--green-600)',
-        }}
-      >
-        {transportPlan?.integration ? (
-          <>
-            <span>
-              <strong>Conexión:</strong>{' '}
-              {transportPlan.access?.modeLabel || transportPlan.modeLabel} → {transportPlan.integration.name}
-            </span>
-            <span style={{ color: 'var(--ink-soft)', fontSize: '0.78rem' }}>
-              {(transportPlan.modesUsed || []).map((mode) =>
-                mode === 'cable' ? 'TransMiCable' : mode === 'veredal' ? 'Van veredal' : mode,
-              ).join(' + ')}
-            </span>
-          </>
-        ) : (
-          <>
-            <span>
-              <strong>Pago:</strong> {activeRoute.paymentMethod || 'Efectivo + TuLlave'}
-            </span>
-            <span style={{ color: 'var(--ink-soft)', fontSize: '0.78rem' }}>
-              {activeRoute.costBreakdown || 'Desglose multimodal'}
-            </span>
-          </>
         )}
+
+        {alternatives.map((alternative) => {
+          const isActive = activeAlternativeId === alternative.id;
+          return (
+            <button
+              key={alternative.id}
+              type="button"
+              className={`mode-pill mode-pill-official${isActive ? ' is-active' : ''}`}
+              onClick={() => onSelectAlternative && onSelectAlternative(alternative.id)}
+              aria-pressed={isActive ? 'true' : 'false'}
+              title={alternative.matchReason ?? undefined}
+              style={{
+                fontSize: '0.82rem',
+                padding: '5px 12px',
+                borderRadius: '20px',
+                border: '1.5px solid #1d5c86',
+                background: isActive ? '#1d5c86' : 'transparent',
+                color: isActive ? '#fff' : '#1d5c86',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.18s ease',
+              }}
+            >
+              {KIND_META[alternative.kind]?.icon} {KIND_META[alternative.kind]?.label} {alternative.routeCode}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Step by step segments with segment costs */}
-      <ol className="route-steps" id="route-steps">
-        {activeRoute.segments.map((seg, i) => (
-          <li key={i} style={{ display: 'grid', gridTemplateColumns: '32px 1fr auto', alignItems: 'center', gap: '10px' }}>
-            <span className={`step-icon ${STEP_COLORS[seg.type] || 'step-walk'}`}>{i + 1}</span>
-            <div>
-              <strong>{seg.title}</strong>
-              <span style={{ display: 'block', fontSize: '0.84rem', color: 'var(--ink-soft)' }}>{seg.detail}</span>
-            </div>
-            {seg.cost && (
-              <span
-                style={{
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  padding: '2px 8px',
-                  borderRadius: '6px',
-                  background: seg.cost.includes('$0') ? 'var(--surface-soft)' : '#fdf3d9',
-                  color: seg.cost.includes('$0') ? 'var(--ink-soft)' : '#9a6c0b',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {seg.cost}
-              </span>
-            )}
-          </li>
-        ))}
-      </ol>
-
-      {/* Confidence + Accessibility & Quality Insights */}
-      <div className="route-insight" style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--line)' }}>
-        <div
-          className="confidence-ring"
-          id="confidence-ring"
-          style={{ '--score': activeRoute.confidence }}
-        >
-          <span id="confidence-score">{activeRoute.confidence}%</span>
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <strong id="confidence-label">{activeRoute.confidenceLabel}</strong>
-            {activeRoute.accessibilityLabel && (
-              <span
-                style={{
-                  fontSize: '0.76rem',
-                  fontWeight: 600,
-                  color: 'var(--green-900)',
-                  background: 'var(--green-100)',
-                  padding: '2px 8px',
-                  borderRadius: '8px',
-                }}
-              >
-                ♿ {activeRoute.accessibilityLabel}
-              </span>
-            )}
-          </div>
-          <p id="route-reason" style={{ margin: '4px 0 0', fontSize: '0.86rem', color: 'var(--ink-soft)' }}>
-            {activeRoute.reason}
-          </p>
-        </div>
-      </div>
-      <p className="map-note" style={{ marginTop: '12px' }}>
-        * La tarifa formal de $3.550 corresponde a 2026. Los tramos informales y las rutas combinadas siguen en validación.
-      </p>
+      {itinerary ? (
+        <ItineraryBody itinerary={itinerary} />
+      ) : (
+        <p className="map-note">
+          Todavía no hay una ruta calculada. Elige origen y destino para ver dónde abordar.
+        </p>
+      )}
     </article>
   );
 }

@@ -13,8 +13,11 @@ import {
 import { requestChat } from '../../services/chatApi';
 import { getShortestRoadRoute, getRoadRouteKey } from '../../services/roadRouting';
 import { getTransportPlan } from '../../services/transportRouting';
+import { buildItinerary } from '../../services/itineraryBuilder';
+import { toOfficialRouteShape, toOfficialTransportPlanShape } from '../../services/officialPlanShapes';
 import { useToast } from '../../hooks/useToast';
 import { useReports } from '../../hooks/useReports';
+import { useSitpData } from '../../hooks/useSitpData';
 import Header from '../../components/Header';
 import Hero from '../../components/Hero';
 import DemoStrip from '../../components/DemoStrip';
@@ -134,9 +137,27 @@ export default function Home() {
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [activeAlternativeId, setActiveAlternativeId] = useState(null);
 
   const { toast, showToast } = useToast();
   const { reports, addReport: addReportToState, clearReports, pruneExpiredReports } = useReports();
+
+  // El extracto oficial pesa demasiado para el bundle inicial: se pide cuando la
+  // persona abre las capas del SITP o cuando hay un origen con coordenadas.
+  /**
+   * Los extractos oficiales se piden cuando hace falta verlos: una capa activa,
+   * una alternativa seleccionada o un viaje con origen y destino. Ese último
+   * caso es el que ofrece el catálogo de alternativas, así que sin él las
+   * pestañas nunca aparecerían y nadie podría activarlas.
+   */
+  const wantsSitpData = Boolean(
+    layers.sitpRoutes ||
+      layers.sitpStops ||
+      layers.trunkStations ||
+      activeAlternativeId ||
+      (hasLocationCoordinates(originLocation) && hasLocationCoordinates(destinationLocation)),
+  );
+  const { status: sitpStatus, data: sitpData, findCorridors, buildAlternatives } = useSitpData(wantsSitpData);
   const chatAbortRef = useRef(null);
   const roadRouteAbortRef = useRef(null);
   const roadRouteRequestIdRef = useRef(0);
@@ -229,6 +250,101 @@ export default function Home() {
     .map((request) => request.requestKey)
     .sort()
     .join('|');
+
+  /**
+   * Todas las alternativas disponibles para el mismo A → B: troncal y SITP
+   * zonal, ambas sobre datos oficiales. La van veredal no entra aquí porque ya la
+   * produce el planificador y se muestra en su propia pestaña.
+   *
+   * Se ofrecen sin elegir ganadora: la decisión es de la persona.
+   */
+  const alternatives = useMemo(() => {
+    if (sitpStatus !== 'ready' || typeof buildAlternatives !== 'function') return { alternatives: [], summaries: [] };
+    if (!hasLocationCoordinates(originLocation)) return { alternatives: [], summaries: [] };
+    return buildAlternatives({
+      originLocation,
+      destinationLocation,
+      destinationLabel: destinationLocation?.label || destination,
+    });
+  }, [buildAlternatives, destination, destinationLocation, originLocation, sitpStatus]);
+
+  /**
+   * Plan activo. `null` significa "sin alternativa oficial seleccionada", y en ese
+   * caso se describe el plan del planificador (que puede ser la van veredal).
+   */
+  const activePlan = useMemo(() => {
+    if (!activeAlternativeId) return null;
+    return alternatives.alternatives.find((plan) => plan.id === activeAlternativeId) ?? null;
+  }, [activeAlternativeId, alternatives.alternatives]);
+
+  const officialRouteForMap = useMemo(() => toOfficialRouteShape(activePlan), [activePlan]);
+  const officialTransportPlan = useMemo(
+    () => toOfficialTransportPlanShape(activePlan),
+    [activePlan],
+  );
+
+  /**
+   * Qué corredores del SITP se pintan.
+   *
+   * Con destino seleccionado la capa se reduce a los corredores que conectan A con
+   * B; sin destino se muestra el catálogo completo de Ciudad Bolívar. Así el mapa
+   * no muestra 176 trazados cuando la persona está viendo un viaje concreto.
+   */
+  const hasBothEndpoints = hasLocationCoordinates(originLocation) && hasLocationCoordinates(destinationLocation);
+
+  const sitpCorridorOptions = useMemo(() => {
+    if (sitpStatus !== 'ready' || typeof findCorridors !== 'function') return null;
+    if (!hasBothEndpoints) return null;
+    return findCorridors(originLocation, destinationLocation);
+  }, [destinationLocation, findCorridors, hasBothEndpoints, originLocation, sitpStatus]);
+
+  const visibleSitpRouteIds = useMemo(() => {
+    if (!hasBothEndpoints) return null;
+    if (!sitpCorridorOptions) return [];
+    return sitpCorridorOptions.routeIds;
+  }, [hasBothEndpoints, sitpCorridorOptions]);
+
+  const itinerary = useMemo(
+    () =>
+      buildItinerary({
+        officialPlan: activePlan,
+        isOfficialActive: Boolean(activePlan),
+        transportPlan: activePlan ? toOfficialTransportPlanShape(activePlan) : transportPlan,
+        activeRoute: activePlan ? toOfficialRouteShape(activePlan) : activeRoute,
+        originLabel: originLocation?.label || origin,
+        destinationLabel: destinationLocation?.label || destination,
+      }),
+    [
+      activePlan,
+      activeRoute,
+      destination,
+      destinationLocation,
+      origin,
+      originLocation,
+      transportPlan,
+    ],
+  );
+
+  const handleSelectAlternative = useCallback(
+    (planId) => {
+      setActiveAlternativeId((previous) => {
+        const next = previous === planId ? null : planId;
+        if (next) {
+          const plan = alternatives.alternatives.find((item) => item.id === next);
+          showToast(
+            `Mostrando ${plan?.title ?? 'la alternativa'}. Trazado oficial; el tiempo es estimado por distancia.`,
+          );
+        }
+        return next;
+      });
+    },
+    [alternatives.alternatives, showToast],
+  );
+
+  /** Volver a una pestaña de demostración apaga la alternativa oficial. */
+  const handleClearAlternative = useCallback(() => {
+    setActiveAlternativeId(null);
+  }, []);
 
   useEffect(() => {
     roadRouteAbortRef.current?.abort();
@@ -761,6 +877,9 @@ export default function Home() {
     (routeId) => {
       const selectedRouteId = setActiveRoute(routeId);
       const route = ROUTES[selectedRouteId];
+      // Volver a una pestaña de demostración debe apagar la alternativa oficial,
+      // o el resumen seguiría describiendo el corredor del SITP.
+      setActiveAlternativeId(null);
       if (route) {
         setSelectedTransportMode('auto');
         showToast(`Ruta activa: ${route.title}`);
@@ -944,8 +1063,8 @@ export default function Home() {
           messages={messages}
           isTyping={isTyping}
           activeRouteId={activeRoute ? activeRouteId : null}
-          activeRoute={activeRoute}
-          transportPlan={transportPlan}
+          activeRoute={activePlan ? officialRouteForMap : activeRoute}
+          transportPlan={activePlan ? officialTransportPlan : transportPlan}
           roadRoute={roadRoute}
           roadRouteStatus={roadRouteStatus}
           roadRouteMessage={roadRouteMessage}
@@ -955,6 +1074,13 @@ export default function Home() {
           reports={reports}
           layers={layers}
           mapConnected={mapConnected}
+          sitpData={sitpData}
+          sitpStatus={sitpStatus}
+          visibleSitpRouteIds={visibleSitpRouteIds}
+          activePlan={activePlan}
+          alternatives={alternatives.summaries}
+          activeAlternativeId={activeAlternativeId}
+          itinerary={itinerary}
           deadline={deadline}
           margin={margin}
           onSendMessage={processTextMessage}
@@ -962,6 +1088,7 @@ export default function Home() {
           onShareRoute={shareCurrentRoute}
           onToggleLayer={toggleLayer}
           onSelectRoute={handleSelectRoute}
+          onSelectAlternative={handleSelectAlternative}
           onSelectTransportMode={handleSelectTransportMode}
           onMapConnectionChange={setMapConnected}
           onScrollToMap={() =>
