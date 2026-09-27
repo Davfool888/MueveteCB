@@ -22,9 +22,10 @@ import {
   SITP_ROUTE_DATA_VERSION,
   SITP_DATA_BOUNDARIES,
 } from '../data/sitpIndex.js';
-import { CABLE_PATH, TRANSMICABLE_STATIONS } from '../data/routes.js';
+import { CABLE_LINE_PATH, CABLE_STATIONS_BY_ID } from '../data/cableIndex.js';
 import { VERIFIED_FACTS } from '../data/mobilitySources.js';
 import { haversineKm, getNearestPointOnPolyline, joinPaths } from './transportRouting.js';
+import { doesCorridorApproachDestination, sliceCorridorPath } from './corridorPath.js';
 
 export const SITP_ROUTING_OPTIONS = Object.freeze({
   /** Distancia máxima al origen para considerarla cubierta por el SITP. */
@@ -47,7 +48,26 @@ export const SITP_ROUTING_OPTIONS = Object.freeze({
   minCorridorLengthKm: 2,
   /** Longitud máxima: un corredor de 50 km no es una alternativa de barrio. */
   maxCorridorLengthKm: 20,
+  /** Recorrido mínimo en bus una vez recortado al tramo que se viaja. */
+  minRideKm: 0.8,
+  /**
+   * Recorrido mínimo en cable para que el transbordo valga la pena. Por debajo de
+   * esto, pagar y esperar el teleférico cuesta más de lo que ahorra.
+   */
+  minCableRideKm: 0.8,
+  /**
+   * Velocidad media asumida del TransMiCable. Es una estimación: el operador
+   * publica la línea y sus estaciones, pero no un tiempo de recorrido por tramo.
+   */
+  cableSpeedKmh: 12,
 });
+
+/**
+ * Radio caminable hasta una estación del cable. Comparte el valor con
+ * `cableService.js` porque es la misma decisión: hasta dónde tiene sentido ir a
+ * pie para tomar el teleférico.
+ */
+const CABLE_ROUTING_OPTIONS = Object.freeze({ walkToStationRadiusKm: 1.2 });
 
 const WALK_MODE = 'walk';
 const SITP_MODE = 'sitp';
@@ -225,7 +245,7 @@ function describeMatch(candidate, destination) {
  */
 export function rankSitpCorridors(originLocation, destinationLocation = null, options = {}) {
   const settings = { ...SITP_ROUTING_OPTIONS, ...options };
-  const { minCorridorLengthKm, maxCorridorLengthKm, corridorSearchRadiusKm } = settings;
+  const { minCorridorLengthKm, maxCorridorLengthKm, corridorSearchRadiusKm, minRideKm } = settings;
   const origin = toSitpPoint(originLocation);
   const destination = toSitpPoint(destinationLocation);
   if (!origin) return [];
@@ -248,7 +268,8 @@ export function rankSitpCorridors(originLocation, destinationLocation = null, op
       .sort((left, right) => left.walkKm - right.walkKm)[0];
     if (!boarding) continue;
 
-    const exitDistanceKm = destination ? distanceToCableExit(route, destination) : Number.NaN;
+    const station = route.cableIntegration ? stationById(route.cableIntegration.stationId) : null;
+    const exitDistanceKm = station && destination ? haversineKm(station.coordinates, destination) : Number.NaN;
 
     const candidate = {
       route,
@@ -256,7 +277,35 @@ export function rankSitpCorridors(originLocation, destinationLocation = null, op
       boardingStop: boarding.stop,
       boardingDistanceKm: boarding.walkKm,
       exitDistanceKm,
+      cableStation: station,
     };
+
+    /**
+     * Con destino, un corredor solo vale si el tramo que se recorre de verdad
+     * acerca. Antes se elegía el corredor más cercano al origen y se dibujaba
+     * entero, así que la línea salía en las dos direcciones y la mitad iba en
+     * sentido contrario al viaje. El recorte se hace sobre la geometría real.
+     */
+    if (destination && station) {
+      const slice = sliceCorridorPath(route.paths, stopPoint(boarding.stop), station.coordinates);
+      if (!slice) continue;
+      // Un recorrido de cero metros no es una alternativa: significa que el
+      // paradero y la estación caen en el mismo segmento del trazado, así que el
+      // bus no avanza hacia ninguna parte.
+      if (slice.distanceKm < minRideKm) continue;
+      if (!doesCorridorApproachDestination(slice.path, origin, destination)) continue;
+      candidate.slice = slice;
+      candidate.rideKm = slice.distanceKm;
+      // El destino viaja con el candidato porque hace falta para medir el tramo en
+      // cable que cierra el viaje.
+      candidate.destination = destination;
+    } else if (destination) {
+      continue;
+    } else {
+      candidate.slice = null;
+      candidate.rideKm = lengthKm;
+    }
+
     candidates.push({
       ...candidate,
       score: scoreRouteCandidate(candidate) + destinationScore(candidate, destination),
@@ -265,14 +314,6 @@ export function rankSitpCorridors(originLocation, destinationLocation = null, op
   }
 
   return candidates.sort((left, right) => right.score - left.score);
-}
-
-/** Distancia del destino a la estación donde el corredor integra con el cable. */
-function distanceToCableExit(route, destination) {
-  if (!route.cableIntegration) return Number.NaN;
-  const station = stationById(route.cableIntegration.stationId);
-  if (!station) return Number.NaN;
-  return haversineKm(station.coordinates, destination);
 }
 
 /** Bonus o castigo por lo bien que el corredor aterriza cerca del destino. */
@@ -324,11 +365,60 @@ export function findSitpCorridorOptions(originLocation, destinationLocation, opt
 /* -------------------------------------------------------------------------- */
 
 function stationById(stationId) {
-  return TRANSMICABLE_STATIONS.find((station) => station.id === stationId) ?? null;
+  const station = CABLE_STATIONS_BY_ID[stationId];
+  if (!station) return null;
+  return { id: station.id, name: station.name, coordinates: station.coordinates };
 }
 
-function buildSteps({ boardingStop, walkingKm, route, ridingKm, alightingStop, cableKm }) {
-  const { estimatedSpeedKmh, walkSpeedKmh } = SITP_ROUTING_OPTIONS;
+/**
+ * Tramo en TransMiCable para cerrar el viaje después del corredor SITP.
+ *
+ * Se mide sobre la línea entre la estación donde se sube y la más cercana al
+ * destino. Si el recorrido en cable no compensa, se devuelve `null` en vez de
+ * encadenar un transbordo que costaría más de lo que ahorra.
+ */
+function buildCableLeg({ boardingStation, destinationLocation, minRideKm }) {
+  if (!boardingStation) return null;
+  const destination = toSitpPoint(destinationLocation);
+  if (!destination) return null;
+
+  let alighting = null;
+  for (const station of Object.values(CABLE_STATIONS_BY_ID)) {
+    const walkKm = haversineKm(station.coordinates, destination);
+    if (walkKm > CABLE_ROUTING_OPTIONS.walkToStationRadiusKm) continue;
+    if (!alighting || walkKm < alighting.walkKm) alighting = { station, walkKm };
+  }
+  if (!alighting || alighting.station.id === boardingStation.id) return null;
+
+  const slice = sliceCorridorPath(
+    [CABLE_LINE_PATH],
+    boardingStation.coordinates,
+    alighting.station.coordinates,
+  );
+  if (!slice || slice.distanceKm < minRideKm) return null;
+
+  return {
+    boarding: boardingStation,
+    alighting: alighting.station,
+    rideKm: slice.distanceKm,
+    walkKm: alighting.walkKm,
+    path: slice.path,
+  };
+}
+
+function buildSteps({
+  boardingStop,
+  walkingKm,
+  route,
+  ridingKm,
+  alightingStop,
+  alightingPoint,
+  cableStation,
+  cableApproachKm,
+  cableLeg,
+  finalWalkKm,
+}) {
+  const { estimatedSpeedKmh, walkSpeedKmh, cableSpeedKmh } = SITP_ROUTING_OPTIONS;
   const steps = [];
 
   if (boardingStop && walkingKm > 0.02) {
@@ -372,18 +462,76 @@ function buildSteps({ boardingStop, walkingKm, route, ridingKm, alightingStop, c
     });
   }
 
-  if (cableKm > 0) {
+  // El bus deja a la persona donde el trazado se acerca más a la estación del
+  // cable, no en la estación: si ese paseo no se cuenta, el viaje parece más corto
+  // de lo que es.
+  if (cableStation && cableApproachKm > 0.05) {
     steps.push({
-      mode: CABLE_MODE,
-      instruction: 'Toma TransMiCable hasta el destino',
-      detail: 'Integración verificada con el corredor del SITP',
-      durationMinutes: estimateMinutes(cableKm, estimatedSpeedKmh),
-      estimatedCostCop: null,
-      source: 'transmilenio_2026',
+      mode: WALK_MODE,
+      instruction: `Camina ${formatKm(cableApproachKm)} hasta ${cableStation.name}`,
+      detail: alightingPoint
+        ? 'Desde donde el bus te deja; el corredor pasa cerca de la estación, no frente a ella'
+        : 'Desde el punto donde termina la ruta',
+      durationMinutes: estimateMinutes(cableApproachKm, walkSpeedKmh),
+      estimatedCostCop: 0,
+      stopId: cableStation.id,
+      source: 'cable_stations_2026',
     });
   }
 
+  if (cableLeg) {
+    steps.push({
+      mode: CABLE_MODE,
+      instruction: `Sube al TransMiCable hacia ${cableLeg.alighting.name}`,
+      detail: `${cableLeg.boarding.name} → ${cableLeg.alighting.name}`,
+      durationMinutes: estimateMinutes(cableLeg.rideKm, cableSpeedKmh),
+      estimatedCostCop: null,
+      stopId: cableLeg.boarding.id,
+      source: 'cable_segments_2026',
+    });
+
+    if (finalWalkKm > 0.05) {
+      steps.push({
+        mode: WALK_MODE,
+        instruction: `Camina ${formatKm(finalWalkKm)} hasta tu destino`,
+        detail: `Desde ${cableLeg.alighting.name}`,
+        durationMinutes: estimateMinutes(finalWalkKm, walkSpeedKmh),
+        estimatedCostCop: 0,
+        source: 'planner_estimate',
+      });
+    }
+  }
+
   return steps;
+}
+
+/**
+ * Alternativas SITP para un par A → B, en orden de puntaje.
+ *
+ * Devuelve varias porque una persona puede preferir la alimentadora corta aunque
+ * el motor puntee otra: son todas corredores que llevan hacia el destino, con la
+ * geometría ya recortada al tramo que se recorre.
+ */
+export function listSitpAlternatives({
+  originLocation,
+  destinationLocation = null,
+  maxAlternatives = 3,
+  options = {},
+} = {}) {
+  const settings = { ...SITP_ROUTING_OPTIONS, ...options };
+  const origin = toSitpPoint(originLocation);
+  if (!origin || !destinationLocation) return [];
+
+  return rankSitpCorridors(origin, destinationLocation, settings)
+    .slice(0, maxAlternatives)
+    .map((candidate) => buildOfficialSitpAlternativeFromCandidate(candidate, settings))
+    .filter(Boolean);
+}
+
+/** Construye el plan completo a partir de un corredor ya elegido. */
+export function buildOfficialSitpAlternativeFromCandidate(selection, settings = SITP_ROUTING_OPTIONS) {
+  if (!selection) return null;
+  return buildPlanFromSelection(selection, settings);
 }
 
 /**
@@ -407,16 +555,43 @@ export function buildOfficialSitpAlternative({
   const selection = rankSitpCorridors(origin, destinationLocation, settings)[0];
   if (!selection) return null;
 
-  const { route, boardingStop, boardingDistanceKm, matchReason } = selection;
+  return buildPlanFromSelection(selection, settings);
+}
+
+/** Ensambla el plan publicable a partir de un corredor candidato. */
+function buildPlanFromSelection(selection, settings) {
+  const { route, boardingStop, boardingDistanceKm, matchReason, slice, rideKm } = selection;
   const cableStation = route.cableIntegration ? stationById(route.cableIntegration.stationId) : null;
   const alightingStop = route.alightingStop
     ? (SITP_STOPS_BY_ID[route.alightingStop.stopId] ?? null)
     : null;
 
   const walkingKm = boardingDistanceKm;
-  const ridingKm = route.lengthKm ?? 0;
-  const cableKm = cableStation ? pathLengthKm(CABLE_PATH) : 0;
-  const totalKm = walkingKm + ridingKm + cableKm;
+  const ridingKm = rideKm ?? route.lengthKm ?? 0;
+
+  /**
+   * El bus no baja en la estación del cable: baja donde el trazado se acerca más
+   * a ella, y de ahí hay un paseo a pie. Medir ese paseo es lo que separa una
+   * integración real de una que solo existe porque el corredor pasa cerca.
+   */
+  const alightingPoint = slice ? slice.path.at(-1) : null;
+  const cableApproachKm = cableStation && alightingPoint
+    ? haversineKm(alightingPoint, cableStation.coordinates)
+    : 0;
+
+  /**
+   * Recorrido en cable medido sobre la línea, entre la estación donde se sube y
+   * la más cercana al destino. Antes se usaba la longitud completa de la línea,
+   * así que un viaje de una estación se cobraba como si fuera de punta a punta.
+   */
+  const cableLeg = buildCableLeg({
+    boardingStation: cableStation,
+    destinationLocation: selection.destination,
+    minRideKm: settings.minCableRideKm,
+  });
+  const finalWalkKm = cableLeg ? cableLeg.walkKm : 0;
+
+  const totalKm = walkingKm + ridingKm + cableApproachKm + (cableLeg?.rideKm ?? 0) + finalWalkKm;
 
   const steps = buildSteps({
     boardingStop,
@@ -424,13 +599,37 @@ export function buildOfficialSitpAlternative({
     route,
     ridingKm,
     alightingStop,
-    cableKm,
+    alightingPoint,
+    cableStation,
+    cableApproachKm,
+    cableLeg,
+    finalWalkKm,
   }).map((step, index) => ({ ...step, order: index + 1 }));
 
   const warnings = [...SITP_DATA_BOUNDARIES];
   if (!cableStation) {
     warnings.push('Este corredor no integra con una estación TransMiCable; la conexión se resuelve solo en el SITP.');
   }
+  if (cableStation && cableApproachKm > 0.5) {
+    warnings.push(
+      `El bus pasa a ${formatKm(cableApproachKm)} de ${cableStation.name}, no frente a ella: ese tramo se cuenta como caminata.`,
+    );
+  }
+  if (cableStation && !cableLeg) {
+    warnings.push(
+      'No se encontró una estación del cable más cercana al destino que compense el transbordo; el viaje se cierra en el SITP.',
+    );
+  }
+  if (slice?.reversed) {
+    warnings.push(
+      'El bus recorre este corredor en sentido contrario al que declara el operador; la línea dibujada sigue el sentido real de la marcha.',
+    );
+  }
+
+  // El recorte de `slice` puede ir en contra del orden en que el operador declara
+  // el corredor. Se expone para que la interfaz pueda decirlo y no tener que
+  // deducirlo de la geometría.
+  const sliceReversed = Boolean(slice?.reversed);
 
   return {
     id: `sitp_${route.code}`,
@@ -449,6 +648,11 @@ export function buildOfficialSitpAlternative({
     scheduleType: route.scheduleType,
     schedule: route.schedule,
     lengthKm: Number(ridingKm.toFixed(2)),
+    /**
+     * Longitud del corredor completo, para poder decir "de 14 km solo se
+     * recorren 3" en lugar de presentar el tramo como si fuera todo el corredor.
+     */
+    corridorLengthKm: route.lengthKm ?? null,
     totalDistanceKm: Number(totalKm.toFixed(2)),
     matchReason,
     estimatedMinutes: steps.reduce((total, step) => total + step.durationMinutes, 0),
@@ -469,17 +673,40 @@ export function buildOfficialSitpAlternative({
           coordinates: stopPoint(alightingStop),
         }
       : null,
+    /** Punto exacto del trazado donde termina el tramo en bus. */
+    alightingPoint: alightingPoint ? [...alightingPoint] : null,
     cableIntegration: route.cableIntegration
       ? {
           stationId: route.cableIntegration.stationId,
           stationName: route.cableIntegration.stationName,
           distanceKm: route.cableIntegration.distanceKm,
+          walkFromAlightingKm: Number(cableApproachKm.toFixed(2)),
           coordinates: cableStation ? [...cableStation.coordinates] : null,
         }
       : null,
-    path: joinPaths(...route.paths, cableStation ? CABLE_PATH : []),
-    sitpPath: route.paths.map((path) => path.map((point) => [...point])),
-    cablePath: cableStation ? CABLE_PATH.map((point) => [...point]) : [],
+    cableLeg: cableLeg
+      ? {
+          boardingStationName: cableLeg.boarding.name,
+          boardingStationId: cableLeg.boarding.id,
+          alightingStationName: cableLeg.alighting.name,
+          alightingStationId: cableLeg.alighting.id,
+          rideKm: Number(cableLeg.rideKm.toFixed(2)),
+          walkKm: Number(cableLeg.walkKm.toFixed(2)),
+          path: cableLeg.path,
+        }
+      : null,
+    // La geometría es el tramo realmente recorrido: del paradero de abordaje al
+    // punto donde el trazado se acerca a la estación del cable, más el tramo de
+    // cable que se recorre. Dibujar el corredor completo hacía que la línea
+    // saliera en las dos direcciones.
+    sliceReversed,
+    sitpGeometry: slice ? slice.path : route.paths.flat(),
+    path: joinPaths(
+      slice ? slice.path : route.paths.flat(),
+      cableLeg ? cableLeg.path : [],
+    ),
+    sitpPath: slice ? slice.path : route.paths.flat(),
+    cablePath: cableLeg ? cableLeg.path.map((point) => [...point]) : [],
     steps,
     totalCostCop: VERIFIED_FACTS.sitpFareCop,
     costFormatted: `$${VERIFIED_FACTS.sitpFareCop.toLocaleString('es-CO')} COP`,

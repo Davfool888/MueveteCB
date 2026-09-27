@@ -17,8 +17,18 @@ const SEGMENT_TYPE_BY_MODE = {
 /** Modo principal de un plan oficial, para el `TransportPlan` que consume la interfaz. */
 function primaryMode(plan) {
   if (plan.kind === 'official-trunk') return 'trunk';
+  if (plan.kind === 'official-cable') return 'cable';
   if (plan.cableIntegration) return 'cable';
   return 'sitp';
+}
+
+/** Etiqueta corta del medio, sin repetir el tipo dos veces. */
+function modeLabel(plan) {
+  if (plan.kind === 'official-trunk') return `Troncal ${plan.routeCode} · Transmilenio`;
+  if (plan.kind === 'official-cable') return 'TransMiCable directo';
+  return plan.cableIntegration
+    ? `SITP ${plan.routeCode} + TransMiCable`
+    : `SITP ${plan.routeCode}`;
 }
 
 /**
@@ -47,13 +57,9 @@ export function toOfficialRouteShape(plan) {
     id: plan.id,
     isOfficialSitp: true,
     isOfficialTrunk: plan.kind === 'official-trunk',
+    isOfficialCable: plan.kind === 'official-cable',
     mode: primaryMode(plan),
-    modeLabel:
-      plan.kind === 'official-trunk'
-        ? `Troncal ${plan.routeCode} · Transmilenio`
-        : plan.cableIntegration
-          ? `SITP ${plan.routeCode} + TransMiCable`
-          : `SITP ${plan.routeCode}`,
+    modeLabel: modeLabel(plan),
     title: plan.title,
     origin: plan.boarding?.name ?? 'Origen',
     destination: plan.cableIntegration?.stationName ?? 'Destino',
@@ -76,10 +82,30 @@ export function toOfficialRouteShape(plan) {
   };
 }
 
+/** Geometría propia de cada modo, según lo que el operador publica. */
+function legPathFor(mode, plan) {
+  if (mode === 'sitp' || mode === 'trunk') {
+    return Array.isArray(plan.sitpPath) && plan.sitpPath.length >= 2 ? plan.sitpPath : null;
+  }
+  if (mode === 'cable') {
+    return Array.isArray(plan.cablePath) && plan.cablePath.length >= 2 ? plan.cablePath : null;
+  }
+  // A pie no hay trazado oficial: el motor no publica la calle y no se inventa.
+  return null;
+}
+
 /** Traduce el plan oficial a la forma de `TransportPlan` que consume la interfaz. */
 export function toOfficialTransportPlanShape(plan) {
   if (!plan) return null;
 
+  /**
+   * Cada tramo lleva su propia geometría.
+   *
+   * Antes los pasos no traían `path` y el mapa no dibujaba nada: solo aparecía el
+   * límite de la localidad. La geometría se asigna por modo, porque lo que hay
+   * son los trazados que publica el operador. Los tramos a pie no llevan trazado
+   * porque no hay fuente para la calle: se dibujan como contexto, no como línea.
+   */
   const legs = plan.steps.map((step) => ({
     order: step.order,
     role: step.order === 1 && step.mode === 'walk' ? 'access' : 'first',
@@ -88,6 +114,7 @@ export function toOfficialTransportPlanShape(plan) {
     status: 'ready',
     source: step.source,
     simulated: false,
+    path: legPathFor(step.mode, plan),
   }));
 
   const mode = primaryMode(plan);
@@ -96,12 +123,10 @@ export function toOfficialTransportPlanShape(plan) {
     schemaVersion: 'transport-plan.official-sitp.v1',
     status: 'route-selected',
     mode,
-    modeLabel:
-      plan.kind === 'official-trunk'
-        ? `Troncal ${plan.routeCode} · Transmilenio`
-        : `SITP ${plan.routeCode} + TransMiCable`,
+    modeLabel: modeLabel(plan),
     isOfficialSitp: true,
     isOfficialTrunk: plan.kind === 'official-trunk',
+    isOfficialCable: plan.kind === 'official-cable',
     origin: plan.boarding?.coordinates ?? null,
     destination: plan.cableIntegration?.coordinates ?? null,
     originStop: plan.boarding

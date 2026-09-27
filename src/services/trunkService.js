@@ -22,6 +22,7 @@ import {
 } from '../data/trunkIndex.js';
 import { VERIFIED_FACTS } from '../data/mobilitySources.js';
 import { haversineKm, getNearestPointOnPolyline, joinPaths } from './transportRouting.js';
+import { doesCorridorApproachDestination, sliceCorridorPath } from './corridorPath.js';
 import { toSitpPoint, formatKm } from './sitpRoutesService.js';
 
 export const TRUNK_ROUTING_OPTIONS = Object.freeze({
@@ -178,12 +179,49 @@ function describeMatch(candidate) {
  */
 export function selectTroncalOption(originLocation, destinationLocation, options = {}) {
   const settings = { ...TRUNK_ROUTING_OPTIONS, ...options };
+  const ranked = rankTroncalCandidates(originLocation, destinationLocation, settings);
+  const best = ranked[0];
+  if (!best) return null;
+  return { ...best, matchReason: describeMatch(best) };
+}
+
+/**
+ * Alternativas troncales para un par A → B, en orden de puntaje.
+ *
+ * Varias porque una persona puede preferir la estación sencilla que le queda a
+ * dos cuadras aunque el motor puntee el portal: son todas opciones que llevan
+ * hacia el destino.
+ */
+export function listTroncalAlternatives({
+  originLocation,
+  destinationLocation,
+  destinationLabel = '',
+  maxAlternatives = 3,
+  options = {},
+} = {}) {
+  const settings = { ...TRUNK_ROUTING_OPTIONS, ...options };
+  return rankTroncalCandidates(originLocation, destinationLocation, settings)
+    .slice(0, maxAlternatives)
+    .map((candidate) => buildPlanFromTroncalSelection(candidate, settings, destinationLabel))
+    .filter(Boolean);
+}
+
+/**
+ * Candidatos troncales para un par A → B, ya puntuados y de mayor a menor.
+ *
+ * El tramo que se devuelve es el que se recorre de verdad, no el corredor entero:
+ * subirse a mitad de camino dibujando el corredor entero hacía que la línea
+ * saliera en las dos direcciones, y la mitad iba en sentido contrario al viaje.
+ * Además se descarta el candidato cuyo tramo no acerca al destino.
+ */
+function rankTroncalCandidates(originLocation, destinationLocation, settings) {
   const origin = toSitpPoint(originLocation);
   const destination = toSitpPoint(destinationLocation);
-  if (!origin || !destination) return null;
+  if (!origin || !destination) return [];
 
-  const candidates = [];
   const originToDestinationKm = haversineKm(origin, destination);
+  const candidates = [];
+
   for (const { station: boardingStation, walkKm: boardingWalkKm } of getBoardableStationsNear(origin, settings)) {
     const corridor = TRUNK_CORRIDORS_BY_ID[boardingStation.corridorId];
     if (!corridor) continue;
@@ -192,8 +230,14 @@ export function selectTroncalOption(originLocation, destinationLocation, options
     if (!alighting) continue;
     if (alighting.walkKm > settings.walkFromStationRadiusKm) continue;
 
-    const rideKm = rideLengthKm(corridor, boardingStation, alighting.station);
-    if (!Number.isFinite(rideKm) || rideKm < settings.minRideKm) continue;
+    const slice = sliceCorridorPath(
+      corridor.paths,
+      pointOfStation(boardingStation),
+      pointOfStation(alighting.station),
+    );
+    if (!slice) continue;
+    if (slice.distanceKm < settings.minRideKm) continue;
+    if (!doesCorridorApproachDestination(slice.path, origin, destination)) continue;
 
     const candidate = {
       boardingStation,
@@ -201,18 +245,16 @@ export function selectTroncalOption(originLocation, destinationLocation, options
       corridor,
       alightingStation: alighting.station,
       alightingWalkKm: alighting.walkKm,
-      rideKm,
+      rideKm: slice.distanceKm,
+      slice,
     };
     candidates.push({ ...candidate, score: scoreCandidate(candidate) });
   }
 
-  const best = candidates.sort((left, right) => right.score - left.score)[0];
-  if (!best) return null;
-  return { ...best, matchReason: describeMatch(best) };
+  return candidates.sort((left, right) => right.score - left.score);
 }
 
-/**
- * Construye la alternativa troncal completa, con los mismos pasos y advertencias
+/** Construye la alternativa troncal completa, con los mismos pasos y advertencias
  * que las demás, para que la interfaz pueda alternar sin cambiar de código.
  */
 export function buildTroncalAlternative({
@@ -222,14 +264,15 @@ export function buildTroncalAlternative({
   options = {},
 } = {}) {
   const settings = { ...TRUNK_ROUTING_OPTIONS, ...options };
-  const origin = toSitpPoint(originLocation);
-  const destination = toSitpPoint(destinationLocation);
-  if (!origin || !destination) return null;
-
-  const selection = selectTroncalOption(origin, destination, settings);
+  const selection = selectTroncalOption(originLocation, destinationLocation, settings);
   if (!selection) return null;
 
-  const { boardingStation, boardingWalkKm, corridor, alightingStation, alightingWalkKm, rideKm } = selection;
+  return buildPlanFromTroncalSelection(selection, settings, destinationLabel);
+}
+
+/** Ensambla el plan troncal publicable. */
+function buildPlanFromTroncalSelection(selection, settings, destinationLabel) {
+  const { boardingStation, boardingWalkKm, corridor, alightingStation, alightingWalkKm, rideKm, slice } = selection;
   const totalKm = boardingWalkKm + rideKm + alightingWalkKm;
 
   const steps = [];
@@ -340,8 +383,8 @@ export function buildTroncalAlternative({
       coordinates: pointOfStation(alightingStation),
     },
     cableIntegration: null,
-    path: joinPaths(...corridor.paths),
-    sitpPath: corridor.paths.map((path) => path.map((point) => [...point])),
+    path: slice ? slice.path : joinPaths(...corridor.paths),
+    sitpPath: slice ? slice.path : corridor.paths.map((path) => path.map((point) => [...point])),
     cablePath: [],
     steps,
     totalCostCop: VERIFIED_FACTS.sitpFareCop,

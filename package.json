@@ -10,18 +10,24 @@
     "test": "node --test \"src/**/*.test.js\" \"api/**/*.test.js\"",
     "extract:gtfs": "node scripts/build-gtfs-snapshot.mjs",
     "extract:sitp": "node scripts/build-sitp-snapshot.mjs",
-    "check": "npm test && npm run build"
+    "check": "npm test && npm run build",
+    "convert:three": "node scripts/convert-three-scene.mjs"
   },
   "dependencies": {
+    "@react-three/fiber": "^9.8.1",
+    "@react-three/postprocessing": "^3.1.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",
     "express": "^5.2.1",
     "firebase": "^12.19.0",
     "firebase-admin": "^14.5.0",
     "leaflet": "^1.9.4",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^7.9.1"
+    "n8ao": "^2.0.1",
+    "postprocessing": "^6.39.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.9.1",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.20",

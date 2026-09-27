@@ -23,6 +23,9 @@ const SOURCE_META = Object.freeze({
   sitp_stops_2026: { label: 'Paradero oficial · Transmilenio', verified: true },
   trunk_stations_2026: { label: 'Inventario de estaciones · Transmilenio', verified: true },
   trunk_corridors_2026: { label: 'Trazado troncal · Transmilenio', verified: true },
+  // Inventario del cable: estaciones con sus elevadores y línea con sus tramos.
+  cable_stations_2026: { label: 'Estación del cable · Transmilenio', verified: true },
+  cable_segments_2026: { label: 'Tramo del cable · Transmilenio', verified: true },
   planner_estimate: { label: 'Estimación del planificador', verified: false },
   transmilenio_2026: { label: 'Transmilenio', verified: true },
   gtfs_20260818: { label: 'GTFS SITP · 18-08-2026', verified: true },
@@ -114,23 +117,43 @@ export function officialPlanToItinerary(plan) {
   });
 
   // Los puntos de abordaje y transbordo son la pregunta que hace la gente, así
-  // que se declaran de forma explícita en vez de deducirse del texto. El tramo
-  // en bus vale lo mismo si es troncal o si es SITP zonal.
-  const busStep = steps.find((step) => step.mode === 'sitp' || step.mode === 'trunk');
-  if (busStep) {
-    busStep.boardAt = plan.boarding?.name ?? null;
-    busStep.alightAt = plan.alighting?.name ?? plan.cableIntegration?.stationName ?? null;
+  // que se declaran de forma explícita en vez de deducirse del texto. El tramo en
+  // vehículo vale lo mismo si es troncal, SITP zonal o cable.
+  const rideStep = steps.find(
+    (step) => step.mode === 'sitp' || step.mode === 'trunk' || step.mode === 'cable',
+  );
+  if (rideStep) {
+    rideStep.boardAt = plan.boarding?.name ?? null;
+    rideStep.alightAt = plan.alighting?.name ?? plan.cableIntegration?.stationName ?? null;
   }
+
+  // El cable solo se marca como transbordo cuando el viaje llega en bus. Si el
+  // cable *es* el medio principal, sobrescribir su abordaje con la estación de
+  // bajada diría que se sube donde se baja.
   const cableStep = steps.find((step) => step.mode === 'cable');
-  if (cableStep && plan.cableIntegration) {
-    cableStep.boardAt = plan.alighting?.name ?? plan.cableIntegration.stationName;
-    cableStep.alightAt = 'Tu destino';
+  const cableIsTransfer = cableStep && rideStep !== cableStep;
+  if (cableIsTransfer && plan.cableIntegration) {
+    // Se sube en la estación del cable, no en el paradero donde baja el bus. Son
+    // lugares distintos: el corredor del SITP pasa cerca de la estación y la
+    // persona termina el tramo a pie. Nombrar el paradero aquí hacía creer que el
+    // teleférico se aborda en la calle, a 336 m de la estación.
+    cableStep.boardAt = plan.cableLeg?.boardingStationName ?? plan.cableIntegration.stationName;
+    cableStep.alightAt = plan.cableLeg?.alightingStationName ?? 'la estación más cercana a tu destino';
   }
 
   return {
-    kind: plan.kind === 'official-trunk' ? 'official-trunk' : 'official-sitp',
+    kind:
+      plan.kind === 'official-trunk'
+        ? 'official-trunk'
+        : plan.kind === 'official-cable'
+          ? 'official-cable'
+          : 'official-sitp',
     kicker:
-      plan.kind === 'official-trunk' ? 'Alternativa troncal' : 'Alternativa oficial SITP',
+      plan.kind === 'official-trunk'
+        ? 'Alternativa troncal'
+        : plan.kind === 'official-cable'
+          ? 'Alternativa TransMiCable'
+          : 'Alternativa oficial SITP',
     title: plan.title,
     subtitle: plan.corridorLabel,
     badge: 'Datos oficiales',

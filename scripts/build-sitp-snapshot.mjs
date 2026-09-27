@@ -21,9 +21,9 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { CIUDAD_BOLIVAR_POLYGON, TRANSMICABLE_STATIONS } from '../src/data/routes.js';
-
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+
+const cableSnapshot = JSON.parse(await readFile(resolve(projectRoot, 'src/data/cable-snapshot.json'), 'utf8'));
 const routesInput = resolve(projectRoot, 'src/data/Servicios_Rutas_Troncales_y_Zonales.geojson');
 const stopsInput = resolve(projectRoot, 'src/data/paraderos.json');
 const routesOutput = resolve(projectRoot, 'src/data/sitp-routes-snapshot.json');
@@ -34,7 +34,7 @@ const routesOutputArg = process.argv[3] || routesOutput;
 const CB_LOCALITY_CODE = 19;
 
 /** Tolerancia de simplificación Douglas-Peucker, en grados (~22 m a esta latitud). */
-const SIMPLIFY_TOLERANCE = 0.0002;
+const SIMPLIFY_TOLERANCE = 0.0004;
 
 /** Radio máximo para considerar que una parada pertenece al corredor de una ruta. */
 const STOP_CORRIDOR_RADIUS_M = 150;
@@ -91,6 +91,21 @@ const SOURCE_URL =
 const STOPS_SOURCE_URL =
   'https://gis.transmilenio.gov.co/arcgis/rest/services/Zonal/consulta_paraderos/FeatureServer/0';
 
+/**
+ * Estaciones del cable con su identificador oficial (`num_est`).
+ *
+ * Se leen del extracto del cable y no de `routes.js` porque la integración de un
+ * corredor SITP con el cable tiene que apuntar al mismo identificador que usa el
+ * índice del cable en tiempo de ejecución. Si las dos fuentes quedaran
+ * desalineadas, ninguna alternativa que combine bus y cable encontraría su
+ * estación. Requiere haber corrido antes `build-cable-snapshot.mjs`.
+ */
+const CABLE_STATIONS = (cableSnapshot.stations ?? []).map((station) => ({
+  id: String(station.id),
+  name: station.name,
+  coordinates: [Number(station.coordinates[0].toFixed(5)), Number(station.coordinates[1].toFixed(5))],
+}));
+
 /* -------------------------------------------------------------------------- */
 /* Proyección local                                                           */
 /* -------------------------------------------------------------------------- */
@@ -107,19 +122,6 @@ function toXY([latitude, longitude]) {
 /* -------------------------------------------------------------------------- */
 /* Geometría                                                                  */
 /* -------------------------------------------------------------------------- */
-
-function isInsideLocality(latitude, longitude) {
-  let inside = false;
-  for (let i = 0, j = CIUDAD_BOLIVAR_POLYGON.length - 1; i < CIUDAD_BOLIVAR_POLYGON.length; j = i, i += 1) {
-    const [yi, xi] = CIUDAD_BOLIVAR_POLYGON[i];
-    const [yj, xj] = CIUDAD_BOLIVAR_POLYGON[j];
-    const straddles = yi > latitude !== yj > latitude;
-    if (straddles && longitude < ((xj - xi) * (latitude - yi)) / (yj - yi) + xi) {
-      inside = !inside;
-    }
-  }
-  return inside;
-}
 
 /** Distancia perpendicular de un punto al segmento AB, en grados. */
 function perpendicularDistance(point, start, end) {
@@ -190,7 +192,6 @@ const routesGeoJson = JSON.parse(await readFile(routesInput, 'utf8'));
 
 const selectedRoutes = [];
 let totalFeatures = 0;
-let insideLocalityCount = 0;
 let rejectedNotOperational = 0;
 let rejectedNotCommercial = 0;
 
@@ -202,11 +203,6 @@ for (const feature of routesGeoJson.features ?? []) {
   );
   if (parts.length === 0) continue;
 
-  const allPoints = parts.flat();
-  const insidePoints = allPoints.filter(([latitude, longitude]) => isInsideLocality(latitude, longitude));
-  if (insidePoints.length === 0) continue;
-  insideLocalityCount += 1;
-
   if (properties.est_ruta !== 1) {
     rejectedNotOperational += 1;
     continue;
@@ -216,16 +212,16 @@ for (const feature of routesGeoJson.features ?? []) {
     continue;
   }
 
-  const corridorFraction = insidePoints.length / allPoints.length;
-  if (corridorFraction < MIN_CORRIDOR_FRACTION) continue;
+  // El sentido se conserva tal como lo publica el operador: el extracto no marca
+  // en qué extremo arranca el bus, así que no se infiere. Se declara lo que dice.
 
   // El resto del proyecto representa puntos como [lat, lng]; se conserva ese orden.
   const simplifiedPaths = parts
     .map((part) =>
       simplifyPath(part, SIMPLIFY_TOLERANCE).map(([latitude, longitude]) => [
-        Number(latitude.toFixed(5)),
-        Number(longitude.toFixed(5)),
-      ])
+        Number(latitude.toFixed(4)),
+        Number(longitude.toFixed(4)),
+      ]),
     )
     .filter((part) => part.length > 1);
 
@@ -233,7 +229,7 @@ for (const feature of routesGeoJson.features ?? []) {
   const serviceType = SERVICE_TYPE_BY_COMPONENT[properties.comp_sitp]?.[properties.tip_serv] ?? 'Desconocido';
 
   let cableIntegration = null;
-  for (const station of TRANSMICABLE_STATIONS) {
+  for (const station of CABLE_STATIONS) {
     const distanceKm = distanceKmToPaths(station.coordinates, simplifiedPaths);
     if (distanceKm <= CABLE_INTEGRATION_RADIUS_KM && (!cableIntegration || distanceKm < cableIntegration.distanceKm)) {
       cableIntegration = {
@@ -248,7 +244,6 @@ for (const feature of routesGeoJson.features ?? []) {
   selectedRoutes.push({
     code: properties.cod_linea,
     id: properties.cod_ruta || `oid-${properties.objectid}`,
-    objectId: properties.objectid,
     name: properties.nom_ruta,
     origin: properties.orig_ruta,
     destination: properties.dest_ruta,
@@ -261,7 +256,6 @@ for (const feature of routesGeoJson.features ?? []) {
     isRural: properties.ruta_rural === 1,
     ruralStatus: RURAL_BY_CODE[properties.ruta_rural] ?? 'Por definir',
     operator: properties.oper_ruta || null,
-    implementedAt: properties.fec_impl || null,
     daysLabel: DAYS_BY_CODE[properties.dias_oper] ?? 'Desconocido',
     scheduleType: SCHEDULE_TYPE_BY_CODE[properties.tip_hor] ?? 'Desconocido',
     schedule: {
@@ -274,7 +268,6 @@ for (const feature of routesGeoJson.features ?? []) {
     originZone: { code: properties.zon_orig, name: ZONE_BY_CODE[properties.zon_orig] ?? 'Desconocida' },
     destinationZone: { code: properties.zon_dest, name: ZONE_BY_CODE[properties.zon_dest] ?? 'Desconocida' },
     lengthKm: Number.isFinite(lengthKm) && lengthKm < 1000 ? Number(lengthKm.toFixed(2)) : null,
-    corridorFraction: Number(corridorFraction.toFixed(3)),
     cableIntegration,
     boardingStop: null,
     alightingStop: null,
@@ -287,49 +280,162 @@ for (const feature of routesGeoJson.features ?? []) {
 /* -------------------------------------------------------------------------- */
 
 const stopsEsri = JSON.parse(await readFile(stopsInput, 'utf8'));
-const allStops = (stopsEsri.features ?? [])
-  .map((entry) => entry.attributes ?? {})
-  .filter((attributes) => attributes.localidad_ === CB_LOCALITY_CODE);
+const allStops = (stopsEsri.features ?? []).map((entry) => ({
+  ...(entry.attributes ?? {}),
+  __geometry: entry.geometry ?? null,
+}));
 
+/**
+ * El feed trae la posición en dos sitios y no siempre coinciden: hay registros con
+ * `latitud_pa` duplicada del longitud, y registros con 0,0. Se lee la geometría
+ * cuando los atributos no caen en el Distrito, y si tampoco la geometría sirve se
+ * descarta el registro en lugar de publicar un punto inventado.
+ */
+const DISTRICT_BOUNDS = { south: 4.3, west: -74.35, north: 4.85, east: -74.0 };
+
+function readCoordinates(attributes, geometry) {
+  const candidates = [
+    [attributes.latitud_pa, attributes.longitud_p],
+    geometry ? [geometry.y, geometry.x] : null,
+  ].filter(Boolean);
+
+  for (const [latitude, longitude] of candidates) {
+    const lat = Number(latitude);
+    const lon = Number(longitude);
+    const usable =
+      Number.isFinite(lat) &&
+      Number.isFinite(lon) &&
+      lat >= DISTRICT_BOUNDS.south &&
+      lat <= DISTRICT_BOUNDS.north &&
+      lon >= DISTRICT_BOUNDS.west &&
+      lon <= DISTRICT_BOUNDS.east;
+    if (usable) return [lat, lon];
+  }
+  return null;
+}
+
+/**
+ * Se conservan solo los campos que la interfaz usa. Con 7.653 paradas, incluir
+ * `consola_pa`, `panel_para` y `objectid` multiplicaba el archivo por dos sin que
+ * aportaran nada: son textos dirigidos al conductor y al panel del bus.
+ */
 const selectedStops = allStops
-  .filter((attributes) => Number.isFinite(attributes.latitud_pa) && Number.isFinite(attributes.longitud_p))
-  .map((attributes) => ({
-    id: attributes.cenefa_par,
-    objectId: attributes.objectid,
-    module: attributes.mdoulo_par || null,
-    name: attributes.nombre_par || attributes.via_parade || 'Paradero sin nombre',
-    street: attributes.via_parade || null,
-    address: attributes.direccion_ || null,
-    consoleText: attributes.consola_pa || null,
-    panelText: attributes.panel_para || null,
-    zone: { code: attributes.zona_parad, name: ZONE_BY_CODE[attributes.zona_parad] ?? 'Desconocida' },
-    locality: { code: attributes.localidad_, name: LOCALITY_BY_CODE[attributes.localidad_] ?? 'Desconocida' },
-    coordinates: [Number(attributes.latitud_pa.toFixed(5)), Number(attributes.longitud_p.toFixed(5))],
-  }))
-  .filter((stop) => Boolean(stop.id));
+  .map((attributes) => {
+    const geometry = attributes.__geometry;
+    const coordinates = readCoordinates(attributes, geometry);
+    if (!coordinates) return null;
+    return {
+      id: attributes.cenefa_par,
+      name: attributes.nombre_par || attributes.via_parade || 'Paradero sin nombre',
+      street: attributes.via_parade || attributes.direccion_ || null,
+      zone: { code: attributes.zona_parad, name: ZONE_BY_CODE[attributes.zona_parad] ?? 'Desconocida' },
+      locality: { code: attributes.localidad_, name: LOCALITY_BY_CODE[attributes.localidad_] ?? 'Desconocida' },
+      coordinates: [Number(coordinates[0].toFixed(4)), Number(coordinates[1].toFixed(4))],
+    };
+  })
+  .filter((stop) => stop && Boolean(stop.id));
 
 /* -------------------------------------------------------------------------- */
 /* Puntos de abordaje y de bajada                                              */
 /* -------------------------------------------------------------------------- */
 
 /**
+ * Índice de rejilla sobre los paraderos.
+ *
+ * Comparar 682 corredores contra 7.653 paraderos punto a punto son cinco millones
+ * de medidas por segmento: minutes of CPU. Con una rejilla de ~1,1 km cada
+ * corredor solo consulta las celdas que su envolvente puede tocar, y el tiempo
+ * baja a segundos sin cambiar el resultado.
+ */
+const GRID_CELL_DEGREES = 0.01;
+const GRID_CELL_METERS = GRID_CELL_DEGREES * METERS_PER_DEGREE_LATITUDE;
+
+function buildStopGrid(stops) {
+  const grid = new Map();
+  const pad = Math.ceil(STOP_CORRIDOR_RADIUS_M / GRID_CELL_METERS);
+
+  for (const stop of stops) {
+    const [latitude, longitude] = stop.coordinates;
+    const cellX = Math.floor(longitude / GRID_CELL_DEGREES);
+    const cellY = Math.floor(latitude / GRID_CELL_DEGREES);
+    for (let dy = -pad; dy <= pad; dy += 1) {
+      for (let dx = -pad; dx <= pad; dx += 1) {
+        const key = `${cellX + dx}:${cellY + dy}`;
+        if (!grid.has(key)) grid.set(key, []);
+        grid.get(key).push(stop);
+      }
+    }
+  }
+  return { grid, pad };
+}
+
+function* candidatesNear(grid, latitude, longitude) {
+  const cellX = Math.floor(longitude / GRID_CELL_DEGREES);
+  const cellY = Math.floor(latitude / GRID_CELL_DEGREES);
+  for (let dy = -grid.pad; dy <= grid.pad; dy += 1) {
+    for (let dx = -grid.pad; dx <= grid.pad; dx += 1) {
+      const bucket = grid.grid.get(`${cellX + dx}:${cellY + dy}`);
+      if (bucket) yield* bucket;
+    }
+  }
+}
+
+function boundingBoxOfPaths(paths) {
+  let south = Infinity;
+  let west = Infinity;
+  let north = -Infinity;
+  let east = -Infinity;
+  for (const path of paths) {
+    for (const [latitude, longitude] of path) {
+      if (latitude < south) south = latitude;
+      if (latitude > north) north = latitude;
+      if (longitude < west) west = longitude;
+      if (longitude > east) east = longitude;
+    }
+  }
+  return { south, west, north, east };
+}
+
+/**
  * El extracto no publica una matriz de paradas por ruta, y aproximarla no sirve:
- * en Ciudad Bolívar las arteriales concentran paradas, así que una parada queda
- * a menos de 150 m de más de cien corredores. Guardar esa lista como "rutas que
- * sirven la parada" sería falso.
+ * en las arteriales de la ciudad las paradas se concentran, así que un solo
+ * paradero queda a menos de 150 m de más de cien corredores. Guardar esa lista
+ * como "rutas que sirven la parada" sería falso.
  *
  * En su lugar se guarda un único punto por extremo, que sí es defendible:
  *   - `boardingStop`: el paradero más cercano al propio trazado del corredor;
  *   - `alightingStop`: el paradero más cercano a la estación de integración.
  */
+const stopGrid = buildStopGrid(selectedStops);
+
+function* stopsNearPaths(paths, bounds) {
+  const seen = new Set();
+  const south = bounds.south - GRID_CELL_DEGREES * 1.5;
+  const north = bounds.north + GRID_CELL_DEGREES * 1.5;
+  const west = bounds.west - GRID_CELL_DEGREES * 1.5;
+  const east = bounds.east + GRID_CELL_DEGREES * 1.5;
+
+  for (let cellY = Math.floor(south / GRID_CELL_DEGREES); cellY <= Math.floor(north / GRID_CELL_DEGREES); cellY += 1) {
+    for (let cellX = Math.floor(west / GRID_CELL_DEGREES); cellX <= Math.floor(east / GRID_CELL_DEGREES); cellX += 1) {
+      const bucket = stopGrid.grid.get(`${cellX}:${cellY}`);
+      if (!bucket) continue;
+      for (const stop of bucket) {
+        if (seen.has(stop.id)) continue;
+        seen.add(stop.id);
+        yield stop;
+      }
+    }
+  }
+}
 
 function nearestStopToPaths(stops, paths) {
   const pathMeters = paths.map((path) => path.map(([latitude, longitude]) => toXY([latitude, longitude])));
   let best = null;
   for (const stop of stops) {
+    const pointMeters = toXY(stop.coordinates);
     let closest = Infinity;
     for (const path of pathMeters) {
-      const measured = measureAgainstPath(toXY(stop.coordinates), path);
+      const measured = measureAgainstPath(pointMeters, path);
       if (measured.distanceMeters < closest) closest = measured.distanceMeters;
     }
     if (!best || closest < best.distanceMeters) {
@@ -339,10 +445,10 @@ function nearestStopToPaths(stops, paths) {
   return best;
 }
 
-function nearestStopToPoint(stops, point) {
+function nearestStopToPoint(point) {
   const [targetX, targetY] = toXY(point);
   let best = null;
-  for (const stop of stops) {
+  for (const stop of candidatesNear(stopGrid, point[0], point[1])) {
     const [stopX, stopY] = toXY(stop.coordinates);
     const distanceMeters = Math.hypot(stopX - targetX, stopY - targetY);
     if (!best || distanceMeters < best.distanceMeters) best = { stop, distanceMeters };
@@ -361,11 +467,12 @@ function describeStop(entry) {
 }
 
 for (const route of selectedRoutes) {
-  const boarding = nearestStopToPaths(selectedStops, route.paths);
+  const bounds = boundingBoxOfPaths(route.paths);
+  const boarding = nearestStopToPaths([...stopsNearPaths(route.paths, bounds)], route.paths);
   const station = route.cableIntegration
-    ? TRANSMICABLE_STATIONS.find((item) => item.id === route.cableIntegration.stationId)
+    ? CABLE_STATIONS.find((item) => item.id === route.cableIntegration.stationId)
     : null;
-  const alighting = station ? nearestStopToPoint(selectedStops, station.coordinates) : null;
+  const alighting = station ? nearestStopToPoint(station.coordinates) : null;
 
   route.boardingStop = describeStop(boarding);
   route.alightingStop = describeStop(alighting);
@@ -384,14 +491,14 @@ const cableIntegrated = selectedRoutes.filter((route) => route.cableIntegration)
 
 const routesSnapshot = {
   metadata: {
-    title: 'Extracto de servicios del SITP para Ciudad Bolívar',
+    title: 'Extracto de servicios del SITP para el Distrito Capital',
     source: 'TRANSMILENIO S.A. — Servicios (Rutas Troncales y Zonales)',
     sourceUrl: SOURCE_URL,
     license: 'CC BY 4.0',
     generatedAt: new Date().toISOString(),
-    locality: { code: CB_LOCALITY_CODE, name: LOCALITY_BY_CODE[CB_LOCALITY_CODE] },
+    scope: 'Distrito Capital de Bogotá D.C.',
+    focusLocality: { code: CB_LOCALITY_CODE, name: LOCALITY_BY_CODE[CB_LOCALITY_CODE] },
     sourceFeatures: totalFeatures,
-    featuresInsideLocality: insideLocalityCount,
     rejectedNotOperational: rejectedNotOperational,
     rejectedNotCommercial: rejectedNotCommercial,
     selectedRoutes: selectedRoutes.length,
@@ -399,28 +506,30 @@ const routesSnapshot = {
     stopCorridorRadiusMeters: STOP_CORRIDOR_RADIUS_M,
     cableIntegrationRadiusKm: CABLE_INTEGRATION_RADIUS_KM,
     note:
-      'Solo se conservan rutas operativas y comerciales cuyo trazado entra a Ciudad Bolívar. ' +
+      'Se conservan todas las rutas operativas y comerciales del Distrito, no solo las de Ciudad Bolívar. ' +
       'El punto de abordaje es el paradero más cercano al trazado dentro de ' +
       `${STOP_CORRIDOR_RADIUS_M} m: es una inferencia geográfica, no una matriz oficial de paradas por ruta. ` +
-      'Los horarios son ventanas de operación del operador, no despachos programados.',
+      'Los horarios son ventanas de operación del operador, no despachos programados. ' +
+      'El extracto no marca en qué extremo arranca el bus, así que el sentido se publica tal como lo declara el operador.',
   },
   routes: routesWithStops,
 };
 
 const stopsSnapshot = {
   metadata: {
-    title: 'Extracto de paraderos zonales del SITP para Ciudad Bolívar',
+    title: 'Extracto de paraderos zonales del SITP para el Distrito Capital',
     source: 'TRANSMILENIO S.A. — Paraderos Zonales del SITP',
     sourceUrl: STOPS_SOURCE_URL,
     license: 'CC BY 4.0',
     generatedAt: new Date().toISOString(),
-    locality: { code: CB_LOCALITY_CODE, name: LOCALITY_BY_CODE[CB_LOCALITY_CODE] },
+    scope: 'Distrito Capital de Bogotá D.C.',
+    focusLocality: { code: CB_LOCALITY_CODE, name: LOCALITY_BY_CODE[CB_LOCALITY_CODE] },
     sourceStops: (stopsEsri.features ?? []).length,
     selectedStops: selectedStops.length,
     note:
       'El identificador es la cenefa del paradero, no un código de ruta: no permite unir de forma ' +
       'directa una parada con las rutas que la sirven. Para eso se usa la proximidad sobre el trazado, ' +
-      'y el resultado vive en `routes[].stopIds` del extracto de rutas.',
+      'y el resultado vive en `routes[].boardingStop` del extracto de rutas.',
   },
   stops: selectedStops,
 };
@@ -442,7 +551,7 @@ console.log(
     `  routes : ${routesWithStops.length} operativas/comerciales (de ${totalFeatures} features; ${rejectedNotOperational} no operativas, ${rejectedNotCommercial} no comerciales descartadas)`,
     `  cable  : ${cableIntegrated.length} rutas a <= ${CABLE_INTEGRATION_RADIUS_KM} km de una estación TransMiCable`,
     `  rural  : ${routesWithStops.filter((route) => route.isRural).length} rutas rurales`,
-    `  stops  : ${selectedStops.length} paraderos en Ciudad Bolívar`,
+    `  stops  : ${selectedStops.length} paraderos del SITP en el Distrito`,
     `  geom   : ${vertices} vértices tras simplificar a ~${Math.round(SIMPLIFY_TOLERANCE * METERS_PER_DEGREE_LATITUDE)} m`,
     `  -> ${routesOutputArg}`,
     `  -> ${stopsOutput}`,

@@ -19,6 +19,7 @@ import { useToast } from '../../hooks/useToast';
 import { useReports } from '../../hooks/useReports';
 import { useSitpData } from '../../hooks/useSitpData';
 import Header from '../../components/Header';
+import BusSceneBackdrop from '../../components/BusSceneBackdrop';
 import Hero from '../../components/Hero';
 import DemoStrip from '../../components/DemoStrip';
 import Workspace from '../../components/Workspace';
@@ -1033,29 +1034,45 @@ export default function Home() {
       />
 
       <main id="contenido">
-        <Hero
-          origin={origin}
-          destination={destination}
-          deadline={deadline}
-          priorityMode={priorityMode}
-          onOriginChange={updateOriginText}
-          onDestinationChange={updateDestinationText}
-          onOriginLocationSelect={selectOriginLocation}
-          onDestinationLocationSelect={selectDestinationLocation}
-          onUseCurrentLocation={handleUseCurrentLocation}
-          isLocatingOrigin={isLocatingOrigin}
-          originStatus={originStatus}
-          originError={originError}
-          plannerError={plannerError}
-          isCalculating={
-            isResolvingPlanner ||
-            roadRouteStatus === 'loading' ||
-            transferRoutesStatus === 'loading'
-          }
+        <div className="hero-stage">
+          {/*
+            Maqueta 3D de buses como fondo del hero.
+
+            Va dentro de una etapa propia y antes del `Hero` en el orden del
+            DOM, con `position: absolute`: asi el lienzo no reserva espacio ni
+            participa del flujo, y el hero queda exactamente donde estaba. El
+            `z-index` explicito es lo que pone el texto del titular y la tarjeta
+            del planificador por encima de la escena.
+
+            Es decoracion pura: no recibe estado del planificador, de modo que la
+            escena no se vuelve a renderizar cuando cambia el origen o el
+            destino.
+          */}
+          <BusSceneBackdrop />
+          <Hero
+            origin={origin}
+            destination={destination}
+            deadline={deadline}
+            priorityMode={priorityMode}
+            onOriginChange={updateOriginText}
+            onDestinationChange={updateDestinationText}
+            onOriginLocationSelect={selectOriginLocation}
+            onDestinationLocationSelect={selectDestinationLocation}
+            onUseCurrentLocation={handleUseCurrentLocation}
+            isLocatingOrigin={isLocatingOrigin}
+            originStatus={originStatus}
+            originError={originError}
+            plannerError={plannerError}
+            isCalculating={
+              isResolvingPlanner ||
+              roadRouteStatus === 'loading' ||
+              transferRoutesStatus === 'loading'
+            }
           onDeadlineChange={setDeadline}
           onPriorityModeChange={setPriorityMode}
           onSubmit={handlePlannerSubmit}
-        />
+          />
+        </div>
 
         <DemoStrip onRunDemo={runDemo} />
 

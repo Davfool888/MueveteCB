@@ -1,0 +1,52 @@
+/* ================================================================
+   Escena 3D a pantalla completa. Sin interfaz de usuario.
+   ================================================================ */
+
+:root {
+  --mint-bg: #ddefe5;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--mint-bg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  isolation: isolate;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+  background: var(--mint-bg);
+}
+
+.stage canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+  touch-action: none;
+}
+
+/* Sin seleccion de texto ni interaccion de interfaz sobre el lienzo */
+.stage canvas * {
+  user-select: none;
+}

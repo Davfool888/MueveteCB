@@ -30,6 +30,55 @@
   --radius-sm: 12px;
   --radius-md: 18px;
   --radius-lg: 28px;
+
+  /* ------------------------------------------------------------------
+     Estetica "softpop" de la maqueta 3D, replicada para la interfaz.
+     ------------------------------------------------------------------
+     Estos tonos vienen de `src/three/lib/palette.js`, que es la fuente y la
+     que usa la escena 3D: si se cambia un color aqui, hay que cambiarlo alla
+     para que la pagina y la maqueta sigan siendo la misma paleta.
+
+     Solo se replica el color y la forma. La tipografia y el contraste de los
+     datos se quedan como estaban: la interfaz muestra paraderos, kilometros y
+     precios, y ahi la legibilidad manda sobre la estetica. La escena 3D es
+     decoracion; estos bloques son los que alguien lee para decidir como
+     moverse.
+     */
+  --softpop-background: #e6f1e9;
+  --softpop-mint: #bcdcc6;
+  --softpop-leaf: #9ac8a4;
+  --softpop-leaf-light: #afd6b6;
+  --softpop-grass: #a6d2b0;
+  --softpop-emerald-dark: #4e8e70;
+  --softpop-road: #b9b7c6;
+  --softpop-curb: #cfe2d6;
+  --softpop-bus-blue: #b4ccdc;
+  --softpop-bus-pink: #e8c4cc;
+  --softpop-bus-butter: #eadeb4;
+  --softpop-bus-white: #f2ece2;
+  --softpop-cabin-lilac: #cec0e0;
+  --softpop-cabin-mint: #bcd8c8;
+  --softpop-wall: #e8e0ce;
+  --softpop-roof: #f0dcc0;
+
+  /* Superficies blandas: el mismo papel-crema y verde-menta que la maqueta. */
+  --softpop-surface: #fbfaf5;
+  --softpop-surface-2: #f1f6f1;
+  --softpop-line: #dbe8de;
+
+  /* Radios mas generosos: leen como plastico moldeado, no como cajas. */
+  --softpop-radius-sm: 14px;
+  --softpop-radius-md: 22px;
+  --softpop-radius-lg: 32px;
+  --softpop-radius-pill: 999px;
+
+  /* Sombras difusas. En la escena 3D la oclusion ambiental profunda hace este
+     trabajo: es lo que da lectura de "hinchado". Aqui se traduce a sombras de
+     caja mas anchas y menos densas. */
+  --softpop-shadow-sm: 0 8px 26px rgba(78, 142, 112, 0.1);
+  --softpop-shadow-md: 0 22px 64px rgba(78, 142, 112, 0.16);
+  --softpop-shadow-lg: 0 34px 90px rgba(78, 142, 112, 0.2);
+  --softpop-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
   --font-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -316,8 +365,17 @@ svg {
   height: 20px;
 }
 
+/* Etapa del hero: contiene el fondo 3D y el contenido. Existe para que el
+   lienzo pueda ser `position: absolute` respecto de esta caja y no de la
+   pagina entera, sin tener que darle una altura a mano. */
+.hero-stage {
+  position: relative;
+  isolation: isolate;
+}
+
 .hero {
   position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1.18fr) minmax(380px, 0.82fr);
   gap: clamp(48px, 8vw, 110px);
@@ -4101,4 +4159,92 @@ svg {
   text-transform: uppercase;
   color: var(--ink-soft);
   opacity: 0.8;
+}
+
+/* Encabezado de medio dentro de la fila de pestañas: separa "estas opciones son
+   de bus SITP" de "estas otras son de troncal", para que una lista larga de
+   códigos no se lea como un solo grupo. */
+.mode-pill-group {
+  align-self: center;
+  padding: 0 6px 0 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #1d5c86;
+  white-space: nowrap;
+}
+
+.mode-pill-group + .mode-pill {
+  margin-left: 0;
+}
+
+/* ==================================================================
+   Fondo animado del Home - maqueta 3D de buses
+   ==================================================================
+   El lienzo va detras del contenido, no dentro de el: por eso el
+   contenedor no participa del flujo y el contenido se posiciona encima
+   con `position: relative`.
+
+   `pointer-events: none` es lo que permite que el planificador de rutas
+   montado encima siga siendo pulsable a traves del canvas. Sin esa linea
+   el hero entero quedaria muerto para el raton.
+   */
+
+.bus-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  /* Mismo fondo que la escena (`COLORS.background`). Si el WebGL no carga, o si
+     la persona pidio menos movimiento, esto es lo que se ve. */
+  background: var(--softpop-background);
+}
+
+/* Degradado que funde el borde inferior de la maqueta con la pagina, para que
+   la losa no termine en un corte recto contra el papel. */
+.bus-scene::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 34%;
+  background: linear-gradient(to bottom, rgba(230, 241, 233, 0) 0%, var(--paper) 92%);
+  pointer-events: none;
+}
+
+.bus-scene canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+  /*
+    Bajado a proposito. La maqueta va detras del titular, de la columna de datos
+    y de la tarjeta del planificador, y los tres son contenido. A opacidad
+    plena compite con el texto; al 60% se lee como horizonte de fondo y el texto
+    sigue siendo lo que manda. El color pastel de la escena ya es claro de por
+    si, asi que no hace falta mas contraste para verla.
+  */
+  opacity: 0.6;
+}
+
+/* Antes de que el lienzo este listo se ve solo el fondo y el degradado. El
+   bloque no se oculta con `display: none` porque el degradado forma parte del
+   diseno y sin el la transicion seria un salto. */
+.bus-scene--pending {
+  opacity: 0;
+}
+
+.bus-scene--pending::after {
+  opacity: 1;
+}
+
+.bus-scene.is-ready {
+  opacity: 1;
+  transition: opacity 420ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bus-scene.is-ready {
+    transition: none;
+  }
 }

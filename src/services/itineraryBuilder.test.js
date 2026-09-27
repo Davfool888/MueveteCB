@@ -29,12 +29,28 @@ function fakeOfficialPlan() {
     dataStatus: 'official-geometry-estimated-time',
     boarding: { stopId: 'x', name: 'Br. Meissen', street: 'AC 60G S', walkKm: 0.1, coordinates: [4.56, -74.13] },
     alighting: { stopId: 'y', name: 'Br. El Mirador', coordinates: [4.55, -74.14] },
-    cableIntegration: { stationId: 'tunal', stationName: 'Portal Tunal', distanceKm: 0.04, coordinates: [4.56917, -74.13968] },
+    cableIntegration: {
+      stationId: '102',
+      stationName: 'Juan Pablo II',
+      distanceKm: 0.04,
+      walkFromAlightingKm: 0.34,
+      coordinates: [4.55579, -74.14742],
+    },
+    cableLeg: {
+      boardingStationId: '102',
+      boardingStationName: 'Juan Pablo II',
+      alightingStationId: '104',
+      alightingStationName: 'Mirador Del Paraiso',
+      rideKm: 1.63,
+      walkKm: 0.2,
+      path: [],
+    },
     warnings: ['Los horarios son ventanas del operador.'],
     steps: [
       { order: 1, mode: 'sitp', instruction: 'Toma la ruta 6-2', detail: 'Alimentación · Padrón', durationMinutes: 16, estimatedCostCop: 3550, source: 'sitp_services_2026' },
       { order: 2, mode: 'walk', instruction: 'Baja en Br. El Mirador', detail: null, durationMinutes: 0, estimatedCostCop: null, source: 'sitp_stops_2026' },
-      { order: 3, mode: 'cable', instruction: 'Toma TransMiCable', detail: null, durationMinutes: 9, estimatedCostCop: null, source: 'transmilenio_2026' },
+      { order: 3, mode: 'walk', instruction: 'Camina 340 m hasta Juan Pablo II', detail: null, durationMinutes: 5, estimatedCostCop: 0, stopId: '102', source: 'cable_stations_2026' },
+      { order: 4, mode: 'cable', instruction: 'Sube al TransMiCable hacia Mirador Del Paraiso', detail: null, durationMinutes: 9, estimatedCostCop: null, stopId: '102', source: 'cable_segments_2026' },
     ],
   };
 }
@@ -48,8 +64,32 @@ test('el itinerario oficial declara dónde abordar y dónde bajar en cada tramo'
 
   assert.equal(sitp.boardAt, 'Br. Meissen', 'el tramo SITP debe nombrar el paradero de abordaje');
   assert.equal(sitp.alightAt, 'Br. El Mirador');
-  assert.equal(cable.boardAt, 'Br. El Mirador', 'el transbordo debe decir dónde se baja');
-  assert.ok(cable.boardAt, 'el tramo del cable debe declarar el punto de transbordo');
+  assert.ok(cable.boardAt, 'el tramo del cable debe declarar dónde se sube');
+  assert.ok(cable.alightAt, 'el tramo del cable debe declarar dónde se baja');
+});
+
+test('el cable se aborda en la estación, no en el paradero donde baja el bus', () => {
+  // El corredor del SITP pasa cerca de la estación y la persona termina el tramo
+  // a pie. Nombrar el paradero como punto de abordaje del teleférico hacía creer
+  // que se sube en la calle, a 340 m de la estación.
+  const itinerary = officialPlanToItinerary(fakeOfficialPlan());
+  const cable = itinerary.steps.find((step) => step.mode === 'cable');
+
+  assert.equal(cable.boardAt, 'Juan Pablo II');
+  assert.equal(cable.alightAt, 'Mirador Del Paraiso');
+  assert.notEqual(cable.boardAt, 'Br. El Mirador');
+  assert.notEqual(cable.boardAt, 'Br. Meissen');
+});
+
+test('el transbordo al cable declara el paseo a pie que lo separa del bus', () => {
+  const itinerary = officialPlanToItinerary(fakeOfficialPlan());
+  const approach = itinerary.steps.find(
+    (step) => step.mode === 'walk' && step.title.includes('Juan Pablo II'),
+  );
+  assert.ok(approach, 'debe existir el paso a pie hasta la estación del cable');
+  assert.equal(approach.title, 'Camina 340 m hasta Juan Pablo II');
+  assert.notEqual(approach.durationLabel, '0 min', 'ese paseo no puede costar cero minutos');
+  assert.equal(approach.verified, true, 'la estación del cable viene del inventario del operador');
 });
 
 test('el itinerario oficial marca como verificados los tramos de Transmilenio', () => {

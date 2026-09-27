@@ -1,5 +1,5 @@
 import { GTFS_ANCHOR_STOPS, GTFS_CB_SNAPSHOT } from '../data/gtfsIndex.js';
-import { CABLE_PATH, TRANSMICABLE_STATIONS } from '../data/routes.js';
+import { CABLE_LINE_PATH, CABLE_STATIONS } from '../data/cableIndex.js';
 import { VEREDAL_ROUTES } from '../data/veredalRoutes.js';
 import { hasLocationCoordinates } from '../utils/locationRoute.js';
 import { getRoadRouteKey } from './roadRouting.js';
@@ -57,7 +57,7 @@ const INTEGRATION_CANDIDATES = [
     coordinates: stop.coordinates,
     source: 'gtfs_20260818',
   })),
-  ...TRANSMICABLE_STATIONS.map((station) => ({
+  ...CABLE_STATIONS.map((station) => ({
     id: station.id,
     name: station.name,
     coordinates: station.coordinates,
@@ -449,7 +449,7 @@ export function getNearestTransmicableStation(point, options = {}) {
   );
 
   let nearest = null;
-  TRANSMICABLE_STATIONS.forEach((station) => {
+  CABLE_STATIONS.forEach((station) => {
     const candidate = stationWithDistance(station, pointValue);
     if (!candidate) return;
     if (candidate.distanceKm > radiusKm) return;
@@ -463,7 +463,7 @@ export function getNearestTransmicableStation(point, options = {}) {
 function stationIndex(station) {
   const knownStation = stationByIdOrPoint(station);
   if (!knownStation) return -1;
-  return CABLE_PATH.findIndex((point) =>
+  return CABLE_LINE_PATH.findIndex((point) =>
     samePoint(point, knownStation.coordinates, 0.02),
   );
 }
@@ -471,7 +471,7 @@ function stationIndex(station) {
 function stationByIdOrPoint(station) {
   const stationId = station?.stationId || station?.id;
   if (stationId) {
-    const byId = TRANSMICABLE_STATIONS.find(
+    const byId = CABLE_STATIONS.find(
       (candidate) => candidate.id === stationId || candidate.id === String(stationId),
     );
     if (byId) return byId;
@@ -479,7 +479,7 @@ function stationByIdOrPoint(station) {
   const point = stationPoint(station);
   if (!point) return null;
   return (
-    TRANSMICABLE_STATIONS.find((candidate) => samePoint(candidate.coordinates, point, 0.05)) ||
+    CABLE_STATIONS.find((candidate) => samePoint(candidate.coordinates, point, 0.05)) ||
     null
   );
 }
@@ -494,7 +494,7 @@ export function getCablePathBetweenStations(fromStation, toStation) {
   const toIndex = stationIndex(toStation);
   if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return [];
 
-  const path = CABLE_PATH.slice(
+  const path = CABLE_LINE_PATH.slice(
     Math.min(fromIndex, toIndex),
     Math.max(fromIndex, toIndex) + 1,
   );
@@ -512,7 +512,7 @@ export function getCablePathBetweenStations(fromStation, toStation) {
 function getCableExitStation(destination, options = {}) {
   const destinationPoint = toPoint(destination);
   if (!destinationPoint) return null;
-  const stations = TRANSMICABLE_STATIONS.map((station) => stationWithDistance(station, destinationPoint));
+  const stations = CABLE_STATIONS.map((station) => stationWithDistance(station, destinationPoint));
   stations.sort((left, right) => left.distanceKm - right.distanceKm);
   const nearest = stations[0] || null;
   if (!nearest) return null;

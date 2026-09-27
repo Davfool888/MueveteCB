@@ -1,0 +1,115 @@
+export const COLORS = {
+  /* Fondo / suelo global */
+  background: "#E6F1E9",
+  ground: "#E6F1E9",
+  /* Plataforma (losa hinchada, mismo color en tapa y cantos) */
+  platformTop: "#BCDCC6",
+  /* Verdos pastel */
+  emeraldDark: "#4E8E70",
+  leaf: "#9AC8A4",
+  leafLight: "#AFD6B6",
+  leafDark: "#82B592",
+  grass: "#A6D2B0",
+  grassLight: "#B4DCBC",
+  grassDeep: "#96C8A4",
+  bush: "#8EC29C",
+  moss: "#7CB48C",
+  /* Calles (gris lavanda muy claro) */
+  road: "#B9B7C6",
+  roadLine: "#F6F4F9",
+  curb: "#CFE2D6",
+  /* Neutros */
+  white: "#FFFFFF",
+  wall: "#E8E0CE",
+  wallAlt: "#DCE8D8",
+  creamDark: "#D6CDB8",
+  stone: "#D4D8D2",
+  stoneDark: "#B8C0B8",
+  rock: "#C8CEC6",
+  rockAlt: "#BCC4BC",
+  rockLight: "#D8DCD4",
+  /* Arquitectura pastel */
+  roof: "#F0DCC0",
+  roofDark: "#DCC4A4",
+  roofDeep: "#E8CCAC",
+  awning: "#BCD8C4",
+  awningLight: "#CFE4D4",
+  awningStripe: "#FFFFFF",
+  buildingMint: "#C2DEC8",
+  buildingLavender: "#D2C8E0",
+  buildingPeach: "#F0D2B8",
+  buildingButter: "#E8DEBC",
+  buildingSky: "#C4D8E0",
+  /* Vehiculos */
+  busBlue: "#B4CCDC",
+  busPink: "#E8C4CC",
+  busButter: "#EADEB4",
+  busWhite: "#F2ECE2",
+  jeepGreen: "#B2BE96",
+  jeepOlive: "#A8A882",
+  jeepRust: "#C6A68A",
+  jeepSage: "#A2B69C",
+  jeepCream: "#E6DCC4",
+  glass: "#C8DDE8",
+  glassDark: "#9AB4C4",
+  glassCabin: "#C4DCE8",
+  tire: "#5A5E62",
+  hub: "#D2D6DA",
+  chrome: "#C8CCD0",
+  /* Teleférico */
+  cableSteel: "#A8AEB4",
+  tower: "#C2C8CE",
+  cabinShell: "#EAE6F0",
+  cabinFrame: "#B4BAC0",
+  cabinLilac: "#CEC0E0",
+  cabinPeach: "#EAC6AE",
+  cabinMint: "#BCD8C8",
+  cabinButter: "#EADCB4",
+  /* Terreno */
+  trunk: "#A88A6E",
+  dirt: "#CFCED8",
+  /* Nubes */
+  cloud: "#FFFFFF",
+  cloudShade: "#EAF2EC",
+  /* Isla central */
+  water: "#AED8E4",
+  waterDeep: "#9ACCD8",
+  mushroomCap: "#E8B49A",
+  mushroomStem: "#F2E6D8",
+  mushroomDot: "#F8F2E8",
+  kioskBody: "#F0EAE0",
+  kioskRoof: "#DCD6C8",
+  path: "#E4DECE",
+  /* Utileria pequena */
+  counter: "#DED2B8",
+  crate: "#C0A888",
+  lamp: "#FAF4E4",
+  lampGlow: "#FFF0CC",
+  hutPurple: "#D2C6E2",
+  hutBlue: "#BCD6E0",
+  /* Personas */
+  skin: "#F0D4BC",
+  trousers: "#8A9098",
+  personRed: "#E0A898",
+  personBlue: "#A8BCCE",
+  personYellow: "#E8D4A0",
+  personPurple: "#C4B4D4",
+  personGreen: "#A8C8AE",
+  personRust: "#D8B49C",
+  /* Texto de la maqueta */
+  text: "#7FB896",
+  textSide: "#66A07D",
+  /* Iluminacion (muy difusa, sin contrastes duros) */
+  lightKey: "#FFFDF8",
+  lightFill: "#F0F6FA",
+  lightAmbient: "#FAFFFC",
+  lightBounce: "#D0E4D8"
+};
+export const MATERIAL = {
+  ground: { roughness: 1, metalness: 0 },
+  platform: { roughness: 0.95, metalness: 0 },
+  vehicle: { roughness: 0.62, metalness: 0.04 },
+  building: { roughness: 0.88, metalness: 0 },
+  /** Aspecto de gomaespoma / plastico mate. */
+  soft: { roughness: 0.82, metalness: 0 }
+};

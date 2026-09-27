@@ -1,5 +1,7 @@
 // ─── Data constants for Muevete CB (Ciudad Bolívar) ─────────────────────────
 
+import { CABLE_LINE_PATH } from './cableIndex.js';
+
 /** Bounding box strictly restricting view/pan to Localidad 19 (Ciudad Bolívar) */
 export const CIUDAD_BOLIVAR_BOUNDS = [
   [4.4150, -74.2250], // Suroeste (Mochuelo Alto / Pasquilla)
@@ -31,13 +33,16 @@ export const CIUDAD_BOLIVAR_POLYGON = [
   [4.5980, -74.1380], // Cierre
 ];
 
-/** Trazado de referencia entre las cuatro estaciones del GTFS 2026-08-18. */
-export const CABLE_PATH = [
-  [4.56917, -74.13968], // Portal Tunal
-  [4.55578995, -74.1473999], // Juan Pablo II
-  [4.55028009, -74.15049744], // Manitas
-  [4.55009985, -74.1588974], // Mirador del Paraíso
-];
+/**
+ * Trazado de la línea del TransMiCable.
+ *
+ * Antes era una lista de cuatro coordenadas escritas a mano, con los nombres de
+ * estación de streets. Ahora sale del inventario del operador (`cableIndex.js`),
+ * que además trae la línea como polilínea de tres tramos y no como cuatro puntos
+ * sueltos. `data/cable-snapshot.json` es el único lugar donde esa geometría se
+ * define.
+ */
+export const CABLE_PATH = CABLE_LINE_PATH.map((point) => [...point]);
 
 /**
  * Tramos recortados de shapes.txt del GTFS 2026-08-18 (puntos cada ≥120 m).
@@ -66,41 +71,14 @@ export const SITP_10_12_PATH = [
   [4.5504, -74.15982], [4.551581, -74.159375], [4.552653, -74.159017], [4.553274, -74.158822],
 ];
 
-/** 4 Estaciones de TransMiCable con detalles de accesibilidad */
-export const TRANSMICABLE_STATIONS = [
-  {
-    id: 'tunal',
-    name: 'Portal Tunal',
-    coordinates: [4.56917, -74.13968],
-    tag: 'Estación troncal',
-    detail: 'Conexión con TransMilenio. El GTFS registra abordaje accesible; verifica las condiciones actuales con el operador.',
-    wheelchairBoarding: 1,
-  },
-  {
-    id: 'juan-pablo',
-    name: 'Juan Pablo II',
-    coordinates: [4.55578995, -74.1473999],
-    tag: 'Estación intermedia',
-    detail: 'Sector Juan Pablo II. El GTFS registra abordaje accesible; la condición actual debe confirmarse.',
-    wheelchairBoarding: 1,
-  },
-  {
-    id: 'manitas',
-    name: 'Manitas',
-    coordinates: [4.55028009, -74.15049744],
-    tag: 'Estación intermedia',
-    detail: 'Conexión con el sector de Manitas. El GTFS registra abordaje accesible.',
-    wheelchairBoarding: 1,
-  },
-  {
-    id: 'paraiso',
-    name: 'Mirador del Paraíso',
-    coordinates: [4.55009985, -74.1588974],
-    tag: 'Estación terminal',
-    detail: 'Terminal del TransMiCable de Ciudad Bolívar y enlace con servicios SITP.',
-    wheelchairBoarding: 1,
-  },
-];
+/**
+ * Las cuatro estaciones del TransMiCable ya no viven aquí.
+ *
+ * Estaban escritas a mano con identificadores inventados (`tunal`, `paraiso`) y
+ * un "accesible" sin fuente. Ahora salen del inventario del operador, con su
+ * identificador real (`num_est` 101-104) y la cantidad de elevadores que reporta
+ * cada estación. Ver `data/cableIndex.js`.
+ */
 
 export const ROUTES = {
   main: {

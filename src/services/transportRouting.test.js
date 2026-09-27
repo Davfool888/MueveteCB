@@ -125,7 +125,9 @@ test('reconoce una estación TransMiCable como candidato cable', () => {
     label: 'Cerca de Manitas',
   });
   assert.ok(station);
-  assert.equal(station.id, 'manitas');
+  // El identificador es el `num_est` del operador, no una etiqueta inventada.
+  assert.equal(station.id, '103');
+  assert.equal(station.name, 'Manitas');
 
   const plan = getTransportPlan({
     originLocation: {

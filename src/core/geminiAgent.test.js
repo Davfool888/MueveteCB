@@ -73,7 +73,7 @@ test('usa Gemini Interactions sin cambiar la ruta seleccionada', async () => {
 
 test('Gemini también puede responder un saludo sin una ruta', async () => {
   const response = await createChatResponse(
-    { message: 'Hola, ¿cómo me可以帮助 a moverme?' },
+    { message: 'Hola, ¿cómo me ayudas a moverme?' },
     {
       apiKey: 'test-secret',
       fetchImpl: async () => interactionResponse('Hola. Cuéntame de dónde sales y a dónde necesitas llegar.'),

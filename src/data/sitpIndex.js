@@ -18,8 +18,9 @@ export const SITP_ROUTE_DATA_VERSION = 'sitp-snapshot-2026-09-26-v1';
  * `stop_times`, así que ninguna hora de salida de aquí es un despacho real.
  */
 export const SITP_DATA_BOUNDARIES = Object.freeze([
-  'Los trazados y paraderos provienen del servicio oficial del SITP de Transmilenio. El punto de abordaje es el paradero más cercano al trazado dentro de 150 m: es una inferencia geográfica, no una matriz oficial de paradas por ruta.',
+  'Los trazados y paraderos provienen del servicio oficial del SITP de Transmilenio y cubren el Distrito Capital, no solo Ciudad Bolívar. El punto de abordaje es el paradero más cercano al trazado dentro de 150 m: es una inferencia geográfica, no una matriz oficial de paradas por ruta.',
   'Los horarios son ventanas de operación del operador, no despachos programados. No se puede afirmar una hora de llegada.',
+  'El extracto no marca en qué extremo del corredor arranca el bus, así que el sentido se publica tal como lo declara el operador.',
   'El extracto no distingue paraderos de ida y de vuelta, ni módulos con el mismo nombre.',
   'Una ruta marcada como rural opera en horarios de menor frecuencia y con paradas más espaciadas; verifica con el operador.',
 ]);
@@ -100,13 +101,8 @@ function freezeRoute(route) {
 function freezeStop(stop) {
   return Object.freeze({
     id: stop.id,
-    objectId: stop.objectId ?? null,
-    module: stop.module,
     name: stop.name,
     street: stop.street,
-    address: stop.address,
-    consoleText: stop.consoleText,
-    panelText: stop.panelText,
     zone: Object.freeze({ ...stop.zone }),
     locality: Object.freeze({ ...stop.locality }),
     latitude: stop.coordinates[0],

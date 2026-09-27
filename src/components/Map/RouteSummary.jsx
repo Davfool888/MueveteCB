@@ -19,20 +19,31 @@ const STEP_COLORS = {
 };
 
 const KIND_META = {
+  cable: { icon: '🚡', label: 'TransMiCable' },
   trunk: { icon: '🚍', label: 'Troncal' },
   sitp: { icon: '🚌', label: 'SITP' },
   veredal: { icon: '🚐', label: 'Van veredal' },
 };
 
-const SOURCE_META = {
-  trunk_stations_2026: { label: 'Inventario de estaciones · Transmilenio', verified: true },
-  trunk_corridors_2026: { label: 'Trazado troncal · Transmilenio', verified: true },
-  planner_estimate: { label: 'Estimación del planificador', verified: false },
-};
-
 function BoardingCell({ label, empty = '—' }) {
   if (!label) return <span className="boarding-empty">{empty}</span>;
   return <span className="boarding-name">{label}</span>;
+}
+
+/**
+ * Texto de la pestaña de una alternativa: dónde se aborda, dónde se termina y
+ * por qué se ofrece. Es la información con la que alguien decide sin abrir la
+ * opción, así que no puede quedarse solo en el título.
+ */
+function alternativeTitle(alternative) {
+  const parts = [];
+  if (alternative.boardAt) parts.push(`Abordas en ${alternative.boardAt}`);
+  if (alternative.alightAt) parts.push(`Terminas en ${alternative.alightAt}`);
+  if (Number.isFinite(alternative.totalDistanceKm)) {
+    parts.push(`${alternative.totalDistanceKm} km en total`);
+  }
+  if (alternative.matchReason) parts.push(alternative.matchReason);
+  return parts.length > 0 ? parts.join(' · ') : undefined;
 }
 
 function ItineraryBody({ itinerary }) {
@@ -162,7 +173,7 @@ export default function RouteSummary({
 
   // El tipo de itinerario es la única fuente de verdad de qué se está mostrando,
   // así la pestaña activa no puede desincronizarse del contenido.
-  const showOfficial = itinerary?.kind === 'official-sitp' || itinerary?.kind === 'official-trunk';
+  const showOfficial = itinerary?.kind !== 'planner';
 
   return (
     <article
@@ -201,36 +212,54 @@ export default function RouteSummary({
           );
         })}
 
-        {alternatives.length > 0 && (
+        {alternatives.length > 1 && (
           <span className="mode-pill-separator" aria-hidden="true">
-            Alternativas oficiales
+            {alternatives.length} formas de llegar
           </span>
         )}
 
-        {alternatives.map((alternative) => {
+        {alternatives.map((alternative, index) => {
           const isActive = activeAlternativeId === alternative.id;
+          const meta = KIND_META[alternative.kind] ?? { icon: '•', label: alternative.kind };
+          // Un separador entre medios, para que se lea "estas son de bus SITP y
+          // estas otras de troncal" y no una lista corrida de códigos.
+          const previous = alternatives[index - 1];
+          const startsGroup = !previous || previous.kind !== alternative.kind;
+
           return (
-            <button
-              key={alternative.id}
-              type="button"
-              className={`mode-pill mode-pill-official${isActive ? ' is-active' : ''}`}
-              onClick={() => onSelectAlternative && onSelectAlternative(alternative.id)}
-              aria-pressed={isActive ? 'true' : 'false'}
-              title={alternative.matchReason ?? undefined}
-              style={{
-                fontSize: '0.82rem',
-                padding: '5px 12px',
-                borderRadius: '20px',
-                border: '1.5px solid #1d5c86',
-                background: isActive ? '#1d5c86' : 'transparent',
-                color: isActive ? '#fff' : '#1d5c86',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.18s ease',
-              }}
-            >
-              {KIND_META[alternative.kind]?.icon} {KIND_META[alternative.kind]?.label} {alternative.routeCode}
-            </button>
+            <React.Fragment key={alternative.id}>
+              {startsGroup && (
+                <span className="mode-pill-group" aria-hidden="true">
+                  {meta.icon} {meta.label}
+                </span>
+              )}
+              <button
+                type="button"
+                className={`mode-pill mode-pill-official${isActive ? ' is-active' : ''}`}
+                onClick={() => onSelectAlternative && onSelectAlternative(alternative.id)}
+                aria-pressed={isActive ? 'true' : 'false'}
+                title={alternativeTitle(alternative)}
+                style={{
+                  fontSize: '0.82rem',
+                  padding: '5px 12px',
+                  borderRadius: '20px',
+                  border: '1.5px solid #1d5c86',
+                  background: isActive ? '#1d5c86' : 'transparent',
+                  color: isActive ? '#fff' : '#1d5c86',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.18s ease',
+                }}
+              >
+                {alternative.routeCode}
+                {Number.isFinite(alternative.estimatedMinutes) && (
+                  <span style={{ opacity: 0.75, fontWeight: 500 }}>
+                    {' '}
+                    {alternative.estimatedMinutes} min
+                  </span>
+                )}
+              </button>
+            </React.Fragment>
           );
         })}
       </div>

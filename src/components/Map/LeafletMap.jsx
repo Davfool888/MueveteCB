@@ -9,8 +9,8 @@ import {
   REPORT_LOCATIONS,
   REPORT_TYPE_LABELS,
   ROUTES,
-  TRANSMICABLE_STATIONS,
 } from '../../data/routes';
+import { CABLE_STATIONS } from '../../data/cableIndex';
 
 function createIcon(kind, label) {
   return L.divIcon({
@@ -123,8 +123,8 @@ function createSitpStopPopup(stop) {
   const source = document.createElement('div');
 
   title.textContent = `🚏 ${stop.name}`;
-  street.textContent = [stop.street, stop.address].filter(Boolean).join(' · ');
-  meta.textContent = `Cenefa ${stop.id} · Zona ${stop.zone.name}`;
+  street.textContent = stop.street ?? '';
+  meta.textContent = `Cenefa ${stop.id} · ${stop.locality?.name ?? 'Distrito'} · Zona ${stop.zone?.name ?? '—'}`;
   source.textContent = 'Paradero oficial · TRANSMILENIO S.A. (CC BY 4.0)';
   source.style.cssText = 'font-size:0.72rem;color:#6b7c7a;margin-top:6px;';
 
@@ -134,14 +134,27 @@ function createSitpStopPopup(stop) {
   return popup;
 }
 
+/**
+ * Umbral de zoom para dibujar los paraderos.
+ *
+ * Con 7.653 paraderos del Distrito, pintarlos todos de golpe satura el lienzo y
+ * ralentiza el mapa sin aportar nada: a escala de ciudad los puntos se pisan. A
+ * partir de este nivel el vecindario ya es legible.
+ */
+const STOPS_MIN_ZOOM = 13;
+
+/**
+ * Dibuja la capa oficial del SITP.
+ *
+ * `visibleRouteIds` en `null` significa "sin destino seleccionado": se pinta el
+ * catálogo completo. Con destino, la capa se reduce a los corredores A → B.
+ */
 function drawSitpOfficialLayers(sitpData, groups, options = {}) {
-  const { highlightRouteId = null, visibleRouteIds = null } = options;
+  const { highlightRouteId = null, visibleRouteIds = null, zoom = 13 } = options;
   groups.sitpRoutes.clearLayers();
   groups.sitpStops.clearLayers();
   if (!sitpData) return;
 
-  // `visibleRouteIds` en `null` significa "sin destino seleccionado": se pinta el
-  // catálogo completo. Con destino, la capa se reduce a los corredores A → B.
   const allowed = Array.isArray(visibleRouteIds) ? new Set(visibleRouteIds) : null;
   const routes = (sitpData.routes ?? []).filter((route) => !allowed || allowed.has(route.id));
 
@@ -160,6 +173,8 @@ function drawSitpOfficialLayers(sitpData, groups, options = {}) {
         .addTo(groups.sitpRoutes);
     }
   }
+
+  if (zoom < STOPS_MIN_ZOOM) return;
 
   for (const stop of sitpData.stops ?? []) {
     L.circleMarker([stop.latitude, stop.longitude], {
@@ -319,11 +334,11 @@ function drawTransportContext(plan, groups) {
   }
 
   if (plan.showCable || plan.legs?.some((leg) => leg.mode === 'cable')) {
-    TRANSMICABLE_STATIONS.forEach((station) => {
+    CABLE_STATIONS.forEach((station) => {
       const marker = L.marker(station.coordinates, {
         icon: createIcon('cable', '🚡'),
         keyboard: true,
-        title: station.name,
+        title: `${station.name} · ${station.accessLabel}`,
       });
       marker.bindPopup(createStopPopup({ ...station, source: 'transmilenio_2026' })).addTo(groups.cable);
     });
@@ -683,19 +698,29 @@ export default function LeafletMap({
   }, [transportPlan]);
 
   useEffect(() => {
+    const map = mapRef.current;
     const groups = layerGroupsRef.current;
-    if (!groups.sitpRoutes) return;
-    const wantsRoutes = Boolean(layers?.sitpRoutes);
-    const wantsStops = Boolean(layers?.sitpStops);
-    if (!wantsRoutes && !wantsStops) {
-      groups.sitpRoutes.clearLayers();
-      groups.sitpStops.clearLayers();
-      return;
-    }
-    drawSitpOfficialLayers(sitpData, groups, {
-      highlightRouteId: highlightRouteId ?? null,
-      visibleRouteIds: visibleSitpRouteIds,
-    });
+    if (!map) return undefined;
+
+    const redraw = () => {
+      const zoom = map.getZoom();
+      if (!layers?.sitpRoutes && !layers?.sitpStops) {
+        groups.sitpRoutes.clearLayers();
+        groups.sitpStops.clearLayers();
+        return;
+      }
+      drawSitpOfficialLayers(sitpData, groups, {
+        highlightRouteId: highlightRouteId ?? null,
+        visibleRouteIds: visibleSitpRouteIds,
+        zoom,
+      });
+    };
+
+    redraw();
+    map.on('zoomend', redraw);
+    return () => {
+      map.off('zoomend', redraw);
+    };
   }, [sitpData, layers?.sitpRoutes, layers?.sitpStops, highlightRouteId, visibleSitpRouteIds]);
 
   useEffect(() => {

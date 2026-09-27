@@ -35,13 +35,15 @@ export function useSitpData(enabled) {
     setState((previous) => ({ ...previous, status: 'loading', error: null }));
 
     Promise.all([
+      import('../services/cableService.js'),
       import('../services/sitpRoutesService.js'),
       import('../services/trunkService.js'),
       import('../services/alternativesService.js'),
       import('../data/sitpIndex.js'),
       import('../data/trunkIndex.js'),
+      import('../data/cableIndex.js'),
     ])
-      .then(([sitp, trunk, alternatives, sitpIndex, trunkIndex]) => {
+      .then(([cable, sitp, trunk, alternatives, sitpIndex, trunkIndex, cableIndex]) => {
         if (cancelled) return;
         setState({
           status: 'ready',
@@ -50,13 +52,16 @@ export function useSitpData(enabled) {
             stops: sitpIndex.SITP_STOPS,
             trunkStations: trunkIndex.TRUNK_STATIONS,
             trunkCorridors: trunkIndex.TRUNK_CORRIDORS,
+            cableStations: cableIndex.CABLE_STATIONS,
           },
           buildAlternative: sitp.buildOfficialSitpAlternative,
           findCorridors: sitp.findSitpCorridorOptions,
           buildAlternatives: (input) =>
             alternatives.buildAlternatives({
               ...input,
-              buildTroncal: trunk.buildTroncalAlternative,
+              buildCable: cable.buildCableAlternative,
+              listTrunk: (args) => trunk.listTroncalAlternatives(args),
+              listSitp: (args) => sitp.listSitpAlternatives(args),
             }),
           error: null,
         });

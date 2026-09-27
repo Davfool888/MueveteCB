@@ -1,4 +1,6 @@
-import { CABLE_PATH, INFORMAL_PATHS } from './routes.js';
+import { CABLE_LINE_PATH, CABLE_STATIONS } from './cableIndex.js';
+import { INFORMAL_PATHS } from './routes.js';
+import { sliceCorridorPath } from '../services/corridorPath.js';
 
 function joinPaths(...paths) {
   const points = paths.flat();
@@ -58,10 +60,26 @@ const sierraToManitas = [
   INFORMAL_PATHS[3].coordinates.at(-1),
 ];
 
-// CABLE_PATH is ordered from Portal Tunal to Mirador del Paraíso. Quiba and
-// Sierra already arrive at Manitas, so their continuation must leave from
-// Manitas toward the useful exit instead of starting at the other terminal.
-const manitasToPortalTunal = CABLE_PATH.slice(0, 3).reverse();
+/**
+ * Tramo de la línea entre Manitas y Tunal.
+ *
+ * La línea viene del inventario del operador como una polilínea de tres tramos,
+ * no como una lista de estaciones. Antes esto se resolvía con
+ * `CABLE_PATH.slice(0, 3).reverse()`, que solo funcionaba porque la ruta escrita
+ * a mano tenía exactamente cuatro puntos. Ahora se recorta sobre la geometría
+ * real entre las dos estaciones, así que si el trazado cambia el tramo se ajusta
+ * solo.
+ */
+const manitasToPortalTunal = (() => {
+  const manitas = CABLE_STATIONS.find((station) => station.id === '103');
+  const tunal = CABLE_STATIONS.find((station) => station.id === '101');
+  const slice = sliceCorridorPath(
+    [CABLE_LINE_PATH],
+    manitas?.coordinates ?? [4.55028009, -74.15049744],
+    tunal?.coordinates ?? [4.56917, -74.13968],
+  );
+  return slice ? slice.path : [];
+})();
 
 export const VEREDAL_ROUTES = [
   {
@@ -85,7 +103,8 @@ export const VEREDAL_ROUTES = [
       createStop('paraiso-transfer', 'Mirador del Paraíso · integración', mochueloIntegration.coordinates, 'integration'),
     ],
     route: mochueloToParaiso,
-    continuation: CABLE_PATH.slice().reverse(),
+    // Del Paraíso hacia Tunal: la línea completa recorrida al revés.
+    continuation: CABLE_LINE_PATH.slice().reverse(),
     simulated: true,
     geometrySource: 'handcrafted_veredal_fixture',
     sourceNote: 'Recorrido aproximado de prototipo; no representa un servicio oficial verificado.',

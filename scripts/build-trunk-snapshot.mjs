@@ -34,13 +34,13 @@ const CORRIDORS_SOURCE_URL =
   'https://gis.transmilenio.gov.co/arcgis/rest/services/ConsultaSubgerenciaPlanificacionSITP/Consulta_Planificacion_SITP/FeatureServer/5';
 
 /**
- * Se recorta a Ciudad Bolívar con un margen de 2,5 km. Fuera de esa ventana el
- * mapa no muestra nada (`maxBounds`) y las estaciones lejanas no sirven como
- * alternativa para un viaje dentro de la localidad.
+ * No se recorta a Ciudad Bolívar: la red troncal es de toda la ciudad y una
+ * estación del norte o del sur es tan válida como una del centro para un viaje
+ * que empieza fuera de la localidad.
  */
-const CLIP_BOUNDS = { south: 4.39, west: -74.25, north: 4.64, east: -74.09 };
+const CLIP_BOUNDS = { south: 4.3, west: -74.35, north: 4.75, east: -74.0 };
 
-const SIMPLIFY_TOLERANCE = 0.0002;
+const SIMPLIFY_TOLERANCE = 0.0004;
 
 /** Diccionario oficial: tipo de estación troncal. */
 const STATION_TYPE_BY_CODE = {

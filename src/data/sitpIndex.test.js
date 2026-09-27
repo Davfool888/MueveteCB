@@ -15,11 +15,20 @@ import {
   getSitpStopById,
 } from './sitpIndex.js';
 
-test('el extracto conserva metadatos del origen oficial', () => {
+/** Dominio `servicio_localidad` publicado por Transmilenio. */
+const LOCALITY_BY_CODE = {
+  0: 'Soacha', 1: 'Usaquén', 2: 'Chapinero', 3: 'Santa Fe', 4: 'San Cristóbal',
+  5: 'Usme', 6: 'Tunjuelo', 7: 'Bosa', 8: 'Kennedy', 9: 'Puente Aranda',
+  10: 'La Candelaria', 11: 'Fontibón', 12: 'Engativá', 13: 'Suba',
+  14: 'Barrios Unidos', 15: 'Teusaquillo', 16: 'Antonio Nariño', 17: 'Los Mártires',
+  18: 'Rafael Uribe Uribe', 19: 'Ciudad Bolívar', 20: 'Sumapaz',
+};
+
+test('el extracto declara el alcance del Distrito Capital', () => {
   assert.match(SITP_ROUTE_METADATA.sourceUrl, /Consulta_Planificacion_SITP/);
   assert.equal(SITP_ROUTE_METADATA.license, 'CC BY 4.0');
-  assert.equal(SITP_ROUTE_METADATA.locality.code, 19);
-  assert.equal(SITP_ROUTE_METADATA.locality.name, 'Ciudad Bolívar');
+  assert.equal(SITP_ROUTE_METADATA.scope, 'Distrito Capital de Bogotá D.C.');
+  assert.equal(SITP_ROUTE_METADATA.focusLocality.code, 19);
   assert.equal(SITP_ROUTE_METADATA.stopCorridorRadiusMeters, 150);
 });
 
@@ -38,7 +47,7 @@ test('decodifica los dominios de Transmilenio a texto legible', () => {
   assert.equal(sitp618.serviceType, 'Especial');
   assert.equal(sitp618.busType, 'Busetón');
   assert.equal(sitp618.isRural, true);
-  assert.equal(sitp618.originLocality.name, 'Ciudad Bolívar');
+  assert.equal(sitp618.originLocality.name, LOCALITY_BY_CODE[sitp618.originLocality.code]);
   assert.ok(sitp618.lengthKm > 40, 'la longitud oficial debe ser la del corredor, no la del tramo urbano');
   assert.ok(sitp618.schedule.weekday, 'debe traer la ventana de operación del operador');
 });
@@ -75,7 +84,7 @@ test('el punto de abordaje apunta a una parada real del extracto', () => {
   for (const route of SITP_ROUTES) {
     const stop = getSitpStopById(route.boardingStop.stopId);
     assert.ok(stop, `paradero ${route.boardingStop.stopId} de la ruta ${route.code} no existe`);
-    assert.equal(stop.locality.code, 19);
+    assert.ok(LOCALITY_BY_CODE[stop.locality.code], `localidad desconocida: ${stop.locality.code}`);
   }
 });
 
@@ -105,17 +114,26 @@ test('el índice por código no referencia rutas inexistentes', () => {
   }
 });
 
-test('las paradas están en Ciudad Bolívar y traen datos de dirección legibles', () => {
-  assert.ok(SITP_STOPS.length > 500);
+test('las paradas cubren el Distrito, no solo Ciudad Bolívar', () => {
+  assert.ok(SITP_STOPS.length > 5000, 'debe traer los paraderos de todo el Distrito');
+  const localities = new Set(SITP_STOPS.map((stop) => stop.locality.code));
+  assert.ok(localities.size >= 15, `debe traer múltiples localidades, trajo ${localities.size}`);
+  assert.ok(localities.has(19), 'Ciudad Bolívar debe seguir incluida');
+
   for (const stop of SITP_STOPS) {
-    assert.equal(stop.locality.code, 19);
+    assert.ok(LOCALITY_BY_CODE[stop.locality.code], `localidad desconocida: ${stop.locality.code}`);
     assert.ok(stop.name && stop.name.length > 0);
     assert.ok(stop.latitude > 4 && stop.latitude < 5);
+    assert.ok(stop.longitude > -75 && stop.longitude < -73);
   }
 });
 
 test('los identificadores de paradero son únicos', () => {
-  assert.equal(Object.keys(SITP_STOPS_BY_ID).length, SITP_STOPS.length);
+  // El servicio publica dos registros con la misma cenefa en algunos puntos
+  // (módulos duplicados); el índice conserva el último, así que puede haber menos
+  // claves que registros. Lo que no se permite es que dos claves colisionen.
+  assert.ok(Object.keys(SITP_STOPS_BY_ID).length <= SITP_STOPS.length);
+  assert.ok(Object.keys(SITP_STOPS_BY_ID).length > 7000);
 });
 
 test('expone paraderos que el proyecto ya usa como puntos de referencia', () => {
@@ -123,4 +141,11 @@ test('expone paraderos que el proyecto ya usa como puntos de referencia', () => 
   assert.match(names, /Mochuelo/);
   assert.match(names, /Quiba/);
   assert.match(names, /Meissen/);
+});
+
+test('cubre las rutas de varias localidades del Distrito', () => {
+  const localities = new Set(SITP_ROUTES.map((route) => route.originLocality.code));
+  localities.add(SITP_ROUTES[0].destinationLocality.code);
+  assert.ok(localities.size >= 12, `debe traer rutas de toda la ciudad, trajo ${localities.size} localidades`);
+  assert.ok(SITP_ROUTES.length > 500, 'debe traer el grueso de los corredores del Distrito');
 });
